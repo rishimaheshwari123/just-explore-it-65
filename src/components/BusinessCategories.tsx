@@ -1,17 +1,17 @@
 import { Button } from "@/components/ui/button";
-import { 
-  UtensilsCrossed, 
-  Building2, 
-  Trophy, 
-  Home, 
-  GraduationCap, 
-  Hospital, 
-  ShoppingBag, 
-  Car, 
+import {
+  UtensilsCrossed,
+  Building2,
+  Trophy,
+  Home,
+  GraduationCap,
+  Hospital,
+  ShoppingBag,
+  Car,
   Scissors,
   Dumbbell,
   Camera,
-  Wrench
+  Wrench,
 } from "lucide-react";
 
 const BusinessCategories = () => {
@@ -27,12 +27,15 @@ const BusinessCategories = () => {
     { name: "Fitness", icon: Dumbbell, color: "text-yellow-600" },
     { name: "Shopping", icon: ShoppingBag, color: "text-indigo-500" },
     { name: "Photography", icon: Camera, color: "text-cyan-500" },
-    { name: "Repair Services", icon: Wrench, color: "text-amber-600" }
+    { name: "Repair Services", icon: Wrench, color: "text-amber-600" },
   ];
 
   return (
     <section className="py-12 bg-background">
       <div className="container mx-auto px-4">
+        <h2 className="text-3xl text-center md:text-4xl font-bold text-foreground mb-4">
+          Our Categories
+        </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {categories.map((category, index) => {
             const IconComponent = category.icon;
@@ -43,12 +46,14 @@ const BusinessCategories = () => {
                 className="h-24 flex flex-col items-center justify-center space-y-2 hover:scale-105 transition-transform duration-200"
               >
                 <IconComponent className={`h-8 w-8 ${category.color}`} />
-                <span className="text-sm font-medium text-center">{category.name}</span>
+                <span className="text-sm font-medium text-center">
+                  {category.name}
+                </span>
               </Button>
             );
           })}
         </div>
-        
+
         {/* Duplicate row for visual effect */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-4">
           {categories.slice(0, 9).map((category, index) => {
@@ -60,7 +65,9 @@ const BusinessCategories = () => {
                 className="h-24 flex flex-col items-center justify-center space-y-2 hover:scale-105 transition-transform duration-200"
               >
                 <IconComponent className={`h-8 w-8 ${category.color}`} />
-                <span className="text-sm font-medium text-center">{category.name}</span>
+                <span className="text-sm font-medium text-center">
+                  {category.name}
+                </span>
               </Button>
             );
           })}

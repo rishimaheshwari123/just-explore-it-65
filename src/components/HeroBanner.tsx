@@ -5,25 +5,26 @@ import heroBanner from "@/assets/hero-banner.jpg";
 
 const HeroBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  
+
   const slides = [
     {
       title: "Rough it with rock rider",
       subtitle: "Adventure awaits you",
       image: heroBanner,
-      gradient: "from-accent/80 to-primary/80"
+      gradient: "from-accent/80 to-primary/80",
     },
     {
       title: "Scoti Cycle RC Pro DP263-4",
       subtitle: "2 Hydrelic Break",
-      description: "It is Scoti's first best-selling model with 14,220 build throughout its production run.",
+      description:
+        "It is Scoti's first best-selling model with 14,220 build throughout its production run.",
       specs: {
         class: "Mountain",
-        year: "2020"
+        year: "2020",
       },
       image: heroBanner,
-      gradient: "from-primary/80 to-secondary/80"
-    }
+      gradient: "from-primary/80 to-secondary/80",
+    },
   ];
 
   useEffect(() => {
@@ -55,8 +56,10 @@ const HeroBanner = () => {
               className="h-full bg-cover bg-center relative"
               style={{ backgroundImage: `url(${slide.image})` }}
             >
-              <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient}`} />
-              
+              <div
+                className={`absolute inset-0 bg-gradient-to-r ${slide.gradient}`}
+              />
+
               <div className="relative h-full flex items-center">
                 <div className="container mx-auto px-4">
                   <div className="max-w-2xl text-background">
@@ -74,16 +77,26 @@ const HeroBanner = () => {
                     {slide.specs && (
                       <div className="flex gap-6 mb-6">
                         <div>
-                          <span className="block text-sm opacity-70">Class</span>
-                          <span className="text-lg font-semibold">{slide.specs.class}</span>
+                          <span className="block text-sm opacity-70">
+                            Class
+                          </span>
+                          <span className="text-lg font-semibold">
+                            {slide.specs.class}
+                          </span>
                         </div>
                         <div>
                           <span className="block text-sm opacity-70">Year</span>
-                          <span className="text-lg font-semibold">{slide.specs.year}</span>
+                          <span className="text-lg font-semibold">
+                            {slide.specs.year}
+                          </span>
                         </div>
                       </div>
                     )}
-                    <Button variant="hero" size="lg" className="bg-background text-primary hover:bg-background/90">
+                    <Button
+                      variant="hero"
+                      size="lg"
+                      className="bg-background text-white hover:bg-background/90"
+                    >
                       Explore Now
                     </Button>
                   </div>
