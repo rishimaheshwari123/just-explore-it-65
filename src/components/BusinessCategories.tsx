@@ -33,20 +33,25 @@ const BusinessCategories = () => {
   return (
     <section className="py-12 bg-background">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl text-center md:text-4xl font-bold text-foreground mb-4">
+        <h2 className="text-3xl text-center md:text-4xl font-bold text-foreground mb-6">
           Our Categories
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+
+        {/* First row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
           {categories.map((category, index) => {
             const IconComponent = category.icon;
             return (
               <Button
                 key={index}
                 variant="category"
-                className="h-24 flex flex-col items-center justify-center space-y-2 hover:scale-105 transition-transform duration-200"
+                className="flex flex-col items-center justify-center 
+                           space-y-3 p-16 
+                           hover:scale-105 transition-transform duration-200 
+                           [&_svg]:!size-12 md:[&_svg]:!size-14"
               >
-                <IconComponent className={`h-8 w-8 ${category.color}`} />
-                <span className="text-sm font-medium text-center">
+                <IconComponent className={category.color} />
+                <span className="text-sm md:text-base font-medium text-center">
                   {category.name}
                 </span>
               </Button>
@@ -54,18 +59,21 @@ const BusinessCategories = () => {
           })}
         </div>
 
-        {/* Duplicate row for visual effect */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-4">
+        {/* Duplicate row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mt-6">
           {categories.slice(0, 9).map((category, index) => {
             const IconComponent = category.icon;
             return (
               <Button
                 key={`duplicate-${index}`}
                 variant="category"
-                className="h-24 flex flex-col items-center justify-center space-y-2 hover:scale-105 transition-transform duration-200"
+                className="flex flex-col items-center justify-center 
+                           space-y-3 p-16
+                           hover:scale-105 transition-transform duration-200 
+                           [&_svg]:!size-12 md:[&_svg]:!size-14"
               >
-                <IconComponent className={`h-8 w-8 ${category.color}`} />
-                <span className="text-sm font-medium text-center">
+                <IconComponent className={category.color} />
+                <span className="text-sm md:text-base font-medium text-center">
                   {category.name}
                 </span>
               </Button>

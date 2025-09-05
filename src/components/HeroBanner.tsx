@@ -8,22 +8,22 @@ const HeroBanner = () => {
 
   const slides = [
     {
-      title: "Rough it with rock rider",
-      subtitle: "Adventure awaits you",
+      title: "Find What You’re Looking For",
+      subtitle: "Explore thousands of listings in one place",
       image: heroBanner,
-      gradient: "from-accent/80 to-primary/80",
+      gradient: "from-black/70 to-black/40",
     },
     {
-      title: "Scoti Cycle RC Pro DP263-4",
-      subtitle: "2 Hydrelic Break",
+      title: "Buy • Sell • Rent",
+      subtitle: "The easiest way to list and discover products & services",
       description:
-        "It is Scoti's first best-selling model with 14,220 build throughout its production run.",
+        "Browse verified listings across multiple categories and connect instantly.",
       specs: {
-        class: "Mountain",
-        year: "2020",
+        class: "Trusted Platform",
+        year: "Since 2024",
       },
       image: heroBanner,
-      gradient: "from-primary/80 to-secondary/80",
+      gradient: "from-black/70 to-black/40",
     },
   ];
 
@@ -43,12 +43,12 @@ const HeroBanner = () => {
   };
 
   return (
-    <section className="relative h-96 md:h-[500px] overflow-hidden bg-gradient-to-r from-primary/10 to-secondary/10">
+    <section className="relative h-[450px] md:h-[550px] overflow-hidden">
       <div className="relative h-full">
         {slides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-500 ${
+            className={`absolute inset-0 transition-opacity duration-700 ${
               index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
           >
@@ -61,43 +61,40 @@ const HeroBanner = () => {
               />
 
               <div className="relative h-full flex items-center">
-                <div className="container mx-auto px-4">
-                  <div className="max-w-2xl text-background">
-                    <h2 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
+                <div className="container mx-auto px-6">
+                  <div className="max-w-2xl text-white drop-shadow-lg">
+                    <h2 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">
                       {slide.title}
                     </h2>
-                    <p className="text-xl md:text-2xl mb-6 opacity-90">
+                    <p className="text-lg md:text-2xl mb-6 opacity-95">
                       {slide.subtitle}
                     </p>
                     {slide.description && (
-                      <p className="text-base md:text-lg mb-6 opacity-80">
+                      <p className="text-base md:text-lg mb-6 opacity-90">
                         {slide.description}
                       </p>
                     )}
                     {slide.specs && (
-                      <div className="flex gap-6 mb-6">
+                      <div className="flex gap-8 mb-6 text-sm md:text-base">
                         <div>
-                          <span className="block text-sm opacity-70">
-                            Class
-                          </span>
-                          <span className="text-lg font-semibold">
+                          <span className="block opacity-70">Category</span>
+                          <span className="font-semibold">
                             {slide.specs.class}
                           </span>
                         </div>
                         <div>
-                          <span className="block text-sm opacity-70">Year</span>
-                          <span className="text-lg font-semibold">
+                          <span className="block opacity-70">Active Since</span>
+                          <span className="font-semibold">
                             {slide.specs.year}
                           </span>
                         </div>
                       </div>
                     )}
                     <Button
-                      variant="hero"
                       size="lg"
-                      className="bg-background text-white hover:bg-background/90"
+                      className="bg-primary text-white font-semibold rounded-xl px-6 py-3 shadow-md hover:bg-primary/90"
                     >
-                      Explore Now
+                      Start Exploring
                     </Button>
                   </div>
                 </div>
@@ -112,27 +109,27 @@ const HeroBanner = () => {
         variant="ghost"
         size="icon"
         onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-background/20 text-background hover:bg-background/30"
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white hover:bg-black/60"
       >
-        <ChevronLeft className="h-6 w-6" />
+        <ChevronLeft className="h-7 w-7" />
       </Button>
       <Button
         variant="ghost"
         size="icon"
         onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-background/20 text-background hover:bg-background/30"
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white hover:bg-black/60"
       >
-        <ChevronRight className="h-6 w-6" />
+        <ChevronRight className="h-7 w-7" />
       </Button>
 
       {/* Dots Indicator */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex space-x-2">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
-            className={`w-3 h-3 rounded-full transition-colors ${
-              index === currentSlide ? "bg-background" : "bg-background/50"
+            className={`w-3.5 h-3.5 rounded-full transition-all ${
+              index === currentSlide ? "bg-white scale-110" : "bg-white/50"
             }`}
           />
         ))}

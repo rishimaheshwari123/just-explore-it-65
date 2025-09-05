@@ -7,6 +7,7 @@ import CustomerReviews from "@/components/CustomerReviews";
 import PopularSearches from "@/components/PopularSearches";
 import AppPromotion from "@/components/AppPromotion";
 import Footer from "@/components/Footer";
+import ConnectSection from "@/components/ConnectSection";
 
 const Index = () => {
   return (
@@ -16,6 +17,7 @@ const Index = () => {
       <HeroBanner />
       <BusinessCategories />
       <FeaturedBusinesses />
+      <ConnectSection />
       <CustomerReviews />
       <PopularSearches />
       <AppPromotion />

@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import {
-  Bell,
   Menu,
   X,
   Facebook,
   Instagram,
   Linkedin,
   Twitch,
+  Phone,
 } from "lucide-react";
 
 const Header = () => {
@@ -58,7 +58,13 @@ const Header = () => {
           </nav>
 
           {/* Right Section */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-6">
+            {/* Call Number */}
+            <div className="hidden md:flex items-center space-x-2 text-purple-600 font-semibold">
+              <Phone className="h-5 w-5" />
+              <span>+91 98765 43210</span>
+            </div>
+
             {/* Hamburger menu - Mobile only */}
             <div className="md:hidden">
               <button
@@ -69,10 +75,7 @@ const Header = () => {
               </button>
             </div>
 
-            {/* Desktop buttons */}
-            <button className="hidden md:block text-gray-600 hover:text-purple-600 p-2 rounded-full transition-colors">
-              <Bell className="h-6 w-6" />
-            </button>
+            {/* Desktop Login Button */}
             <button className="hidden md:block px-4 py-2 rounded-full text-purple-600 border border-purple-600 hover:bg-purple-600 hover:text-white transition-colors font-semibold">
               Login / Signup
             </button>
@@ -115,15 +118,23 @@ const Header = () => {
           >
             Free Business Listing
           </a>
+
+          {/* Call Number - Mobile */}
+          <div className="flex items-center space-x-2 text-purple-600 font-semibold mt-4">
+            <Phone className="h-5 w-5" />
+            <span>+91 98765 43210</span>
+          </div>
+
           <button className="mt-6 w-full px-4 py-2 rounded-full text-white bg-purple-600 hover:bg-purple-700 transition-colors font-semibold">
             Login / Signup
           </button>
+
           {/* Social media icons */}
           <div className="mt-6 pt-4 border-t border-gray-200">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-500">
               Connect With Us
             </h3>
-            <div className="flex justify-center  space-x-4 mt-5">
+            <div className="flex justify-center space-x-4 mt-5">
               <a
                 href="#"
                 className="text-gray-600 hover:text-purple-600 transition-colors"
