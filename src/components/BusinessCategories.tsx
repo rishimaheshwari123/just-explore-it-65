@@ -48,7 +48,7 @@ const BusinessCategories = () => {
                 className="flex flex-col items-center justify-center 
                            space-y-3 p-16 
                            hover:scale-105 transition-transform duration-200 
-                           [&_svg]:!size-12 md:[&_svg]:!size-14"
+                           [&_svg]:!size-7 md:[&_svg]:!size-9"
               >
                 <IconComponent className={category.color} />
                 <span className="text-sm md:text-base font-medium text-center">
@@ -70,7 +70,7 @@ const BusinessCategories = () => {
                 className="flex flex-col items-center justify-center 
                            space-y-3 p-16
                            hover:scale-105 transition-transform duration-200 
-                           [&_svg]:!size-12 md:[&_svg]:!size-14"
+                           [&_svg]:!size-7 md:[&_svg]:!size-9"
               >
                 <IconComponent className={category.color} />
                 <span className="text-sm md:text-base font-medium text-center">
