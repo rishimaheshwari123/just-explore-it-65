@@ -1,70 +1,91 @@
 const Property = require('../models/propertyModel');
-const { uploadImageToCloudinary } = require("../config/imageUploader");
 
-const createPropertyCtrl = async (req, res) => {
+const updatePropertyCtrl = async (req, res) => {
     try {
-        const {
-            title,
-            price,
-            location,
-            type,
-            bedrooms,
-            bathrooms,
-            area,
-            description,
-            vendor,
-            images,
-            floors,
-            parking,
-            furnished,
-            plotType
-        } = req.body;
-        const imagesArray = JSON.parse(images);
+        const { id } = req.params;
+        const { title, location, category, description, vendor, images } = req.body;
 
-        if (
-            !title ||
-            !price ||
-            !location ||
-            !type ||
+        let imagesArray = [];
+        if (images) {
+            try {
+                imagesArray = JSON.parse(images); // if coming as string
+            } catch {
+                imagesArray = images; // if already array
+            }
+        }
 
-            !description ||
-            !imagesArray ||
-            !vendor
-        ) {
-            return res.status(400).json({
+        // Find property
+        const property = await Property.findById(id);
+        if (!property) {
+            return res.status(404).json({
                 success: false,
-                message: 'Please provide all fields',
+                message: "Property not found",
             });
         }
 
+        // Update fields
+        property.title = title || property.title;
+        property.location = location || property.location;
+        property.category = category || property.category;
+        property.description = description || property.description;
+        property.images = imagesArray.length ? imagesArray : property.images;
+        property.vendor = vendor || property.vendor;
+
+        await property.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Property updated successfully!",
+            property,
+        });
+    } catch (error) {
+        console.error("Error updating property:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Error in updating property API!",
+        });
+    }
+};
+
+const createPropertyCtrl = async (req, res) => {
+    try {
+        const { title, location, category, description, vendor, images } = req.body;
+
+        let imagesArray = [];
+        if (images) {
+            try {
+                imagesArray = JSON.parse(images); // if coming as string
+            } catch {
+                imagesArray = images; // if already array
+            }
+        }
+
+        if (!title || !location || !category || !description || !imagesArray.length || !vendor) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide all required fields",
+            });
+        }
 
         const property = await Property.create({
             title,
-            price,
             location,
-            type,
-            bedrooms,
-            bathrooms,
-            area,
+            category,
             description,
             images: imagesArray,
             vendor,
-            floors,
-            parking,
-            furnished,
-            plotType
         });
 
         return res.status(201).json({
             success: true,
-            message: 'Property Created Successfully!',
+            message: "Property created successfully!",
             property,
         });
     } catch (error) {
-        console.error('Error creating property:', error);
+        console.error("Error creating property:", error);
         return res.status(500).json({
             success: false,
-            message: 'Error in creating property API!',
+            message: "Error in creating property API!",
         });
     }
 };
@@ -91,68 +112,6 @@ const getPropertiesByVendor = async (req, res) => {
 };
 
 
-const updatePropertyCtrl = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const {
-            title,
-            price,
-            location,
-            type,
-            bedrooms,
-            bathrooms,
-            area,
-            description,
-            vendor,
-            images,
-            floors,
-            parking,
-            furnished,
-            plotType
-        } = req.body;
-        const imagesArray = JSON.parse(images);
-        // Find property
-        const property = await Property.findById(id);
-        if (!property) {
-            return res.status(404).json({
-                success: false,
-                message: 'Property not found',
-            });
-        }
-
-
-        // Update fields
-        property.title = title || property.title;
-        property.price = price || property.price;
-        property.location = location || property.location;
-        property.type = type || property.type;
-        property.bedrooms = bedrooms || property.bedrooms;
-        property.bathrooms = bathrooms || property.bathrooms;
-        property.area = area || property.area;
-        property.description = description || property.description;
-        property.images = imagesArray || property.images;
-        property.vendor = vendor || property.vendor;
-        property.floors = floors || property.floors;
-        property.parking = parking || property.parking;
-        property.furnished = furnished || property.furnished;
-        property.plotType = plotType || property.plotType;
-
-        await property.save();
-
-        return res.status(200).json({
-            success: true,
-            message: 'Property updated successfully!',
-            property,
-        });
-
-    } catch (error) {
-        console.error('Error updating property:', error);
-        return res.status(500).json({
-            success: false,
-            message: 'Error in updating property API!',
-        });
-    }
-};
 
 
 const getPropertiesCtrl = async (req, res) => {

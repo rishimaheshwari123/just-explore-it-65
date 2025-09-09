@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const registerCtrl = async (req, res) => {
   try {
     const {
-      name, email, password, isvendor, isProperties, isInquiry, isBlog, isAppicatoin, isJob, type
+      name, email, password,
     } = req.body;
 
     if (!name || !email || !password) {
@@ -29,7 +29,7 @@ const registerCtrl = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await authModel.create({
-      name, email, password: hashedPassword, isvendor, isProperties, isInquiry, isBlog, isAppicatoin, isJob, type
+      name, email, password: hashedPassword,
     });
 
     const token = jwt.sign(

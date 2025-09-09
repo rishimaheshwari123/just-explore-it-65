@@ -4,32 +4,48 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { login } from "../service/operations/auth";
 import { HiEye, HiEyeOff } from "react-icons/hi";
+import { signup } from "../service/operations/auth";
 
-const AdminLogin = () => {
+const AdminSignup = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password, dispatch);
+    const formData = { name, email, password };
+    const result = await signup(formData);
+    if (result?.success) {
+      navigate("/login");
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-200 px-4">
       <Card className="w-full max-w-md shadow-lg rounded-lg">
         <CardHeader className="text-center py-6">
-          <CardTitle className="text-3xl font-bold"> Login</CardTitle>
-          <p className="text-gray-600 mt-2">Sign in to your panel</p>
+          <CardTitle className="text-3xl font-bold">Register</CardTitle>
+          <p className="text-gray-600 mt-2">Create your account</p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-6">
-            {/* Email Field */}
+          <form onSubmit={handleSignup} className="space-y-6">
+            {/* Name */}
+            <div className="space-y-1">
+              <Label htmlFor="name">Name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Email */}
             <div className="space-y-1">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -42,7 +58,7 @@ const AdminLogin = () => {
               />
             </div>
 
-            {/* Password Field with Show/Hide */}
+            {/* Password with show/hide */}
             <div className="space-y-1 relative">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
@@ -53,7 +69,7 @@ const AdminLogin = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="pr-10" // space for icon inside input
+                  className="pr-10"
                 />
                 <span
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500 hover:text-gray-700"
@@ -63,15 +79,15 @@ const AdminLogin = () => {
                 </span>
               </div>
             </div>
+
+            {/* Already have account */}
             <div className="flex items-center justify-between mt-4">
-              <p className="text-sm text-gray-600">
-                If not have account please register
-              </p>
+              <p className="text-sm text-gray-600">Already have an account?</p>
               <Link
-                to="/register"
+                to="/login"
                 className="text-sm font-semibold text-blue-600 hover:underline"
               >
-                Register
+                Login
               </Link>
             </div>
 
@@ -79,7 +95,7 @@ const AdminLogin = () => {
               type="submit"
               className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-semibold hover:from-yellow-600 hover:to-yellow-700 transition"
             >
-              Login
+              Register
             </Button>
           </form>
         </CardContent>
@@ -88,4 +104,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default AdminSignup;

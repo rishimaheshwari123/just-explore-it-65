@@ -8,6 +8,7 @@ import {
   Twitch,
   Phone,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -76,9 +77,12 @@ const Header = () => {
             </div>
 
             {/* Desktop Login Button */}
-            <button className="hidden md:block px-4 py-2 rounded-full text-purple-600 border border-purple-600 hover:bg-purple-600 hover:text-white transition-colors font-semibold">
+            <Link
+              to={"/login"}
+              className="hidden md:block px-4 py-2 rounded-full text-purple-600 border border-purple-600 hover:bg-purple-600 hover:text-white transition-colors font-semibold"
+            >
               Login / Signup
-            </button>
+            </Link>
           </div>
         </div>
       </div>
