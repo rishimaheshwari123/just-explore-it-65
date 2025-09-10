@@ -16,6 +16,9 @@ import { useSelector } from "react-redux";
 import VendorRegister from "./pages/VendorRegister";
 import VendorLogin from "./pages/VendorLogin";
 import VendorManagement from "./pages/admin/VendorManagement";
+import VendorLayout from "./pages/vendor/VendorLayout";
+import VendorDashboard from "./pages/vendor/VendorDashboard";
+import VendorAddProperty from "./pages/vendor/VendorAddProperty";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +90,33 @@ const App = () => {
                   element={
                     <PrivateRoute>
                       <VendorManagement />
+                    </PrivateRoute>
+                  }
+                />
+              </Route>
+            )}
+            {user?.role === "vendor" && (
+              <Route
+                path="/vendor"
+                element={
+                  <PrivateRoute>
+                    <VendorLayout />
+                  </PrivateRoute>
+                }
+              >
+                <Route
+                  path="dashboard"
+                  element={
+                    <PrivateRoute>
+                      <VendorDashboard />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="add-property"
+                  element={
+                    <PrivateRoute>
+                      <VendorAddProperty />
                     </PrivateRoute>
                   }
                 />
