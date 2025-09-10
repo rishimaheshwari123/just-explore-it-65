@@ -8,10 +8,12 @@ import PopularSearches from "@/components/PopularSearches";
 import AppPromotion from "@/components/AppPromotion";
 import Footer from "@/components/Footer";
 import ConnectSection from "@/components/ConnectSection";
+import TopBar from "@/components/TopBar";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <TopBar />
       <Header />
       <HeroBanner />
       <SearchSection />

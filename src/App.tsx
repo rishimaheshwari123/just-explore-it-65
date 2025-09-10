@@ -13,6 +13,9 @@ import Dashboard from "./pages/admin/Dashboard";
 import Layout from "./pages/admin/Layout";
 import { RootState } from "./redux/store";
 import { useSelector } from "react-redux";
+import VendorRegister from "./pages/VendorRegister";
+import VendorLogin from "./pages/VendorLogin";
+import VendorManagement from "./pages/admin/VendorManagement";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +47,22 @@ const App = () => {
                 </OpenRoute>
               }
             />
+            <Route
+              path="/vendor/register"
+              element={
+                <OpenRoute>
+                  <VendorRegister />
+                </OpenRoute>
+              }
+            />
+            <Route
+              path="/vendor/login"
+              element={
+                <OpenRoute>
+                  <VendorLogin />
+                </OpenRoute>
+              }
+            />
 
             {/* ✅ Admin Routes (only if role = admin) */}
             {user?.role === "admin" && (
@@ -60,6 +79,14 @@ const App = () => {
                   element={
                     <PrivateRoute>
                       <Dashboard />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="vendors"
+                  element={
+                    <PrivateRoute>
+                      <VendorManagement />
                     </PrivateRoute>
                   }
                 />

@@ -84,19 +84,9 @@ const Sidebar = () => {
           { to: "/admin/dashboard", icon: <FcBullish />, label: "Dashboard" },
 
           {
-            to: "/admin/add-product",
+            to: "/admin/vendors",
             icon: <FcPlus />,
-            label: "Add Product",
-          },
-          {
-            to: "/admin/get-products",
-            icon: <FcPlus />,
-            label: "Get Products",
-          },
-          {
-            to: "/admin/get-orders",
-            icon: <FcPlus />,
-            label: "Get Orders",
+            label: "Manage Vendors",
           },
         ].map((item) => (
           <NavLink

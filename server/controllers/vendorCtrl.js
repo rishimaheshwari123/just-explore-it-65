@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const vendorRegisterCtrl = async (req, res) => {
   try {
     const {
-      name, email, password, phone, company, address, adhar, pan, description, status = "pending"
+      name, email, password, phone, company, address, description, status = "pending"
     } = req.body;
 
     if (!name || !email || !password) {
@@ -29,7 +29,7 @@ const vendorRegisterCtrl = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await vendorModel.create({
-      name, email, password: hashedPassword, phone, company, address, adhar, pan, description, status
+      name, email, password: hashedPassword, phone, company, address, description, status
     });
 
     const token = jwt.sign(

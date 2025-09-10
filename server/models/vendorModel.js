@@ -40,18 +40,18 @@ const vendorSchema = new mongoose.Schema(
             type: String,
             // default: false
         },
-        percentage: {
-            type: String,
-            // default: false
-        },
-        adhar: {
-            type: String,
+        // percentage: {
+        //     type: String,
+        //     // default: false
+        // },
+        // adhar: {
+        //     type: String,
 
-        },
-        pan: {
-            type: String,
+        // },
+        // pan: {
+        //     type: String,
 
-        },
+        // },
         token: {
             type: String,
         },
