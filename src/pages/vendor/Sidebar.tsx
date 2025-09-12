@@ -93,6 +93,11 @@ const Sidebar = () => {
             icon: <FcPlus />,
             label: "All Properties",
           },
+          {
+            to: "/vendor/property-inquiry",
+            icon: <FcPlus />,
+            label: "Property Inquiry",
+          },
         ].map((item) => (
           <NavLink
             key={item.to}

@@ -16,7 +16,7 @@ export const createContactAPI = async (contactData) => {
     if (!response?.data?.success) {
       throw new Error(response?.data?.message || "Something went wrong!");
     }
-
+    toast.success(response?.data?.message)
     return response?.data?.newContact;
   } catch (error) {
     console.error("contact API ERROR:", error);

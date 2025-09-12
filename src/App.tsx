@@ -24,6 +24,9 @@ import GetBlog from "./pages/admin/GetBlog";
 import AddBlog from "./pages/admin/AddBlog";
 import Blogs from "./pages/Blogs";
 import SingleBlog from "./pages/SingleBlog";
+import Properties from "./pages/Properties";
+import PropertyDetail from "./pages/PropertyDetail";
+import VendorGetInquiry from "./pages/vendor/VendorGetInquiry";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +43,8 @@ const App = () => {
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/blogs" element={<Blogs />} />
+            <Route path="/properties" element={<Properties />} />
+            <Route path="/property/:id" element={<PropertyDetail />} />
             <Route path="/blog/:id" element={<SingleBlog />} />
             <Route
               path="/login"
@@ -148,6 +153,14 @@ const App = () => {
                   element={
                     <PrivateRoute>
                       <VendorProperties />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="property-inquiry"
+                  element={
+                    <PrivateRoute>
+                      <VendorGetInquiry />
                     </PrivateRoute>
                   }
                 />

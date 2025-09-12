@@ -135,10 +135,8 @@ const getPropertiesByIdCtrl = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const property = await Property.findById(id).populate({
-            path: "vendor", // or whatever the referenced field is
-            select: "name company"
-        });
+        const property = await Property.findById(id).populate("vendor");
+
 
         res.status(200).json({
             success: true,

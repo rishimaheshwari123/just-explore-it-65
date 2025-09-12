@@ -15,6 +15,7 @@ import { getAllBlogsAPI } from "@/service/operations/blog";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import TopBar from "@/components/TopBar";
 
 const Blogs = () => {
   const navigate = useNavigate();
@@ -129,6 +130,7 @@ const Blogs = () => {
 
   return (
     <>
+      <TopBar />
       <Header />
       <div className="min-h-screen bg-gray-50">
         {/* Header */}

@@ -48,7 +48,7 @@ export const getVendorPropertyAPI = async (vendor) => {
   }
 
 };
-export const getAllPropertyAPI = async (vendor) => {
+export const getAllPropertyAPI = async () => {
 
   try {
     const response = await apiConnector("GET", GET_ALL_PROPERTY_API)
