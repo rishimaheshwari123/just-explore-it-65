@@ -10,6 +10,13 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const menuLinks = [
+  { label: "Home", href: "/" },
+  { label: "Advertise", href: "/advertise" },
+  { label: "Free Business Listing", href: "/properties", hot: true },
+  { label: "Articals", href: "/blogs" },
+];
+
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -33,29 +40,21 @@ const Header = () => {
 
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a
-              href="#"
-              className="text-gray-600 hover:text-purple-600 transition-colors font-medium"
-            >
-              Home
-            </a>
-            <a
-              href="#"
-              className="text-gray-600 hover:text-purple-600 transition-colors font-medium"
-            >
-              Advertise
-            </a>
-            <div className="flex items-center space-x-2">
-              <a
-                href="#"
-                className="text-gray-600 hover:text-purple-600 transition-colors font-medium"
-              >
-                Free Business Listing
-              </a>
-              <span className="bg-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                Hot
-              </span>
-            </div>
+            {menuLinks.map((link) => (
+              <div key={link.label} className="flex items-center space-x-2">
+                <a
+                  href={link.href}
+                  className="text-gray-600 hover:text-purple-600 transition-colors font-medium"
+                >
+                  {link.label}
+                </a>
+                {link.hot && (
+                  <span className="bg-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                    Hot
+                  </span>
+                )}
+              </div>
+            ))}
           </nav>
 
           {/* Right Section */}
@@ -104,24 +103,21 @@ const Header = () => {
         </div>
 
         <nav className="flex flex-col p-4 space-y-4">
-          <a
-            href="#"
-            className="text-gray-800 hover:text-purple-600 transition-colors font-medium text-lg"
-          >
-            Home
-          </a>
-          <a
-            href="#"
-            className="text-gray-800 hover:text-purple-600 transition-colors font-medium text-lg"
-          >
-            Advertise
-          </a>
-          <a
-            href="#"
-            className="text-gray-800 hover:text-purple-600 transition-colors font-medium text-lg"
-          >
-            Free Business Listing
-          </a>
+          {menuLinks.map((link) => (
+            <div key={link.label} className="flex items-center space-x-2">
+              <a
+                href={link.href}
+                className="text-gray-800 hover:text-purple-600 transition-colors font-medium text-lg"
+              >
+                {link.label}
+              </a>
+              {link.hot && (
+                <span className="bg-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                  Hot
+                </span>
+              )}
+            </div>
+          ))}
 
           {/* Call Number - Mobile */}
           <div className="flex items-center space-x-2 text-purple-600 font-semibold mt-4">

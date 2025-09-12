@@ -68,7 +68,17 @@ const VendorAddProperty = () => {
       const response = await createPropertyAPI(dataToSend);
       if (response?.data?.success) {
         toast.success("Property added successfully!");
-        // navigate("/vendor/dashboard");
+
+        // yahin par formData empty karo
+        setFormData({
+          title: "",
+          location: "",
+          category: "",
+          description: "",
+          vendor: "",
+        });
+
+        setImages([]); // agar images bhi clear karni hai
       } else {
         toast.error(response?.data?.message || "Failed to add property.");
       }

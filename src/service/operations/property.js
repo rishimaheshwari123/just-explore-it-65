@@ -17,7 +17,7 @@ export const createPropertyAPI = async (formData) => {
     if (!response?.data?.success) {
       throw new Error(response?.data?.message || "Something went wrong!");
     }
-
+    toast.success(response?.data?.message)
     return response;
   } catch (error) {
     console.error("CATEGORY API ERROR:", error);

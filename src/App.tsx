@@ -19,6 +19,11 @@ import VendorManagement from "./pages/admin/VendorManagement";
 import VendorLayout from "./pages/vendor/VendorLayout";
 import VendorDashboard from "./pages/vendor/VendorDashboard";
 import VendorAddProperty from "./pages/vendor/VendorAddProperty";
+import VendorProperties from "./pages/vendor/VendorProperties";
+import GetBlog from "./pages/admin/GetBlog";
+import AddBlog from "./pages/admin/AddBlog";
+import Blogs from "./pages/Blogs";
+import SingleBlog from "./pages/SingleBlog";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +39,8 @@ const App = () => {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
+            <Route path="/blogs" element={<Blogs />} />
+            <Route path="/blog/:id" element={<SingleBlog />} />
             <Route
               path="/login"
               element={
@@ -93,6 +100,22 @@ const App = () => {
                     </PrivateRoute>
                   }
                 />
+                <Route
+                  path="add-blog"
+                  element={
+                    <PrivateRoute>
+                      <AddBlog />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="get-blog"
+                  element={
+                    <PrivateRoute>
+                      <GetBlog />
+                    </PrivateRoute>
+                  }
+                />
               </Route>
             )}
             {user?.role === "vendor" && (
@@ -117,6 +140,14 @@ const App = () => {
                   element={
                     <PrivateRoute>
                       <VendorAddProperty />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="properties"
+                  element={
+                    <PrivateRoute>
+                      <VendorProperties />
                     </PrivateRoute>
                   }
                 />

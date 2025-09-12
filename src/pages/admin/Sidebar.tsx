@@ -88,6 +88,16 @@ const Sidebar = () => {
             icon: <FcPlus />,
             label: "Manage Vendors",
           },
+          {
+            to: "/admin/add-blog",
+            icon: <FcPlus />,
+            label: "Add Blog",
+          },
+          {
+            to: "/admin/get-blog",
+            icon: <FcPlus />,
+            label: "Get Blog",
+          },
         ].map((item) => (
           <NavLink
             key={item.to}
