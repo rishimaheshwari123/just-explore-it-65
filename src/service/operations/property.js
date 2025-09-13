@@ -5,7 +5,7 @@ import { property } from "../apis";
 
 const {
   CREATE_PROPERTY_API,
-  GET_VENDOR_PROPERTY_API, UPDATE_PROPERTY_API, GET_ALL_PROPERTY_API, DELETE_PROPERTY_API, GET_PROPERTY_BY_ID_API } = property;
+  GET_VENDOR_PROPERTY_API, UPDATE_PROPERTY_API, GET_ALL_PROPERTY_API, DELETE_PROPERTY_API, GET_PROPERTY_BY_ID_API, INCREMENT_PROPERTY_VIEW_API } = property;
 
 export const createPropertyAPI = async (formData) => {
   const toastId = toast.loading("Loading...");
@@ -27,6 +27,21 @@ export const createPropertyAPI = async (formData) => {
     toast.dismiss(toastId);
   }
 
+};
+
+export const incrementPropertyViewAPI = async (id) => {
+  try {
+    const response = await apiConnector("PUT", `${INCREMENT_PROPERTY_VIEW_API}/${id}`);
+    
+    if (!response?.data?.success) {
+      throw new Error(response?.data?.message || "Something went wrong!");
+    }
+    
+    return response?.data;
+  } catch (error) {
+    console.error("INCREMENT PROPERTY VIEW API ERROR:", error);
+    return null;
+  }
 };
 
 

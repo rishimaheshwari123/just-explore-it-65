@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Dropzone from "react-dropzone";
 import {
   Dialog,
@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { updatePropertyAPI } from "@/service/operations/property";
 import { imageUpload } from "@/service/operations/image";
+import { BUSINESS_CATEGORIES } from "@/constants/categories";
 
 interface Image {
   public_id: string;
@@ -25,10 +26,20 @@ interface Property {
   _id: string;
   title: string;
   location: string;
+  latitude?: string;
+  longitude?: string;
   category: string;
   image?: string | File;
   images?: Image[];
   description?: string;
+  tags?: string;
+  keywords?: string;
+}
+
+interface LocationSuggestion {
+  name: string;
+  lat: number;
+  lng: number;
 }
 
 interface EditPropertyModalProps {
@@ -50,13 +61,21 @@ export const EditPropertyModal = ({
     _id: "",
     title: "",
     location: "",
+    latitude: "",
+    longitude: "",
     category: "",
     image: "",
     images: [],
     description: "",
+    tags: "",
+    keywords: "",
   });
   const [images, setImages] = useState<Image[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [locationSuggestions, setLocationSuggestions] = useState<LocationSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
+  const locationInputRef = useRef<HTMLInputElement>(null);
 
   // Pre-populate form when property changes
   useEffect(() => {
@@ -65,9 +84,13 @@ export const EditPropertyModal = ({
         _id: property._id,
         title: property.title || "",
         location: property.location || "",
+        latitude: property.latitude || "",
+        longitude: property.longitude || "",
         category: property.category || "",
         image: property.image || "",
         description: property.description || "",
+        tags: property.tags || "",
+        keywords: property.keywords || "",
       });
 
       // Initialize images if they exist in the property
@@ -79,14 +102,129 @@ export const EditPropertyModal = ({
     }
   }, [property]);
 
+  // Load Google Maps API
+  useEffect(() => {
+    const loadGoogleMapsAPI = () => {
+      if (window.google && window.google.maps) {
+        setIsGoogleMapsLoaded(true);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyASz6Gqa5Oa3WialPx7Z6ebZTj02Liw-Gk&libraries=places`;
+      script.async = true;
+      script.onload = () => {
+        setIsGoogleMapsLoaded(true);
+      };
+      document.head.appendChild(script);
+    };
+
+    loadGoogleMapsAPI();
+  }, []);
+
   const handleInputChange = (
     field: keyof Property,
-    value: string | number | File
+    value: string | File
   ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
+
+    // Handle location search
+    if (field === 'location' && typeof value === 'string' && isGoogleMapsLoaded) {
+      handleLocationSearch(value);
+    }
+  };
+
+  const handleLocationSearch = (query: string) => {
+    if (!query.trim() || !isGoogleMapsLoaded) {
+      setLocationSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const service = new window.google.maps.places.AutocompleteService();
+    service.getPlacePredictions(
+      {
+        input: query,
+        types: ['(cities)'],
+      },
+      (predictions, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
+          const suggestions = predictions.slice(0, 5).map((prediction) => ({
+            name: prediction.description,
+            lat: 0,
+            lng: 0,
+            placeId: prediction.place_id,
+          }));
+          setLocationSuggestions(suggestions as any);
+          setShowSuggestions(true);
+        } else {
+          setLocationSuggestions([]);
+          setShowSuggestions(false);
+        }
+      }
+    );
+  };
+
+  const handleLocationSelect = (suggestion: LocationSuggestion & { placeId?: string }) => {
+    console.log('Selected city:', suggestion.name);
+    
+    if (!isGoogleMapsLoaded) {
+      console.log('Google Maps not loaded');
+      return;
+    }
+
+    const service = new window.google.maps.places.PlacesService(
+      document.createElement('div')
+    );
+    
+    console.log('Places service available:', !!service);
+
+    if (suggestion.placeId) {
+      const request = {
+        placeId: suggestion.placeId,
+        fields: ['geometry', 'name'],
+      };
+      
+      console.log('Place details request:', request);
+
+      service.getDetails(request, (place, status) => {
+        console.log('Place details response:', { place, status });
+        
+        if (status === window.google.maps.places.PlacesServiceStatus.OK && place?.geometry?.location) {
+          const lat = place.geometry.location.lat();
+          const lng = place.geometry.location.lng();
+          
+          console.log('Coordinates found:', { lat, lng });
+          
+          setFormData(prev => ({
+            ...prev,
+            location: suggestion.name,
+            latitude: lat.toString(),
+            longitude: lng.toString(),
+          }));
+        } else {
+          console.log('Using fallback coordinates');
+          setFormData(prev => ({
+            ...prev,
+            location: suggestion.name,
+            latitude: '0',
+            longitude: '0',
+          }));
+        }
+      });
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        location: suggestion.name,
+        latitude: suggestion.lat.toString(),
+        longitude: suggestion.lng.toString(),
+      }));
+    }
+
+    setShowSuggestions(false);
   };
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -138,11 +276,21 @@ export const EditPropertyModal = ({
       // Append basic fields
       dataToSend.append("title", formData.title);
       dataToSend.append("location", formData.location);
+      dataToSend.append("latitude", formData.latitude || "0");
+      dataToSend.append("longitude", formData.longitude || "0");
       dataToSend.append("category", formData.category);
 
       // Append optional fields only if they have values
       if (formData.description) {
         dataToSend.append("description", formData.description);
+      }
+
+      // Append tags and keywords
+      if (formData.tags) {
+        dataToSend.append("tags", formData.tags);
+      }
+      if (formData.keywords) {
+        dataToSend.append("keywords", formData.keywords);
       }
 
       // Handle single image file or existing URL
@@ -186,9 +334,13 @@ export const EditPropertyModal = ({
         _id: property._id,
         title: property.title || "",
         location: property.location || "",
+        latitude: property.latitude || "",
+        longitude: property.longitude || "",
         category: property.category || "",
         image: property.image || "",
         description: property.description || "",
+        tags: property.tags || "",
+        keywords: property.keywords || "",
       });
 
       if (property.images && Array.isArray(property.images)) {
@@ -197,6 +349,8 @@ export const EditPropertyModal = ({
         setImages([]);
       }
     }
+    setLocationSuggestions([]);
+    setShowSuggestions(false);
     onClose();
   };
 
@@ -220,32 +374,72 @@ export const EditPropertyModal = ({
               />
             </div>
 
-            <div className="grid gap-2">
+            {/* Location */}
+            <div className="grid gap-2 relative">
               <Label htmlFor="location">Location *</Label>
               <Input
+                ref={locationInputRef}
                 id="location"
                 value={formData.location}
                 onChange={(e) => handleInputChange("location", e.target.value)}
-                placeholder="Enter property location"
+                onFocus={() => formData.location && setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                placeholder="Enter city name"
               />
+              {showSuggestions && locationSuggestions.length > 0 && (
+                <div className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto top-full mt-1">
+                  {locationSuggestions.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      onClick={() => handleLocationSelect(suggestion as any)}
+                    >
+                      <div className="font-medium text-gray-900">{suggestion.name}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Coordinates Display */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="latitude">Latitude</Label>
+                <Input
+                  id="latitude"
+                  value={formData.latitude}
+                  readOnly
+                  placeholder="Auto-filled"
+                  className="bg-gray-50"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="longitude">Longitude</Label>
+                <Input
+                  id="longitude"
+                  value={formData.longitude}
+                  readOnly
+                  placeholder="Auto-filled"
+                  className="bg-gray-50"
+                />
+              </div>
             </div>
 
             {/* Category Dropdown */}
             <div className="grid gap-2">
-              <Label htmlFor="category">Category *</Label>
+              <Label htmlFor="category">Business Category *</Label>
               <select
                 id="category"
                 value={formData.category}
                 onChange={(e) => handleInputChange("category", e.target.value)}
                 className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">Select category</option>
-                <option value="electronics">Electronics</option>
-                <option value="furniture">Furniture</option>
-                <option value="vehicles">Vehicles</option>
-                <option value="jobs">Jobs</option>
-                <option value="property">Property</option>
-                <option value="services">Services</option>
+                <option value="">Select a category</option>
+                {BUSINESS_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -323,9 +517,43 @@ export const EditPropertyModal = ({
                 onChange={(e) =>
                   handleInputChange("description", e.target.value)
                 }
-                placeholder="Enter property description"
+                placeholder="Enter detailed property description"
                 rows={3}
+                className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
+            </div>
+
+            {/* SEO Fields */}
+            <div className="bg-gray-50 p-4 rounded-lg space-y-4 mt-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">SEO Settings</h3>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="tags">
+                  Tags <span className="text-sm text-gray-500">(comma separated)</span>
+                </Label>
+                <Input
+                  id="tags"
+                  value={formData.tags || ""}
+                  onChange={(e) => handleInputChange("tags", e.target.value)}
+                  placeholder="e.g., luxury, spacious, modern, furnished"
+                  className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <p className="text-xs text-gray-500">Add relevant tags to help users find your property</p>
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="keywords">
+                  Keywords <span className="text-sm text-gray-500">(comma separated)</span>
+                </Label>
+                <Input
+                  id="keywords"
+                  value={formData.keywords || ""}
+                  onChange={(e) => handleInputChange("keywords", e.target.value)}
+                  placeholder="e.g., apartment for rent, 2bhk, near metro, parking"
+                  className="focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <p className="text-xs text-gray-500">Add keywords for better search visibility</p>
+              </div>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Menu,
   X,
@@ -7,8 +7,11 @@ import {
   Linkedin,
   Twitch,
   Phone,
+  MapPin,
+  Loader2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const menuLinks = [
   { label: "Home", href: "/" },
@@ -19,10 +22,84 @@ const menuLinks = [
 
 const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<string>("");
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  // Get current location using geolocation API
+  const getCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by this browser.");
+      return;
+    }
+
+    setIsLoadingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          
+          // Reverse geocoding to get city name
+          const response = await fetch(
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyASz6Gqa5Oa3WialPx7Z6ebZTj02Liw-Gk`
+          );
+          const data = await response.json();
+          
+          if (data.results && data.results.length > 0) {
+            // Extract city name from address components
+            const addressComponents = data.results[0].address_components;
+            const city = addressComponents.find((component: any) => 
+              component.types.includes('locality') || 
+              component.types.includes('administrative_area_level_2')
+            );
+            
+            if (city) {
+              setCurrentLocation(city.long_name);
+              toast.success(`Location detected: ${city.long_name}`);
+            } else {
+              setCurrentLocation("Location detected");
+              toast.success("Location detected successfully");
+            }
+          }
+        } catch (error) {
+          console.error('Error getting location name:', error);
+          toast.error("Failed to get location name");
+        } finally {
+          setIsLoadingLocation(false);
+        }
+      },
+      (error) => {
+        setIsLoadingLocation(false);
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            toast.error("Location access denied by user.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            toast.error("Location information is unavailable.");
+            break;
+          case error.TIMEOUT:
+            toast.error("Location request timed out.");
+            break;
+          default:
+            toast.error("An unknown error occurred while getting location.");
+            break;
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 600000 // 10 minutes
+      }
+    );
+  };
+
+  // Auto-detect location on component mount
+  useEffect(() => {
+    getCurrentLocation();
+  }, []);
 
   return (
     <header className="bg-background border-b border-border shadow-sm font-sans relative z-50">
@@ -59,8 +136,37 @@ const Header = () => {
 
           {/* Right Section */}
           <div className="flex items-center space-x-6">
+            {/* Current Location */}
+            <div className="hidden md:flex items-center space-x-2 text-gray-600">
+              {isLoadingLocation ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">Detecting location...</span>
+                </>
+              ) : currentLocation ? (
+                <>
+                  <MapPin className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium">{currentLocation}</span>
+                  <button
+                    onClick={getCurrentLocation}
+                    className="text-xs text-purple-600 hover:underline ml-1"
+                  >
+                    Update
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={getCurrentLocation}
+                  className="flex items-center space-x-1 text-sm text-purple-600 hover:underline"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span>Detect Location</span>
+                </button>
+              )}
+            </div>
+
             {/* Call Number */}
-            <div className="hidden md:flex items-center space-x-2 text-purple-600 font-semibold">
+            <div className="hidden lg:flex items-center space-x-2 text-purple-600 font-semibold">
               <Phone className="h-5 w-5" />
               <span>+91 98765 43210</span>
             </div>

@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { CiMenuFries } from "react-icons/ci";
-import { RxCross1 } from "react-icons/rx";
-import { AiOutlineUser } from "react-icons/ai";
-import { MdLogout } from "react-icons/md";
-import { FaHome } from "react-icons/fa";
+import { ChevronLeft, ChevronRight, Home, BarChart3, Plus, Building2, MessageSquare, LogOut } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken, setUser } from "@/redux/authSlice";
-import { FcBullish, FcPlus } from "react-icons/fc";
 import { toast } from "react-toastify";
 import { RootState } from "@/redux/store";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(
@@ -53,111 +51,111 @@ const Sidebar = () => {
     };
   }, []);
 
+  const menuItems = [
+    { to: "/", icon: Home, label: "Back To Home", color: "text-blue-600" },
+    { to: "/vendor/dashboard", icon: BarChart3, label: "Dashboard", color: "text-green-600" },
+    { to: "/vendor/add-property", icon: Plus, label: "Add Property", color: "text-purple-600" },
+    { to: "/vendor/properties", icon: Building2, label: "All Properties", color: "text-orange-600" },
+    { to: "/vendor/property-inquiry", icon: MessageSquare, label: "Property Inquiry", color: "text-indigo-600" },
+  ];
+
   return (
     <div
       ref={sidebarRef}
-      className={`fixed h-screen top-0 overflow-y-scroll z-50 ${
+      className={`fixed h-screen top-0 z-50 ${
         isCollapsed ? "w-20" : "w-64"
-      } bg-white transition-all duration-300`}
+      } bg-white border-r border-gray-200 shadow-lg transition-all duration-300 flex flex-col`}
     >
-      <div className="flex items-center justify-between p-4">
-        <div
-          className={`${
-            isCollapsed ? "hidden" : "block"
-          } text-gray-600 font-bold text-xl`}
-        >
-          <img src="/logo.png" alt=" Logo" className="h-12 w-auto" />
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <div className={`${isCollapsed ? "hidden" : "flex"} items-center space-x-2`}>
+          <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-blue-600 rounded-lg flex items-center justify-center">
+            <span className="text-white font-bold text-sm">V</span>
+          </div>
+          <span className="font-bold text-gray-800 text-lg">Vendor Panel</span>
         </div>
-        {/* Toggle button */}
-        <button
+        
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={handleToggle}
-          className="bg-transparent border-none w-8 h-8 flex justify-center items-center cursor-pointer text-gray-600"
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          {isCollapsed ? <CiMenuFries size={22} /> : <RxCross1 size={22} />}
-        </button>
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </Button>
       </div>
 
-      {/* Navigation links */}
-      <ul className="text-gray-600 list-none flex flex-col gap-2 p-4 mb-14">
-        {[
-          { to: "/", icon: <FaHome />, label: "Back To Home" },
-          { to: "/vendor/dashboard", icon: <FcBullish />, label: "Dashboard" },
-
-          {
-            to: "/vendor/add-property",
-            icon: <FcPlus />,
-            label: "Add Property",
-          },
-          {
-            to: "/vendor/properties",
-            icon: <FcPlus />,
-            label: "All Properties",
-          },
-          {
-            to: "/vendor/property-inquiry",
-            icon: <FcPlus />,
-            label: "Property Inquiry",
-          },
-        ].map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            onClick={handleToggle}
-            className={({ isActive }) =>
-              `text-gray-600 py-4 flex items-center hover:border-r-4 hover:border-black ${
-                isActive ? "border-r-4 border-black" : ""
-              }`
-            }
-          >
-            <div className="text-2xl">{item.icon}</div>
-            <span
-              className={`ml-4 text-xl ${isCollapsed ? "hidden" : "block"}`}
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-2">
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 group ${
+                  isActive 
+                    ? "bg-green-50 border-r-4 border-green-600 text-green-700" 
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                }`
+              }
             >
-              {item.label}
-            </span>
-          </NavLink>
-        ))}
-      </ul>
+              {({ isActive }) => (
+                <>
+                  <Icon 
+                    className={`h-5 w-5 flex-shrink-0 ${
+                      isActive ? "text-green-600" : item.color
+                    } group-hover:scale-110 transition-transform`} 
+                  />
+                  <span className={`font-medium ${
+                    isCollapsed ? "hidden" : "block"
+                  } transition-all duration-200`}>
+                    {item.label}
+                  </span>
+                </>
+              )}
+            </NavLink>
+          );
+        })}
+      </nav>
 
-      {/* User and logout section */}
-      <div className="absolute left-2 right-2 bottom-0 mt-10">
-        <div
-          className={`flex items-center justify-center w-full ${
-            isCollapsed
-              ? "w-11 h-11 rounded-full bg-black "
-              : "bg-black py-2 px-4 rounded-lg"
-          }`}
-        >
-          <div
-            className={`cursor-pointer flex items-center justify-center text-white ${
-              isCollapsed ? "w-10 h-10 rounded-full" : ""
-            }`}
-          >
-            {isCollapsed ? (
-              <AiOutlineUser size={20} />
-            ) : (
-              <span className="text-xl">
-                {user?.name.charAt(0).toUpperCase() + user?.name.slice(1)}
-              </span>
-            )}
-          </div>
-        </div>
-        <button
-          onClick={handleLogout}
-          className={`bg-red-600 text-white text-xl flex items-center justify-center mt-2 ${
-            isCollapsed
-              ? "w-12 h-12 rounded-full"
-              : "py-2 px-4 w-full rounded-lg"
-          }`}
-        >
-          {isCollapsed ? (
-            <MdLogout className="cursor-pointer" />
-          ) : (
-            <span className="flex gap-1 cursor-pointer  items-center text-xl">
-              <MdLogout /> Logout
-            </span>
+      <Separator className="mx-4" />
+
+      {/* User Profile & Logout */}
+      <div className="p-4 space-y-3">
+        {/* User Profile */}
+        <div className={`flex items-center space-x-3 p-3 rounded-lg bg-gray-50 ${
+          isCollapsed ? "justify-center" : ""
+        }`}>
+          <Avatar className="h-8 w-8">
+            <AvatarFallback className="bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold">
+              {user?.name?.charAt(0).toUpperCase() || "V"}
+            </AvatarFallback>
+          </Avatar>
+          {!isCollapsed && (
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user?.name?.charAt(0).toUpperCase() + user?.name?.slice(1) || "Vendor"}
+              </p>
+              <p className="text-xs text-gray-500 truncate">
+                Property Vendor
+              </p>
+            </div>
           )}
-        </button>
+        </div>
+
+        {/* Logout Button */}
+        <Button
+          onClick={handleLogout}
+          variant="destructive"
+          className={`w-full ${
+            isCollapsed ? "px-2" : "px-4"
+          } py-2 bg-red-600 hover:bg-red-700 transition-colors`}
+        >
+          <LogOut className="h-4 w-4" />
+          {!isCollapsed && <span className="ml-2">Logout</span>}
+        </Button>
       </div>
     </div>
   );

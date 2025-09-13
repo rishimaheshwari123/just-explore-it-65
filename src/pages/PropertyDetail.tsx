@@ -12,7 +12,7 @@ import {
   Bath,
   Layout,
 } from "lucide-react";
-import { getPropertyBYIDAPI } from "@/service/operations/property";
+import { getPropertyBYIDAPI, incrementPropertyViewAPI } from "@/service/operations/property";
 
 // Swiper imports
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -38,6 +38,9 @@ const PropertyDetail = () => {
       setLoading(true);
       const response = await getPropertyBYIDAPI(id!);
       setProperty(response);
+      
+      // Increment view count
+      await incrementPropertyViewAPI(id!);
     } catch (error) {
       console.error("Error fetching property:", error);
       toast.error("Failed to fetch property");

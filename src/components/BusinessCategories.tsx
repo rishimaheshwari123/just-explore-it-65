@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import { BUSINESS_CATEGORIES } from "@/constants/categories";
 import {
   Briefcase,
@@ -64,6 +65,12 @@ import {
 
 const BusinessCategories = () => {
   const [showAll, setShowAll] = useState(false);
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (categoryName: string) => {
+    // Navigate to properties page with category filter
+    navigate(`/properties?category=${encodeURIComponent(categoryName)}`);
+  };
 
   const categoryIcons = {
     "Advertising Agencies": { icon: Megaphone, color: "text-red-500" },
@@ -135,13 +142,19 @@ const BusinessCategories = () => {
   const visibleCategories = showAll ? categories : categories.slice(0, 10);
 
   return (
-    <section className="py-12 bg-background">
+    <section className="py-16 bg-gradient-to-br from-muted/30 via-background to-muted/20">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl text-center md:text-4xl font-bold text-foreground mb-6">
-          Our Categories
-        </h2>
+        {/* Enhanced Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent mb-4">
+            Browse by Categories
+          </h2>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Explore our comprehensive range of business categories and find exactly what you're looking for
+          </p>
+        </div>
 
-        {/* Categories Grid */}
+        {/* Enhanced Categories Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
           {visibleCategories.map((category, index) => {
             const IconComponent = category.icon;
@@ -149,33 +162,35 @@ const BusinessCategories = () => {
               <Button
                 key={index}
                 variant="category"
-                className="flex flex-col items-center justify-center 
-                           space-y-2 md:space-y-3 p-4 md:p-6 lg:p-8 
-                           hover:scale-105 transition-transform duration-200 
+                className="group flex flex-col items-center justify-center 
+                           space-y-3 p-4 md:p-6 lg:p-8 
+                           hover:scale-105 hover:shadow-xl transition-all duration-300 
                            [&_svg]:!size-6 md:[&_svg]:!size-7 lg:[&_svg]:!size-8
-                           min-h-[100px] md:min-h-[120px] lg:min-h-[140px]"
+                           min-h-[120px] md:min-h-[140px] lg:min-h-[160px]
+                           bg-white/60 backdrop-blur-sm border border-white/30
+                           hover:bg-white/90 hover:border-purple-300
+                           rounded-2xl shadow-lg hover:shadow-2xl"
+                onClick={() => handleCategoryClick(category.name)}
               >
-                <IconComponent className={category.color} />
-         <span
-  className="text-xs md:text-sm lg:text-base font-medium text-center w-full overflow-hidden relative"
->
-  <span className="inline-block whitespace-nowrap animate-marquee">
-    {category.name}
-  </span>
-</span>
-
-
-
+                <div className="p-3 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md group-hover:shadow-lg transition-all duration-300">
+                  <IconComponent className={`${category.color} group-hover:scale-110 transition-transform duration-300`} />
+                </div>
+                <span className="text-xs md:text-sm font-semibold text-center leading-tight px-2 text-gray-800 group-hover:text-purple-700 transition-colors duration-300">
+                  {category.name}
+                </span>
               </Button>
             );
           })}
         </div>
 
-        {/* More Button */}
+        {/* Enhanced More Button */}
         {!showAll && categories.length > 10 && (
-          <div className="flex justify-center mt-6">
-            <Button onClick={() => setShowAll(true)} variant="outline">
-              More
+          <div className="flex justify-center mt-10">
+            <Button 
+              onClick={() => setShowAll(true)} 
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              View All Categories
             </Button>
           </div>
         )}

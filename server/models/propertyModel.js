@@ -14,6 +14,16 @@ const propertySchema = new mongoose.Schema(
             trim: true,
         },
 
+        latitude: {
+            type: String,
+            trim: true,
+        },
+
+        longitude: {
+            type: String,
+            trim: true,
+        },
+
         category: {
             type: String, // e.g. "Electronics", "Furniture", "Jobs", "Vehicles", "Property"
             required: true,
@@ -23,6 +33,21 @@ const propertySchema = new mongoose.Schema(
         description: {
             type: String,
             trim: true,
+        },
+
+        tags: {
+            type: String,
+            trim: true,
+        },
+
+        keywords: {
+            type: String,
+            trim: true,
+        },
+
+        views: {
+            type: Number,
+            default: 0,
         },
 
         images: [

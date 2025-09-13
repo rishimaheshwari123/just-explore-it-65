@@ -30,6 +30,7 @@ export const property = {
   UPDATE_PROPERTY_API: BASE_URL + "/property/update",
   DELETE_PROPERTY_API: BASE_URL + "/property/delete",
   GET_PROPERTY_BY_ID_API: BASE_URL + "/property/get",
+  INCREMENT_PROPERTY_VIEW_API: BASE_URL + "/property/increment-view",
 }
 export const contact = {
   CREATE_CONTACT_API: BASE_URL + "/contact/create",

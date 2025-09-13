@@ -10,12 +10,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Home, MapPin, Tag, Search, Filter, X } from "lucide-react";
+import { Home, MapPin, Tag, Search, Filter, X, Navigation, SortAsc } from "lucide-react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { getAllPropertyAPI } from "@/service/operations/property";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TopBar from "@/components/TopBar";
@@ -28,6 +28,9 @@ interface Property {
   category: string;
   images: { url: string }[];
   description?: string;
+  latitude?: string;
+  longitude?: string;
+  distance?: number;
 }
 
 const Properties = () => {
@@ -38,10 +41,70 @@ const Properties = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedLocation, setSelectedLocation] = useState<string>("all");
+  const [sortByDistance, setSortByDistance] = useState(false);
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
   // Get unique locations from properties
   const uniqueLocations = Array.from(new Set(properties.map(p => p.location).filter(Boolean)));
+
+  // Calculate distance between two coordinates using Haversine formula
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distance = R * c; // Distance in kilometers
+    return Math.round(distance * 100) / 100; // Round to 2 decimal places
+  };
+
+  // Get user's current location
+  const getUserLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by this browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ lat: latitude, lng: longitude });
+        toast.success("Location detected for distance sorting");
+      },
+      (error) => {
+        console.error('Error getting location:', error);
+        toast.error("Failed to get your location for distance sorting");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 600000
+      }
+    );
+  };
+
+  // Calculate distances for all properties
+  const calculatePropertyDistances = (propertiesData: Property[]) => {
+    if (!userLocation) return propertiesData;
+
+    return propertiesData.map(property => {
+      if (property.latitude && property.longitude) {
+        const distance = calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          parseFloat(property.latitude),
+          parseFloat(property.longitude)
+        );
+        return { ...property, distance };
+      }
+      return { ...property, distance: undefined };
+    });
+  };
 
   const fetchProperties = async () => {
     try {
@@ -62,6 +125,11 @@ const Properties = () => {
   const filterProperties = () => {
     let filtered = properties;
 
+    // Calculate distances if user location is available
+    if (userLocation) {
+      filtered = calculatePropertyDistances(filtered);
+    }
+
     // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(property =>
@@ -76,9 +144,29 @@ const Properties = () => {
       filtered = filtered.filter(property => property.category === selectedCategory);
     }
 
-    // Filter by location
+    // Filter by location (improved matching)
     if (selectedLocation !== "all") {
-      filtered = filtered.filter(property => property.location === selectedLocation);
+      filtered = filtered.filter(property => 
+        property.location.toLowerCase().includes(selectedLocation.toLowerCase()) ||
+        selectedLocation.toLowerCase().includes(property.location.toLowerCase())
+      );
+    }
+
+    // Sort by distance if enabled and user location is available
+    if (sortByDistance && userLocation) {
+      filtered = filtered.sort((a, b) => {
+        // Properties with distance come first, then properties without distance
+        if (a.distance !== undefined && b.distance !== undefined) {
+          return a.distance - b.distance;
+        }
+        if (a.distance !== undefined && b.distance === undefined) {
+          return -1;
+        }
+        if (a.distance === undefined && b.distance !== undefined) {
+          return 1;
+        }
+        return 0;
+      });
     }
 
     setFilteredProperties(filtered);
@@ -89,16 +177,35 @@ const Properties = () => {
     setSearchTerm("");
     setSelectedCategory("all");
     setSelectedLocation("all");
-    setFilteredProperties(properties);
+    setSortByDistance(false);
+    // Clear URL parameters
+    setSearchParams({});
   };
 
   useEffect(() => {
     fetchProperties();
-  }, []);
+    
+    // Handle URL parameters
+    const searchParam = searchParams.get('search');
+    const categoryParam = searchParams.get('category');
+    const locationParam = searchParams.get('location');
+    
+    if (searchParam) {
+      setSearchTerm(searchParam);
+    }
+    
+    if (categoryParam && BUSINESS_CATEGORIES.includes(categoryParam)) {
+      setSelectedCategory(categoryParam);
+    }
+    
+    if (locationParam) {
+      setSelectedLocation(locationParam);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     filterProperties();
-  }, [searchTerm, selectedCategory, selectedLocation, properties]);
+  }, [searchTerm, selectedCategory, selectedLocation, properties, sortByDistance, userLocation]);
 
   if (loading) {
     return (
@@ -122,7 +229,7 @@ const Properties = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               {/* Search Input */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -164,6 +271,31 @@ const Properties = () => {
                 </SelectContent>
               </Select>
 
+              {/* Distance Sort Button */}
+              <Button
+                variant={sortByDistance ? "default" : "outline"}
+                onClick={() => {
+                  if (!userLocation) {
+                    getUserLocation();
+                  } else {
+                    setSortByDistance(!sortByDistance);
+                  }
+                }}
+                className="flex items-center gap-2"
+              >
+                {userLocation ? (
+                  <>
+                    <SortAsc className="w-4 h-4" />
+                    {sortByDistance ? "Distance: On" : "Sort by Distance"}
+                  </>
+                ) : (
+                  <>
+                    <Navigation className="w-4 h-4" />
+                    Get Location
+                  </>
+                )}
+              </Button>
+
               {/* Clear Filters Button */}
               <Button
                 variant="outline"
@@ -176,7 +308,7 @@ const Properties = () => {
             </div>
 
             {/* Active Filters Display */}
-            {(searchTerm || selectedCategory !== "all" || selectedLocation !== "all") && (
+            {(searchTerm || selectedCategory !== "all" || selectedLocation !== "all" || sortByDistance) && (
               <div className="mt-4 flex flex-wrap gap-2">
                 {searchTerm && (
                   <Badge variant="secondary" className="flex items-center gap-1">
@@ -202,6 +334,15 @@ const Properties = () => {
                     <X 
                       className="w-3 h-3 cursor-pointer" 
                       onClick={() => setSelectedLocation("all")} 
+                    />
+                  </Badge>
+                )}
+                {sortByDistance && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    Sorted by Distance
+                    <X 
+                      className="w-3 h-3 cursor-pointer" 
+                      onClick={() => setSortByDistance(false)} 
                     />
                   </Badge>
                 )}
@@ -258,9 +399,16 @@ const Properties = () => {
                   </Badge>
                 </CardHeader>
                 <CardContent>
-                  <div className="mb-1 flex items-center space-x-2 text-sm text-gray-600">
-                    <MapPin className="h-4 w-4" />
-                    <span>{property.location}</span>
+                  <div className="mb-1 flex items-center justify-between">
+                    <div className="flex items-center space-x-2 text-sm text-gray-600">
+                      <MapPin className="h-4 w-4" />
+                      <span>{property.location}</span>
+                    </div>
+                    {property.distance !== undefined && (
+                      <Badge variant="outline" className="text-xs">
+                        {property.distance} km away
+                      </Badge>
+                    )}
                   </div>
                   {property.description && (
                     <p className="line-clamp-2 text-sm text-gray-600">

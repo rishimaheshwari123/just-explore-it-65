@@ -3,8 +3,8 @@ const Property = require('../models/propertyModel');
 const updatePropertyCtrl = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, location, category, description, vendor, images } = req.body;
-
+        const { title, location, latitude, longitude, category, description, tags, keywords, vendor, images } = req.body;
+console.log("images", req.body);
         let imagesArray = [];
         if (images) {
             try {
@@ -26,8 +26,12 @@ const updatePropertyCtrl = async (req, res) => {
         // Update fields
         property.title = title || property.title;
         property.location = location || property.location;
+        property.latitude = latitude || property.latitude;
+        property.longitude = longitude || property.longitude;
         property.category = category || property.category;
         property.description = description || property.description;
+        property.tags = tags || property.tags;
+        property.keywords = keywords || property.keywords;
         property.images = imagesArray.length ? imagesArray : property.images;
         property.vendor = vendor || property.vendor;
 
@@ -49,7 +53,7 @@ const updatePropertyCtrl = async (req, res) => {
 
 const createPropertyCtrl = async (req, res) => {
     try {
-        const { title, location, category, description, vendor, images } = req.body;
+        const { title, location, latitude, longitude, category, description, tags, keywords, vendor, images } = req.body;
 
         let imagesArray = [];
         if (images) {
@@ -70,8 +74,12 @@ const createPropertyCtrl = async (req, res) => {
         const property = await Property.create({
             title,
             location,
+            latitude,
+            longitude,
             category,
             description,
+            tags,
+            keywords,
             images: imagesArray,
             vendor,
         });
@@ -168,4 +176,35 @@ const deletePropertyCtrl = async (req, res) => {
         res.status(500).json({ success: false, message: 'Something went wrong' });
     }
 };
-module.exports = { createPropertyCtrl, getPropertiesByVendor, updatePropertyCtrl, getPropertiesCtrl, getPropertiesByIdCtrl, deletePropertyCtrl };
+
+const incrementPropertyViewCtrl = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const property = await Property.findByIdAndUpdate(
+            id,
+            { $inc: { views: 1 } },
+            { new: true }
+        ).populate('vendor');
+
+        if (!property) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Property not found' 
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Property view incremented successfully',
+            property
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Something went wrong' 
+        });
+    }
+};
+module.exports = { createPropertyCtrl, getPropertiesByVendor, updatePropertyCtrl, getPropertiesCtrl, getPropertiesByIdCtrl, deletePropertyCtrl, incrementPropertyViewCtrl };
