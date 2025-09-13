@@ -59,10 +59,19 @@ import {
   Clock,
   Loader2,
   RefreshCw,
+  Tag,
 } from "lucide-react";
 import { signUp } from "../../service/operations/vendor";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { BUSINESS_CATEGORIES } from "@/constants/categories";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Import your API functions
 import {
@@ -94,6 +103,8 @@ const VendorManagement = () => {
   const [submitting, setSubmitting] = useState(false);
   const [loadingProperties, setLoadingProperties] = useState(false);
   const [updatingPercentage, setUpdatingPercentage] = useState({});
+  const [propertySearchTerm, setPropertySearchTerm] = useState("");
+  const [selectedPropertyCategory, setSelectedPropertyCategory] = useState("all");
   const user = useSelector((state: RootState) => state.auth?.user ?? null);
 
   const { toast } = useToast();
@@ -927,48 +938,118 @@ const VendorManagement = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
+                  {/* Property Filters */}
+                  {vendorProperties.length > 0 && (
+                    <div className="mb-4 space-y-3">
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <div className="flex-1">
+                          <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                            <Input
+                              placeholder="Search properties..."
+                              value={propertySearchTerm}
+                              onChange={(e) => setPropertySearchTerm(e.target.value)}
+                              className="pl-10"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Tag className="w-4 h-4 text-gray-500" />
+                          <Select value={selectedPropertyCategory} onValueChange={setSelectedPropertyCategory}>
+                            <SelectTrigger className="w-48">
+                              <SelectValue placeholder="Filter by category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Categories</SelectItem>
+                              {BUSINESS_CATEGORIES.map((category) => (
+                                <SelectItem key={category} value={category}>
+                                  {category}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   {loadingProperties ? (
                     <div className="text-center py-8">
                       <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
                       <p className="text-gray-500">Loading properties...</p>
                     </div>
                   ) : vendorProperties.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {vendorProperties.map((property) => (
-                        <Card key={property._id} className="overflow-hidden">
-                          <div className="aspect-video relative">
-                            <img
-                              src={
-                                property?.images?.[0]?.url ||
-                                "/placeholder.svg?height=200&width=300"
-                              }
-                              alt={property?.title || "Property image"}
-                              className="w-full h-full object-cover"
-                            />
+                    (() => {
+                      // Filter properties based on search term and category
+                      const filteredProperties = vendorProperties.filter(property => {
+                        const matchesSearch = propertySearchTerm === "" || 
+                          property.title?.toLowerCase().includes(propertySearchTerm.toLowerCase()) ||
+                          property.location?.toLowerCase().includes(propertySearchTerm.toLowerCase()) ||
+                          property.type?.toLowerCase().includes(propertySearchTerm.toLowerCase());
+                        
+                        const matchesCategory = selectedPropertyCategory === "all" || 
+                          property.category === selectedPropertyCategory;
+                        
+                        return matchesSearch && matchesCategory;
+                      });
+
+                      return filteredProperties.length > 0 ? (
+                        <>
+                          <div className="mb-3 text-sm text-gray-600">
+                            Showing {filteredProperties.length} of {vendorProperties.length} properties
                           </div>
-                          <CardContent className="p-4">
-                            <h4 className="font-semibold text-lg mb-2">
-                              {property?.title}
-                            </h4>
-                            <div className="space-y-2 text-sm">
-                              <div className="flex items-center gap-2">
-                                <Building2 className="w-4 h-4 text-gray-400" />
-                                <span>{property.type}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <MapPin className="w-4 h-4 text-gray-400" />
-                                <span>{property.location}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <span className="font-semibold text-green-600">
-                                  ₹{property.price}
-                                </span>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {filteredProperties.map((property) => (
+                              <Card key={property._id} className="overflow-hidden">
+                                <div className="aspect-video relative">
+                                  <img
+                                    src={
+                                      property?.images?.[0]?.url ||
+                                      "/placeholder.svg?height=200&width=300"
+                                    }
+                                    alt={property?.title || "Property image"}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <CardContent className="p-4">
+                                  <h4 className="font-semibold text-lg mb-2">
+                                    {property?.title}
+                                  </h4>
+                                  <div className="space-y-2 text-sm">
+                                    <div className="flex items-center gap-2">
+                                      <Building2 className="w-4 h-4 text-gray-400" />
+                                      <span>{property.type}</span>
+                                    </div>
+                                    {property.category && (
+                                      <div className="flex items-center gap-2">
+                                        <Tag className="w-4 h-4 text-gray-400" />
+                                        <Badge variant="secondary" className="text-xs">
+                                          {property.category}
+                                        </Badge>
+                                      </div>
+                                    )}
+                                    <div className="flex items-center gap-2">
+                                      <MapPin className="w-4 h-4 text-gray-400" />
+                                      <span>{property.location}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <span className="font-semibold text-green-600">
+                                        ₹{property.price}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-center py-8 text-gray-500">
+                          <Building2 className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                          <p>No properties match your filters.</p>
+                          <p className="text-sm mt-1">Try adjusting your search criteria.</p>
+                        </div>
+                      );
+                    })()
                   ) : (
                     <div className="text-center py-8 text-gray-500">
                       <Building2 className="w-12 h-12 mx-auto mb-4 text-gray-300" />

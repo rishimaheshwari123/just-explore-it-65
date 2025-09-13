@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 
 const menuLinks = [
   { label: "Home", href: "/" },
-  { label: "Advertise", href: "/advertise" },
+  // { label: "Advertise", href: "/advertise" },
   { label: "Free Business Listing", href: "/properties", hot: true },
   { label: "Articals", href: "/blogs" },
 ];
