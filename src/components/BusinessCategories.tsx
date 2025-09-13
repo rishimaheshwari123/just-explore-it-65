@@ -175,9 +175,14 @@ const BusinessCategories = () => {
                 <div className="p-3 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md group-hover:shadow-lg transition-all duration-300">
                   <IconComponent className={`${category.color} group-hover:scale-110 transition-transform duration-300`} />
                 </div>
-                <span className="text-xs md:text-sm font-semibold text-center leading-tight px-2 text-gray-800 group-hover:text-purple-700 transition-colors duration-300">
-                  {category.name}
-                </span>
+               <span
+  className="text-xs md:text-sm lg:text-base font-medium text-center w-full overflow-hidden relative"
+>
+  <span className="inline-block whitespace-nowrap animate-marquee">
+    {category.name}
+  </span>
+</span>
+
               </Button>
             );
           })}
