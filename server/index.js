@@ -19,8 +19,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(cors({
   origin: "*",
-  credentials: true,
-}))
+}));
 
 app.use(
   fileUpload({
