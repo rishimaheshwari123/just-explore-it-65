@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Building2, 
-  Eye, 
-  MessageSquare, 
-  TrendingUp, 
+import {
+  Building2,
+  Eye,
+  MessageSquare,
+  TrendingUp,
   Plus,
   Calendar,
   Bell,
-  DollarSign,
   Users,
-  Trophy
+  Trophy,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 // Property API import removed
@@ -22,7 +21,7 @@ import { toast } from 'sonner';
 
 const VendorDashboard = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const [properties, setProperties] = useState([]);
+  const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalViews, setTotalViews] = useState(0);
   const [totalProperties, setTotalProperties] = useState(0);
@@ -35,7 +34,7 @@ const VendorDashboard = () => {
       change: "+0 this month",
       icon: Building2,
       color: "text-blue-600",
-      bgColor: "bg-blue-50"
+      bgColor: "bg-blue-50",
     },
     {
       title: "Total Views",
@@ -43,7 +42,7 @@ const VendorDashboard = () => {
       change: "+0% this week",
       icon: Eye,
       color: "text-green-600",
-      bgColor: "bg-green-50"
+      bgColor: "bg-green-50",
     },
     {
       title: "Inquiries",
@@ -51,7 +50,7 @@ const VendorDashboard = () => {
       change: "+0 new",
       icon: MessageSquare,
       color: "text-purple-600",
-      bgColor: "bg-purple-50"
+      bgColor: "bg-purple-50",
     },
     {
       title: "Active Listings",
@@ -59,8 +58,8 @@ const VendorDashboard = () => {
       change: "Currently live",
       icon: Users,
       color: "text-orange-600",
-      bgColor: "bg-orange-50"
-    }
+      bgColor: "bg-orange-50",
+    },
   ]);
 
   const fetchVendorProperties = async () => {
@@ -68,7 +67,7 @@ const VendorDashboard = () => {
       setLoading(true);
       // Property API call removed - focusing on business only
       setProperties(response || []);
-      
+
       // Calculate actual stats
       const calculatedTotalProperties = response?.length || 0;
       // Property calculations removed - focusing on business metrics only
@@ -89,7 +88,7 @@ const VendorDashboard = () => {
           change: `+${calculatedThisMonthProperties} this month`,
           icon: Building2,
           color: "text-blue-600",
-          bgColor: "bg-blue-50"
+          bgColor: "bg-blue-50",
         },
         {
           title: "Total Views",
@@ -97,7 +96,7 @@ const VendorDashboard = () => {
           change: "+0% this week",
           icon: Eye,
           color: "text-green-600",
-          bgColor: "bg-green-50"
+          bgColor: "bg-green-50",
         },
         {
           title: "Inquiries",
@@ -105,7 +104,7 @@ const VendorDashboard = () => {
           change: "+0 new",
           icon: MessageSquare,
           color: "text-purple-600",
-          bgColor: "bg-purple-50"
+          bgColor: "bg-purple-50",
         },
         {
           title: "Active Listings",
@@ -113,12 +112,12 @@ const VendorDashboard = () => {
           change: "Currently live",
           icon: Users,
           color: "text-orange-600",
-          bgColor: "bg-orange-50"
-        }
+          bgColor: "bg-orange-50",
+        },
       ]);
     } catch (error) {
-      console.error('Error fetching vendor properties:', error);
-      toast.error('Failed to fetch properties');
+      console.error("Error fetching vendor properties:", error);
+      toast.error("Failed to fetch properties");
     } finally {
       setLoading(false);
     }
@@ -137,16 +136,33 @@ const VendorDashboard = () => {
       description: "Respond to customer inquiries",
       icon: MessageSquare,
       link: "/vendor/inquiries",
-      color: "bg-purple-600 hover:bg-purple-700"
-    }
+      color: "bg-purple-600 hover:bg-purple-700",
+    },
   ];
 
-  // Recent Activities with more dynamic data
+  // Recent Activities
   const recentActivities = [
     // Property activities removed
   ].slice(0, 3);
 
-  // Performance data for analytics
+  // Performance data (calculated safely from state)
+  const totalProperties = properties?.length || 0;
+  const totalViews =
+    properties?.reduce((sum, property) => sum + (property?.views || 0), 0) || 0;
+  const activeListings =
+    properties?.filter((property) => property?.status !== "inactive")?.length ||
+    0;
+  const thisMonthProperties =
+    properties?.filter((property) => {
+      if (!property?.createdAt) return false;
+      const createdDate = new Date(property.createdAt);
+      const currentDate = new Date();
+      return (
+        createdDate.getMonth() === currentDate.getMonth() &&
+        createdDate.getFullYear() === currentDate.getFullYear()
+      );
+    })?.length || 0;
+
   const performanceData = {
     totalViews: totalViews,
     totalProperties: totalProperties,
@@ -163,7 +179,8 @@ const VendorDashboard = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold mb-2">
-              Welcome back, {user?.name.charAt(0).toUpperCase() + user?.name.slice(1)}! 👋
+              Welcome back,{" "}
+              {user?.name?.charAt(0).toUpperCase() + user?.name?.slice(1)}! 👋
             </h1>
             <p className="text-green-100">
               Manage your properties and grow your business with us.
@@ -171,7 +188,10 @@ const VendorDashboard = () => {
           </div>
           <div className="hidden md:flex items-center space-x-2">
             <Bell className="h-6 w-6" />
-            <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+            <Badge
+              variant="secondary"
+              className="bg-white/20 text-white border-white/30"
+            >
               {new Date().toLocaleDateString()}
             </Badge>
           </div>
@@ -183,30 +203,35 @@ const VendorDashboard = () => {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="hover:shadow-lg transition-all duration-300 hover:scale-105">
-                   <CardContent className="p-6">
-                     <div className="flex items-center justify-between">
-                       <div>
-                         <p className="text-sm font-medium text-gray-600 mb-1">
-                           {stat.title}
-                         </p>
-                         {loading ? (
-                           <div className="h-8 w-16 bg-gray-200 animate-pulse rounded mb-1"></div>
-                         ) : (
-                           <p className="text-2xl font-bold text-gray-900">
-                             {stat.value}
-                           </p>
-                         )}
-                         <p className="text-sm text-green-600 font-medium">
-                           {stat.change}
-                         </p>
-                       </div>
-                       <div className={`p-3 rounded-full ${stat.bgColor} transition-all duration-300`}>
-                         <Icon className={`h-6 w-6 ${stat.color}`} />
-                       </div>
-                     </div>
-                   </CardContent>
-                 </Card>
+            <Card
+              key={index}
+              className="hover:shadow-lg transition-all duration-300 hover:scale-105"
+            >
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 mb-1">
+                      {stat.title}
+                    </p>
+                    {loading ? (
+                      <div className="h-8 w-16 bg-gray-200 animate-pulse rounded mb-1"></div>
+                    ) : (
+                      <p className="text-2xl font-bold text-gray-900">
+                        {stat.value}
+                      </p>
+                    )}
+                    <p className="text-sm text-green-600 font-medium">
+                      {stat.change}
+                    </p>
+                  </div>
+                  <div
+                    className={`p-3 rounded-full ${stat.bgColor} transition-all duration-300`}
+                  >
+                    <Icon className={`h-6 w-6 ${stat.color}`} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           );
         })}
       </div>
@@ -228,7 +253,9 @@ const VendorDashboard = () => {
                   <Card className="hover:shadow-md transition-shadow cursor-pointer border-2 hover:border-green-200">
                     <CardContent className="p-4">
                       <div className="flex items-start space-x-3">
-                        <div className={`p-2 rounded-lg ${action.color} text-white`}>
+                        <div
+                          className={`p-2 rounded-lg ${action.color} text-white`}
+                        >
                           <Icon className="h-5 w-5" />
                         </div>
                         <div className="flex-1">
@@ -262,14 +289,21 @@ const VendorDashboard = () => {
             {recentActivities.map((activity, index) => {
               const Icon = activity.icon;
               return (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                <div
+                  key={index}
+                  className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+                >
                   <div className={`p-2 ${activity.bgColor} rounded-full`}>
                     <Icon className={`h-4 w-4 ${activity.color}`} />
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">{activity.title}</p>
-                    <p className="text-xs text-gray-600">{activity.description}</p>
-                    <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                    <p className="text-xs text-gray-600">
+                      {activity.description}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {activity.time}
+                    </p>
                   </div>
                 </div>
               );
