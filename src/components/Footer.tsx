@@ -9,6 +9,7 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -64,44 +65,44 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/"
                   className="text-white hover:text-secondary transition-colors"
                 >
                   About Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/"
                   className="text-white hover:text-secondary transition-colors"
                 >
                   Contact
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/"
                   className="text-white hover:text-secondary transition-colors"
                 >
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/"
                   className="text-white hover:text-secondary transition-colors"
                 >
                   Terms of Service
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/"
                   className="text-white hover:text-secondary transition-colors"
                 >
                   Help Center
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -111,44 +112,44 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Popular Categories</h3>
             <ul className="space-y-2">
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/business-listing?category=Restaurants & Food"
                   className="text-white hover:text-secondary transition-colors"
                 >
                   Restaurants
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/business-listing?category=Travel & Tourism"
                   className="text-white hover:text-secondary transition-colors"
                 >
                   Hotels
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/business-listing?category=Healthcare & Medical"
                   className="text-white hover:text-secondary transition-colors"
                 >
                   Healthcare
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/business-listing?category=Education"
                   className="text-white hover:text-secondary transition-colors"
                 >
                   Education
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/business-listing?category=Retail & Shopping"
                   className="text-white hover:text-secondary transition-colors"
                 >
                   Shopping
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

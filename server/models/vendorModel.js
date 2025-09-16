@@ -2,61 +2,289 @@ const mongoose = require("mongoose");
 
 const vendorSchema = new mongoose.Schema(
     {
+        // Personal Information
         name: {
             type: String,
+            required: true,
             trim: true,
         },
-
+        
         email: {
             type: String,
+            required: true,
+            unique: true,
+            lowercase: true,
+            trim: true,
         },
+        
         password: {
             type: String,
-            trim: true,
+            required: true,
+            minlength: 6,
         },
+        
         phone: {
             type: String,
+            required: true,
             trim: true,
         },
+        
+        alternatePhone: {
+            type: String,
+            trim: true,
+        },
+        
+        // Business Owner Information
+        ownerDetails: {
+            firstName: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+            lastName: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+            dateOfBirth: Date,
+            gender: {
+                type: String,
+                enum: ['Male', 'Female', 'Other'],
+            },
+        },
+        
+        // Company/Business Information
         company: {
             type: String,
+            required: true,
             trim: true,
         },
-        address: {
+        
+        businessRegistrationNumber: {
             type: String,
             trim: true,
         },
+        
+        gstNumber: {
+            type: String,
+            trim: true,
+        },
+        
+        // Address Information
+        address: {
+            street: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+            area: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+            city: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+            state: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+            pincode: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+        },
+        
         description: {
             type: String,
             trim: true,
+            maxlength: 500,
         },
-
+        
+        // Verification Documents
+        documents: {
+            aadhar: {
+                number: String,
+                frontImage: {
+                    public_id: String,
+                    url: String,
+                },
+                backImage: {
+                    public_id: String,
+                    url: String,
+                },
+                isVerified: {
+                    type: Boolean,
+                    default: false,
+                },
+            },
+            pan: {
+                number: String,
+                image: {
+                    public_id: String,
+                    url: String,
+                },
+                isVerified: {
+                    type: Boolean,
+                    default: false,
+                },
+            },
+            businessLicense: {
+                number: String,
+                image: {
+                    public_id: String,
+                    url: String,
+                },
+                isVerified: {
+                    type: Boolean,
+                    default: false,
+                },
+            },
+        },
+        
+        // Profile Information
+        profileImage: {
+            public_id: String,
+            url: String,
+        },
+        
+        // Account Status
         role: {
             type: String,
-            enum: ["vendor"],
+            enum: ["vendor", "premium_vendor", "enterprise_vendor"],
             default: "vendor",
         },
+        
         status: {
             type: String,
-            // default: false
+            enum: ['active', 'inactive', 'pending', 'suspended', 'rejected'],
+            default: 'pending',
         },
-        // percentage: {
-        //     type: String,
-        //     // default: false
-        // },
-        // adhar: {
-        //     type: String,
-
-        // },
-        // pan: {
-        //     type: String,
-
-        // },
+        
+        // Verification Status
+        verification: {
+            isEmailVerified: {
+                type: Boolean,
+                default: false,
+            },
+            isPhoneVerified: {
+                type: Boolean,
+                default: false,
+            },
+            isDocumentVerified: {
+                type: Boolean,
+                default: false,
+            },
+            verificationLevel: {
+                type: String,
+                enum: ['basic', 'standard', 'premium'],
+                default: 'basic',
+            },
+        },
+        
+        // Subscription Information
+        subscription: {
+            plan: {
+                type: String,
+                enum: ['free', 'basic', 'premium', 'enterprise'],
+                default: 'free',
+            },
+            startDate: Date,
+            endDate: Date,
+            isActive: {
+                type: Boolean,
+                default: false,
+            },
+            features: [{
+                name: String,
+                isEnabled: Boolean,
+            }],
+        },
+        
+        // Business Analytics
+        analytics: {
+            totalBusinesses: {
+                type: Number,
+                default: 0,
+            },
+            totalViews: {
+                type: Number,
+                default: 0,
+            },
+            totalCalls: {
+                type: Number,
+                default: 0,
+            },
+            totalInquiries: {
+                type: Number,
+                default: 0,
+            },
+        },
+        
+        // Payment Information
+        paymentInfo: {
+            totalEarnings: {
+                type: Number,
+                default: 0,
+            },
+            pendingPayments: {
+                type: Number,
+                default: 0,
+            },
+            lastPaymentDate: Date,
+        },
+        
+        // Settings
+        settings: {
+            notifications: {
+                email: {
+                    type: Boolean,
+                    default: true,
+                },
+                sms: {
+                    type: Boolean,
+                    default: true,
+                },
+                push: {
+                    type: Boolean,
+                    default: true,
+                },
+            },
+            privacy: {
+                showPhone: {
+                    type: Boolean,
+                    default: true,
+                },
+                showEmail: {
+                    type: Boolean,
+                    default: true,
+                },
+            },
+        },
+        
+        // Login Information
+        lastLogin: Date,
+        loginCount: {
+            type: Number,
+            default: 0,
+        },
+        
         token: {
             type: String,
         },
+        
+        resetPasswordToken: String,
+        resetPasswordExpire: Date,
     },
-    { timestamps: true }
+    { 
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+    }
 );
 
 module.exports = mongoose.model("Vendor", vendorSchema);

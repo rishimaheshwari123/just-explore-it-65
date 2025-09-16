@@ -18,14 +18,20 @@ import VendorLogin from "./pages/VendorLogin";
 import VendorManagement from "./pages/admin/VendorManagement";
 import VendorLayout from "./pages/vendor/VendorLayout";
 import VendorDashboard from "./pages/vendor/VendorDashboard";
-import VendorAddProperty from "./pages/vendor/VendorAddProperty";
-import VendorProperties from "./pages/vendor/VendorProperties";
+
+import VendorAddBusiness from "./pages/vendor/VendorAddBusiness";
+import VendorBusinesses from "./pages/vendor/VendorBusinesses";
+import VendorEditBusiness from "./pages/vendor/VendorEditBusiness";
+import VendorBusinessInquiry from "./pages/vendor/VendorBusinessInquiry";
 import GetBlog from "./pages/admin/GetBlog";
 import AddBlog from "./pages/admin/AddBlog";
 import Blogs from "./pages/Blogs";
 import SingleBlog from "./pages/SingleBlog";
-import Properties from "./pages/Properties";
-import PropertyDetail from "./pages/PropertyDetail";
+
+import BusinessListing from "./pages/BusinessListing";
+import BusinessDetail from "./pages/BusinessDetail";
+import AddBusiness from "./pages/AddBusiness";
+import EditBusiness from "./pages/EditBusiness";
 import VendorGetInquiry from "./pages/vendor/VendorGetInquiry";
 
 const queryClient = new QueryClient();
@@ -43,8 +49,13 @@ const App = () => {
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/blogs" element={<Blogs />} />
-            <Route path="/properties" element={<Properties />} />
-            <Route path="/property/:id" element={<PropertyDetail />} />
+            <Route path="/properties" element={<Index />} />
+            <Route path="/contact" element={<Index />} />
+
+            <Route path="/business-listing" element={<BusinessListing />} />
+            <Route path="/business/:id" element={<BusinessDetail />} />
+            <Route path="/add-business" element={<AddBusiness />} />
+            <Route path="/edit-business/:id" element={<EditBusiness />} />
             <Route path="/blog/:id" element={<SingleBlog />} />
             <Route
               path="/login"
@@ -140,24 +151,41 @@ const App = () => {
                     </PrivateRoute>
                   }
                 />
+
                 <Route
-                  path="add-property"
+                  path="add-business"
                   element={
                     <PrivateRoute>
-                      <VendorAddProperty />
+                      <VendorAddBusiness />
                     </PrivateRoute>
                   }
                 />
                 <Route
-                  path="properties"
+                  path="businesses"
                   element={
                     <PrivateRoute>
-                      <VendorProperties />
+                      <VendorBusinesses />
                     </PrivateRoute>
                   }
                 />
                 <Route
-                  path="property-inquiry"
+                  path="edit-business/:businessId"
+                  element={
+                    <PrivateRoute>
+                      <VendorEditBusiness />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="business-inquiry"
+                  element={
+                    <PrivateRoute>
+                      <VendorBusinessInquiry />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="get-inquiry"
                   element={
                     <PrivateRoute>
                       <VendorGetInquiry />

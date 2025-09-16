@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Home, BarChart3, Plus, Building2, MessageSquare, LogOut } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, BarChart3, Plus, Building2, MessageSquare, LogOut, Store, ShoppingBag, Mail } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken, setUser } from "@/redux/authSlice";
 import { toast } from "react-toastify";
@@ -52,11 +52,16 @@ const Sidebar = () => {
   }, []);
 
   const menuItems = [
-    { to: "/", icon: Home, label: "Back To Home", color: "text-blue-600" },
-    { to: "/vendor/dashboard", icon: BarChart3, label: "Dashboard", color: "text-green-600" },
-    { to: "/vendor/add-property", icon: Plus, label: "Add Property", color: "text-purple-600" },
-    { to: "/vendor/properties", icon: Building2, label: "All Properties", color: "text-orange-600" },
-    { to: "/vendor/property-inquiry", icon: MessageSquare, label: "Property Inquiry", color: "text-indigo-600" },
+    { to: "/", icon: Home, label: "Back To Home", color: "text-blue-600", section: "general" },
+    { to: "/vendor/dashboard", icon: BarChart3, label: "Dashboard", color: "text-green-600", section: "general" },
+  ];
+
+  // Property functionality removed as per requirements
+
+  const businessMenuItems = [
+    { to: "/vendor/add-business", icon: Store, label: "Add Business", color: "text-emerald-600" },
+    { to: "/vendor/businesses", icon: ShoppingBag, label: "All Businesses", color: "text-teal-600" },
+    { to: "/vendor/business-inquiry", icon: Mail, label: "Business Inquiry", color: "text-cyan-600" },
   ];
 
   return (
@@ -86,38 +91,83 @@ const Sidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 group ${
-                  isActive 
-                    ? "bg-green-50 border-r-4 border-green-600 text-green-700" 
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <Icon 
-                    className={`h-5 w-5 flex-shrink-0 ${
-                      isActive ? "text-green-600" : item.color
-                    } group-hover:scale-110 transition-transform`} 
-                  />
-                  <span className={`font-medium ${
-                    isCollapsed ? "hidden" : "block"
-                  } transition-all duration-200`}>
-                    {item.label}
-                  </span>
-                </>
-              )}
-            </NavLink>
-          );
-        })}
+      <nav className="flex-1 p-4 space-y-4 overflow-y-auto">
+        {/* General Menu */}
+        <div className="space-y-2">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 group ${
+                    isActive 
+                      ? "bg-green-50 border-r-4 border-green-600 text-green-700" 
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon 
+                      className={`h-5 w-5 flex-shrink-0 ${
+                        isActive ? "text-green-600" : item.color
+                      } group-hover:scale-110 transition-transform`} 
+                    />
+                    <span className={`font-medium ${
+                      isCollapsed ? "hidden" : "block"
+                    } transition-all duration-200`}>
+                      {item.label}
+                    </span>
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
+        </div>
+
+        {/* Property Management Section - Removed */}
+
+        {/* Business Management Section */}
+        <div className="space-y-2">
+          {!isCollapsed && (
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
+              Business Management
+            </h3>
+          )}
+          {businessMenuItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 group ${
+                    isActive 
+                      ? "bg-emerald-50 border-r-4 border-emerald-600 text-emerald-700" 
+                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <Icon 
+                      className={`h-5 w-5 flex-shrink-0 ${
+                        isActive ? "text-emerald-600" : item.color
+                      } group-hover:scale-110 transition-transform`} 
+                    />
+                    <span className={`font-medium ${
+                      isCollapsed ? "hidden" : "block"
+                    } transition-all duration-200`}>
+                      {item.label}
+                    </span>
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
+        </div>
       </nav>
 
       <Separator className="mx-4" />

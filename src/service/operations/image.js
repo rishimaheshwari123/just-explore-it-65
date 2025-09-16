@@ -8,7 +8,7 @@ const { IMAGE_UPLOAD } = image
 export const imageUpload = async (data, token) => {
     let result = []
     console.log(data)
-    const toastId = toast.loading("Loading...")
+    const toastId = toast.loading("Uploading images...")
     try {
 
         const formData = new FormData();
@@ -19,16 +19,18 @@ export const imageUpload = async (data, token) => {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
         })
-        // console.log("CREATE IMAGE API RESPONSE............", response)
+        console.log("IMAGE UPLOAD API RESPONSE............", response)
         if (!response?.data?.success) {
-            throw new Error("Could Not Add IMAGE Details")
+            throw new Error("Could Not Upload Images")
         }
-        toast.success("IMAGE Details Added Successfully")
-        result = response?.data?.images
+        toast.success("Images Uploaded Successfully")
+        
+        // Extract direct URLs from the response
+        result = response?.data?.images?.map(img => img.secure_url || img.url) || []
 
     } catch (error) {
-        console.log("CREATE IMAGE API ERROR............", error)
-        toast.error(error.message)
+        console.log("IMAGE UPLOAD API ERROR............", error)
+        toast.error(error.message || "Image upload failed")
     }
     toast.dismiss(toastId)
     return result

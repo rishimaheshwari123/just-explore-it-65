@@ -17,13 +17,17 @@ import {
   Trophy
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { getVendorPropertyAPI } from '@/service/operations/property';
+// Property API import removed
 import { toast } from 'sonner';
 
 const VendorDashboard = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [totalViews, setTotalViews] = useState(0);
+  const [totalProperties, setTotalProperties] = useState(0);
+  const [activeListings, setActiveListings] = useState(0);
+  const [thisMonthProperties, setThisMonthProperties] = useState(0);
   const [stats, setStats] = useState([
     {
       title: "My Properties",
@@ -62,32 +66,34 @@ const VendorDashboard = () => {
   const fetchVendorProperties = async () => {
     try {
       setLoading(true);
-      const response = await getVendorPropertyAPI({ vendor: user?._id });
+      // Property API call removed - focusing on business only
       setProperties(response || []);
       
       // Calculate actual stats
-      const totalProperties = response?.length || 0;
-      const totalViews = response?.reduce((sum, property) => sum + (property.views || 0), 0) || 0;
-      const activeListings = response?.filter(property => property.status !== 'inactive')?.length || 0;
-      const thisMonthProperties = response?.filter(property => {
-        const createdDate = new Date(property.createdAt);
-        const currentDate = new Date();
-        return createdDate.getMonth() === currentDate.getMonth() && 
-               createdDate.getFullYear() === currentDate.getFullYear();
-      })?.length || 0;
+      const calculatedTotalProperties = response?.length || 0;
+      // Property calculations removed - focusing on business metrics only
+      const calculatedTotalViews = 0;
+      const calculatedActiveListings = 0;
+      const calculatedThisMonthProperties = 0;
+      
+      // Update state variables
+      setTotalProperties(calculatedTotalProperties);
+      setTotalViews(calculatedTotalViews);
+      setActiveListings(calculatedActiveListings);
+      setThisMonthProperties(calculatedThisMonthProperties);
       
       setStats([
         {
           title: "My Properties",
-          value: totalProperties.toString(),
-          change: `+${thisMonthProperties} this month`,
+          value: calculatedTotalProperties.toString(),
+          change: `+${calculatedThisMonthProperties} this month`,
           icon: Building2,
           color: "text-blue-600",
           bgColor: "bg-blue-50"
         },
         {
           title: "Total Views",
-          value: totalViews > 999 ? `${(totalViews/1000).toFixed(1)}K` : totalViews.toString(),
+          value: calculatedTotalViews > 999 ? `${(calculatedTotalViews/1000).toFixed(1)}K` : calculatedTotalViews.toString(),
           change: "+0% this week",
           icon: Eye,
           color: "text-green-600",
@@ -103,7 +109,7 @@ const VendorDashboard = () => {
         },
         {
           title: "Active Listings",
-          value: activeListings.toString(),
+          value: calculatedActiveListings.toString(),
           change: "Currently live",
           icon: Users,
           color: "text-orange-600",
@@ -125,20 +131,7 @@ const VendorDashboard = () => {
   }, [user]);
 
   const quickActions = [
-    {
-      title: "Add New Property",
-      description: "List a new property for rent or sale",
-      icon: Plus,
-      link: "/vendor/add-property",
-      color: "bg-blue-600 hover:bg-blue-700"
-    },
-    {
-      title: "View Properties",
-      description: "Manage your existing property listings",
-      icon: Building2,
-      link: "/vendor/properties",
-      color: "bg-green-600 hover:bg-green-700"
-    },
+    // Property quick actions removed
     {
       title: "Check Inquiries",
       description: "Respond to customer inquiries",
@@ -150,29 +143,7 @@ const VendorDashboard = () => {
 
   // Recent Activities with more dynamic data
   const recentActivities = [
-    ...properties.slice(0, 2).map((property) => ({
-      id: property._id,
-      title: "Property Listed",
-      description: property.title,
-      time: new Date(property.createdAt).toLocaleDateString(),
-      icon: Building2,
-      color: "text-green-600",
-      bgColor: "bg-green-100",
-      views: property.views || 0,
-      type: "listing"
-    })),
-    // Add view activity for properties with views
-    ...properties.filter(p => p.views > 0).slice(0, 1).map((property) => ({
-      id: `view-${property._id}`,
-      title: "Property Viewed",
-      description: `${property.title} - ${property.views} views`,
-      time: "Today",
-      icon: Eye,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100",
-      views: property.views,
-      type: "view"
-    }))
+    // Property activities removed
   ].slice(0, 3);
 
   // Performance data for analytics
@@ -182,8 +153,7 @@ const VendorDashboard = () => {
     activeListings: activeListings,
     thisMonthProperties: thisMonthProperties,
     averageViews: totalProperties > 0 ? Math.round(totalViews / totalProperties) : 0,
-    topProperty: properties.reduce((prev, current) => 
-      (prev.views || 0) > (current.views || 0) ? prev : current, properties[0] || {})
+    topProperty: null // Property analytics removed
   };
 
   return (
@@ -308,107 +278,22 @@ const VendorDashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Property Performance Analytics */}
+      {/* Business Performance Analytics */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5" />
-            Property Performance
+            Business Performance
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {properties.length > 0 ? (
-            <div className="space-y-6">
-              {/* Performance Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-blue-600 font-medium">Average Views</p>
-                      <p className="text-2xl font-bold text-blue-800">{performanceData.averageViews}</p>
-                      <p className="text-xs text-blue-600">per property</p>
-                    </div>
-                    <Eye className="h-8 w-8 text-blue-600" />
-                  </div>
-                </div>
-                
-                <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-green-600 font-medium">Total Views</p>
-                      <p className="text-2xl font-bold text-green-800">{performanceData.totalViews}</p>
-                      <p className="text-xs text-green-600">all properties</p>
-                    </div>
-                    <TrendingUp className="h-8 w-8 text-green-600" />
-                  </div>
-                </div>
-                
-                <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-purple-600 font-medium">Active Listings</p>
-                      <p className="text-2xl font-bold text-purple-800">{performanceData.activeListings}</p>
-                      <p className="text-xs text-purple-600">currently live</p>
-                    </div>
-                    <Building2 className="h-8 w-8 text-purple-600" />
-                  </div>
-                </div>
-              </div>
-              
-              {/* Top Performing Property */}
-              {performanceData.topProperty?.title && (
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg border border-yellow-200">
-                  <h4 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-yellow-600" />
-                    Top Performing Property
-                  </h4>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-gray-900">{performanceData.topProperty.title}</p>
-                      <p className="text-sm text-gray-600">{performanceData.topProperty.views || 0} views</p>
-                    </div>
-                    <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                      Best Performer
-                    </Badge>
-                  </div>
-                </div>
-              )}
-              
-              {/* Recent Properties Performance */}
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-3">Recent Properties Performance</h4>
-                <div className="space-y-2">
-                  {properties.slice(0, 5).map((property) => (
-                    <div key={property._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900 truncate">{property.title}</p>
-                        <p className="text-sm text-gray-600">Listed on {new Date(property.createdAt).toLocaleDateString()}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-gray-900">{property.views || 0} views</p>
-                        <div className="flex items-center gap-1">
-                          <div className="w-16 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                              style={{ width: `${Math.min((property.views || 0) / Math.max(performanceData.totalViews, 1) * 100, 100)}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          <div className="h-64 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg flex items-center justify-center">
+            <div className="text-center">
+              <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 font-medium">Business Analytics</p>
+              <p className="text-sm text-gray-500">Focus on business listings and performance</p>
             </div>
-          ) : (
-            <div className="h-64 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 font-medium">Performance Analytics</p>
-                <p className="text-sm text-gray-500">Add properties to see performance data</p>
-              </div>
-            </div>
-          )}
+          </div>
         </CardContent>
       </Card>
     </div>

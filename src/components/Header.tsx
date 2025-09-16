@@ -15,9 +15,9 @@ import { toast } from "sonner";
 
 const menuLinks = [
   { label: "Home", href: "/" },
-  // { label: "Advertise", href: "/advertise" },
-  { label: "Free Business Listing", href: "/properties", hot: true },
-  { label: "Articals", href: "/blogs" },
+  { label: "Businesses", href: "/business-listing" },
+  { label: "Free Business Listing", href: "/vendor/register", hot: true },
+  { label: "Articles", href: "/blogs" },
 ];
 
 const Header = () => {
@@ -65,8 +65,8 @@ const Header = () => {
             }
           }
         } catch (error) {
-          console.error('Error getting location name:', error);
-          toast.error("Failed to get location name");
+          // Silently handle geocoding error
+          setCurrentLocation("Location detected");
         } finally {
           setIsLoadingLocation(false);
         }

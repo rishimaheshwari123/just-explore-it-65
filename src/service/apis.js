@@ -1,5 +1,5 @@
 
-const BASE_URL = "http://localhost:8000/api/v1"
+const BASE_URL = "http://localhost:8002/api/v1"
 // const BASE_URL = "https://propcorn-marketplace-hub.onrender.com/api/v1"
 // const BASE_URL = import.meta.env.VITE_APP_BASE_URL;
 
@@ -31,6 +31,17 @@ export const property = {
   DELETE_PROPERTY_API: BASE_URL + "/property/delete",
   GET_PROPERTY_BY_ID_API: BASE_URL + "/property/get",
   INCREMENT_PROPERTY_VIEW_API: BASE_URL + "/property/increment-view",
+}
+export const business = {
+  CREATE_BUSINESS_API: BASE_URL + "/property/businesses",
+  GET_ALL_BUSINESS_API: BASE_URL + "/property/businesses",
+  GET_BUSINESS_BY_ID_API: BASE_URL + "/property/businesses",
+  UPDATE_BUSINESS_API: BASE_URL + "/property/businesses",
+  DELETE_BUSINESS_API: BASE_URL + "/property/businesses",
+  GET_VENDOR_BUSINESS_API: BASE_URL + "/property/businesses/vendor",
+  GET_FEATURED_BUSINESS_API: BASE_URL + "/property/businesses/featured",
+  GET_TRENDING_BUSINESS_API: BASE_URL + "/property/businesses/trending",
+  TRACK_BUSINESS_INTERACTION_API: BASE_URL + "/property/businesses",
 }
 export const contact = {
   CREATE_CONTACT_API: BASE_URL + "/contact/create",
