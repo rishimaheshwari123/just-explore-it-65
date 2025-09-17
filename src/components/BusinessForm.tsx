@@ -300,7 +300,7 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:8000/api/v1/property/businesses/${businessId}`
+        `https://propcorn-marketplace-hub.onrender.com/api/v1/property/businesses/${businessId}`
       );
       const data = await response.json();
 
@@ -577,8 +577,8 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
 
       const url =
         mode === "add"
-          ? "http://localhost:8000/api/v1/property/create-business"
-          : `http://localhost:8000/api/v1/property/businesses/${businessId}`;
+          ? "https://propcorn-marketplace-hub.onrender.com/api/v1/property/create-business"
+          : `https://propcorn-marketplace-hub.onrender.com/api/v1/property/businesses/${businessId}`;
 
       const method = mode === "add" ? "POST" : "PUT";
 

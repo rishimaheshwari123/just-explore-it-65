@@ -79,7 +79,7 @@ const FeaturedProperties = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "http://localhost:8000/api/v1/property/getAll?category=Real Estate&limit=8"
+        "https://propcorn-marketplace-hub.onrender.com/api/v1/property/getAll?category=Real Estate&limit=8"
       );
 
       if (!response.ok) {

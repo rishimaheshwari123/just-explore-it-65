@@ -20,7 +20,7 @@ import { Building2, Plus, List } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
-  const [activeFilter, setActiveFilter] = useState<'all' | 'businesses'>('all');
+  const [activeFilter, setActiveFilter] = useState<"all" | "businesses">("all");
   const navigate = useNavigate();
 
   return (
@@ -29,54 +29,58 @@ const Index = () => {
       <Header />
       <HeroBanner />
       <SearchSection />
-      
+
       {/* Filter Section */}
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center space-x-4">
             <Button
-              variant={activeFilter === 'all' ? 'default' : 'outline'}
-              onClick={() => setActiveFilter('all')}
+              variant={activeFilter === "all" ? "default" : "outline"}
+              onClick={() => setActiveFilter("all")}
               className="flex items-center space-x-2"
             >
               <span>All Businesses</span>
             </Button>
             <Button
-              variant={activeFilter === 'businesses' ? 'default' : 'outline'}
-              onClick={() => setActiveFilter('businesses')}
+              variant={activeFilter === "businesses" ? "default" : "outline"}
+              onClick={() => setActiveFilter("businesses")}
               className="flex items-center space-x-2"
             >
               <Building2 className="w-4 h-4" />
               <span>Featured Businesses</span>
             </Button>
           </div>
-          
+
           <div className="flex items-center space-x-3">
             <Button
               variant="outline"
-              onClick={() => navigate('/business-listing')}
+              onClick={() => navigate("/business-listing")}
               className="flex items-center space-x-2"
             >
               <List className="w-4 h-4" />
               <span>View All</span>
             </Button>
-            <Button
+            {/* <Button
               onClick={() => navigate('/add-business')}
               className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
             >
               <Plus className="w-4 h-4" />
               <span>Add Business</span>
-            </Button>
+            </Button> */}
           </div>
         </div>
       </div>
 
       <BusinessCategories />
-      
+
       {/* Conditional rendering based on filter */}
-      {(activeFilter === 'all' || activeFilter === 'businesses') && <FeaturedBusinesses />}
-      {(activeFilter === 'all' || activeFilter === 'businesses') && <BusinessListing />}
-      
+      {(activeFilter === "all" || activeFilter === "businesses") && (
+        <FeaturedBusinesses />
+      )}
+      {(activeFilter === "all" || activeFilter === "businesses") && (
+        <BusinessListing />
+      )}
+
       <TrendingSection />
       <LocationServices />
       <ReviewsSection />

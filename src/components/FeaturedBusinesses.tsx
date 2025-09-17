@@ -137,7 +137,7 @@ const FeaturedBusinesses = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8000/api/v1/property/featured-businesses?page=${page}&limit=12`
+        `https://propcorn-marketplace-hub.onrender.com/api/v1/property/featured-businesses?page=${page}&limit=12`
       );
 
       if (!response.ok) {

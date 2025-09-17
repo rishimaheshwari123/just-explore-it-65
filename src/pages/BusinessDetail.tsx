@@ -119,7 +119,7 @@ const BusinessDetail: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:8000/api/v1/property/business/${id}`
+        `https://propcorn-marketplace-hub.onrender.com/api/v1/property/business/${id}`
       );
       const data = await response.json();
       if (data.success) {
@@ -140,7 +140,7 @@ const BusinessDetail: React.FC = () => {
   const trackView = async () => {
     try {
       await fetch(
-        `http://localhost:8000/api/v1/property/business/${id}/interaction`,
+        `https://propcorn-marketplace-hub.onrender.com/api/v1/property/business/${id}/interaction`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -154,11 +154,14 @@ const BusinessDetail: React.FC = () => {
 
   const handleCall = (phone: string) => {
     // Track call interaction
-    fetch(`http://localhost:8000/api/v1/property/business/${id}/interaction`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "call" }),
-    }).catch(console.error);
+    fetch(
+      `https://propcorn-marketplace-hub.onrender.com/api/v1/property/business/${id}/interaction`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "call" }),
+      }
+    ).catch(console.error);
 
     window.open(`tel:${phone}`, "_self");
   };
@@ -175,7 +178,7 @@ const BusinessDetail: React.FC = () => {
     try {
       setDeleting(true);
       const response = await fetch(
-        `http://localhost:8000/api/v1/property/business/delete/${id}`,
+        `https://propcorn-marketplace-hub.onrender.com/api/v1/property/business/delete/${id}`,
         {
           method: "DELETE",
         }
