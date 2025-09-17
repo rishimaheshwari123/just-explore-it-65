@@ -12,6 +12,7 @@ import { ArrowLeft, Save, Plus, X, MapPin, Phone, Mail, Globe, Clock, Upload, St
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
+import GooglePlacesAutocomplete from './GooglePlacesAutocomplete';
 
 interface BusinessFormProps {
   businessId?: string;
@@ -139,18 +140,7 @@ const DAYS_OF_WEEK = [
 ];
 
 // City data with state, pincode and coordinates
-const CITY_DATA = {
-  'Mumbai': { state: 'Maharashtra', pincode: '400001', lat: 19.0760, lng: 72.8777 },
-  'Delhi': { state: 'Delhi', pincode: '110001', lat: 28.7041, lng: 77.1025 },
-  'Bangalore': { state: 'Karnataka', pincode: '560001', lat: 12.9716, lng: 77.5946 },
-  'Hyderabad': { state: 'Telangana', pincode: '500001', lat: 17.3850, lng: 78.4867 },
-  'Chennai': { state: 'Tamil Nadu', pincode: '600001', lat: 13.0827, lng: 80.2707 },
-  'Kolkata': { state: 'West Bengal', pincode: '700001', lat: 22.5726, lng: 88.3639 },
-  'Pune': { state: 'Maharashtra', pincode: '411001', lat: 18.5204, lng: 73.8567 },
-  'Ahmedabad': { state: 'Gujarat', pincode: '380001', lat: 23.0225, lng: 72.5714 },
-  'Jaipur': { state: 'Rajasthan', pincode: '302001', lat: 26.9124, lng: 75.7873 },
-  'Surat': { state: 'Gujarat', pincode: '395001', lat: 21.1702, lng: 72.8311 }
-};
+// Removed CITY_DATA - now using GooglePlacesAutocomplete for dynamic city selection
 
 const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
   const navigate = useNavigate();
@@ -284,20 +274,40 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
     }
   };
 
-  const handleCityChange = (city: string) => {
-    const cityData = CITY_DATA[city as keyof typeof CITY_DATA];
-    if (cityData) {
+  const handlePlaceSelect = (place: any) => {
+    if (place && place.address_components) {
+      const addressComponents = place.address_components;
+      let city = '';
+      let state = '';
+      let pincode = '';
+      
+      addressComponents.forEach((component: any) => {
+        const types = component.types;
+        if (types.includes('locality') || types.includes('administrative_area_level_2')) {
+          city = component.long_name;
+        }
+        if (types.includes('administrative_area_level_1')) {
+          state = component.long_name;
+        }
+        if (types.includes('postal_code')) {
+          pincode = component.long_name;
+        }
+      });
+      
+      const lat = place.geometry?.location?.lat() || 0;
+      const lng = place.geometry?.location?.lng() || 0;
+      
       setFormData(prev => ({
         ...prev,
         address: {
           ...prev.address,
           city,
-          state: cityData.state,
-          pincode: cityData.pincode
+          state,
+          pincode
         },
         coordinates: {
-          latitude: cityData.lat,
-          longitude: cityData.lng
+          latitude: lat,
+          longitude: lng
         }
       }));
     }
@@ -711,21 +721,11 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
 
                 <div>
                   <Label htmlFor="city">City *</Label>
-                  <Select
+                  <GooglePlacesAutocomplete
+                    onPlaceSelect={handlePlaceSelect}
+                    placeholder="Search for city..."
                     value={formData.address.city}
-                    onValueChange={handleCityChange}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select city" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Object.keys(CITY_DATA).map(city => (
-                        <SelectItem key={city} value={city}>
-                          {city}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  />
                 </div>
 
                 <div>

@@ -26,6 +26,15 @@ interface Business {
   category: string;
   subCategory?: string;
   businessType: string;
+  establishedYear?: string;
+  employeeCount?: string;
+  whatsappNumber?: string;
+  socialMedia?: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    linkedin?: string;
+  };
   contactInfo: {
     primaryPhone: string;
     secondaryPhone?: string;
@@ -80,6 +89,13 @@ interface Business {
   services: Array<{
     name: string;
     description: string;
+    price?: {
+      min: number;
+      max?: number;
+      currency?: string;
+      priceType?: string;
+    };
+    features?: string[];
   }>;
   priceRange: string;
   features: string[];
@@ -330,19 +346,65 @@ const BusinessDetail: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Price Range */}
+            {business.priceRange && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Price Range</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-lg px-4 py-2">
+                      {business.priceRange}
+                    </Badge>
+                    <span className="text-muted-foreground text-sm">
+                      {business.priceRange === '$' && 'Budget-friendly'}
+                      {business.priceRange === '$$' && 'Moderate pricing'}
+                      {business.priceRange === '$$$' && 'Premium pricing'}
+                      {business.priceRange === '$$$$' && 'Luxury pricing'}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Services */}
             {business.services && business.services.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Services</CardTitle>
+                  <CardTitle>Services & Pricing</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {business.services.map((service, index) => (
-                      <div key={index} className="p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <h4 className="font-semibold">{service.name}</h4>
-                          <p className="text-sm text-muted-foreground">{service.description}</p>
+                      <div key={index} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-lg mb-2">{service.name}</h4>
+                            <p className="text-sm text-muted-foreground mb-3">{service.description}</p>
+                            {service.features && service.features.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mb-2">
+                                {service.features.map((feature, idx) => (
+                                  <Badge key={idx} variant="secondary" className="text-xs">
+                                    {feature}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          {service.price && (
+                            <div className="text-right ml-4">
+                              <div className="text-lg font-bold text-primary">
+                                ₹{service.price.min}
+                                {service.price.max && service.price.max !== service.price.min && (
+                                  <span> - ₹{service.price.max}</span>
+                                )}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {service.price.priceType || 'per service'}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -408,6 +470,68 @@ const BusinessDetail: React.FC = () => {
                     >
                       Visit Website
                     </a>
+                  </div>
+                )}
+                
+                {business.whatsappNumber && (
+                  <div className="flex items-center gap-3">
+                    <Phone className="h-5 w-5 text-green-600" />
+                    <a 
+                      href={`https://wa.me/${business.whatsappNumber.replace(/[^0-9]/g, '')}`}
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-green-600 hover:underline font-medium"
+                    >
+                      WhatsApp: {business.whatsappNumber}
+                    </a>
+                  </div>
+                )}
+                
+                {business.socialMedia && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-muted-foreground">Social Media</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {business.socialMedia.facebook && (
+                        <a 
+                          href={business.socialMedia.facebook} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline text-sm"
+                        >
+                          Facebook
+                        </a>
+                      )}
+                      {business.socialMedia.instagram && (
+                        <a 
+                          href={business.socialMedia.instagram} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-pink-600 hover:underline text-sm"
+                        >
+                          Instagram
+                        </a>
+                      )}
+                      {business.socialMedia.twitter && (
+                        <a 
+                          href={business.socialMedia.twitter} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-400 hover:underline text-sm"
+                        >
+                          Twitter
+                        </a>
+                      )}
+                      {business.socialMedia.linkedin && (
+                        <a 
+                          href={business.socialMedia.linkedin} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-700 hover:underline text-sm"
+                        >
+                          LinkedIn
+                        </a>
+                      )}
+                    </div>
                   </div>
                 )}
                 
@@ -482,6 +606,49 @@ const BusinessDetail: React.FC = () => {
                 <div className="space-y-2">
                   {formatBusinessHours(business.businessHours)}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Business Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Business Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {business.businessType && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Business Type</span>
+                    <span className="font-medium">{business.businessType}</span>
+                  </div>
+                )}
+                
+                {business.establishedYear && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Established</span>
+                    <span className="font-medium">{business.establishedYear}</span>
+                  </div>
+                )}
+                
+                {business.employeeCount && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Team Size</span>
+                    <span className="font-medium">{business.employeeCount} employees</span>
+                  </div>
+                )}
+                
+                {business.verification && business.verification.trustScore && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Trust Score</span>
+                    <span className="font-medium">{business.verification.trustScore}/100</span>
+                  </div>
+                )}
+                
+                {business.subCategory && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Specialty</span>
+                    <span className="font-medium">{business.subCategory}</span>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

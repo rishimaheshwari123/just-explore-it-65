@@ -16,12 +16,12 @@ import {
   Trophy,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-// Property API import removed
+import { getVendorBusinessAPI } from "../../service/operations/business";
 import { toast } from 'sonner';
 
 const VendorDashboard = () => {
   const { user } = useSelector((state: RootState) => state.auth);
-  const [properties, setProperties] = useState<any[]>([]);
+  const [businesses, setBusinesses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalViews, setTotalViews] = useState(0);
   const [totalProperties, setTotalProperties] = useState(0);
@@ -29,13 +29,13 @@ const VendorDashboard = () => {
   const [thisMonthProperties, setThisMonthProperties] = useState(0);
   const [stats, setStats] = useState([
     {
-      title: "My Properties",
-      value: "0",
-      change: "+0 this month",
-      icon: Building2,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-    },
+          title: "My Businesses",
+          value: "0",
+          change: "+0 this month",
+          icon: Building2,
+          color: "text-blue-600",
+          bgColor: "bg-blue-50",
+        },
     {
       title: "Total Views",
       value: "0",
@@ -62,18 +62,25 @@ const VendorDashboard = () => {
     },
   ]);
 
-  const fetchVendorProperties = async () => {
+  const fetchVendorBusinesses = async () => {
     try {
       setLoading(true);
-      // Property API call removed - focusing on business only
-      setProperties(response || []);
+      const response = await getVendorBusinessAPI(user?._id);
+      setBusinesses(response || []);
 
       // Calculate actual stats
       const calculatedTotalProperties = response?.length || 0;
-      // Property calculations removed - focusing on business metrics only
-      const calculatedTotalViews = 0;
-      const calculatedActiveListings = 0;
-      const calculatedThisMonthProperties = 0;
+      const calculatedTotalViews = response?.reduce((sum, business) => sum + (business?.views || 0), 0) || 0;
+      const calculatedActiveListings = response?.filter((business) => business?.status !== "inactive")?.length || 0;
+      const calculatedThisMonthProperties = response?.filter((business) => {
+        if (!business?.createdAt) return false;
+        const createdDate = new Date(business.createdAt);
+        const currentDate = new Date();
+        return (
+          createdDate.getMonth() === currentDate.getMonth() &&
+          createdDate.getFullYear() === currentDate.getFullYear()
+        );
+      })?.length || 0;
       
       // Update state variables
       setTotalProperties(calculatedTotalProperties);
@@ -83,7 +90,7 @@ const VendorDashboard = () => {
       
       setStats([
         {
-          title: "My Properties",
+          title: "My Businesses",
           value: calculatedTotalProperties.toString(),
           change: `+${calculatedThisMonthProperties} this month`,
           icon: Building2,
@@ -116,8 +123,8 @@ const VendorDashboard = () => {
         },
       ]);
     } catch (error) {
-      console.error("Error fetching vendor properties:", error);
-      toast.error("Failed to fetch properties");
+      console.error("Error fetching vendor businesses:", error);
+      toast.error("Failed to fetch businesses");
     } finally {
       setLoading(false);
     }
@@ -125,7 +132,7 @@ const VendorDashboard = () => {
 
   useEffect(() => {
     if (user?._id) {
-      fetchVendorProperties();
+      fetchVendorBusinesses();
     }
   }, [user]);
 
@@ -145,23 +152,7 @@ const VendorDashboard = () => {
     // Property activities removed
   ].slice(0, 3);
 
-  // Performance data (calculated safely from state)
-  const totalProperties = properties?.length || 0;
-  const totalViews =
-    properties?.reduce((sum, property) => sum + (property?.views || 0), 0) || 0;
-  const activeListings =
-    properties?.filter((property) => property?.status !== "inactive")?.length ||
-    0;
-  const thisMonthProperties =
-    properties?.filter((property) => {
-      if (!property?.createdAt) return false;
-      const createdDate = new Date(property.createdAt);
-      const currentDate = new Date();
-      return (
-        createdDate.getMonth() === currentDate.getMonth() &&
-        createdDate.getFullYear() === currentDate.getFullYear()
-      );
-    })?.length || 0;
+  // Performance data (using state variables)
 
   const performanceData = {
     totalViews: totalViews,
@@ -183,7 +174,7 @@ const VendorDashboard = () => {
               {user?.name?.charAt(0).toUpperCase() + user?.name?.slice(1)}! 👋
             </h1>
             <p className="text-green-100">
-              Manage your properties and grow your business with us.
+              Manage your businesses and grow your business with us.
             </p>
           </div>
           <div className="hidden md:flex items-center space-x-2">

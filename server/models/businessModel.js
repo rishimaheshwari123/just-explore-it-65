@@ -173,7 +173,7 @@ const businessSchema = new mongoose.Schema(
         // Pricing Information
         priceRange: {
             type: String,
-            enum: ['₹', '₹₹', '₹₹₹', '₹₹₹₹'],
+        
             default: '₹₹',
         },
 

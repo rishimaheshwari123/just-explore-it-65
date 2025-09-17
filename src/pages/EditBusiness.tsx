@@ -1,12 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import BusinessForm from '@/components/BusinessForm';
+import AddBusinessForm from '@/components/AddBusinessForm';
 
 const EditBusiness: React.FC = () => {
   const { id } = useParams<{ id: string }>();
 
   return (
-    <BusinessForm mode="edit" businessId={id} />
+    <AddBusinessForm mode="edit" businessId={id} />
   );
 };
 
