@@ -1,6 +1,5 @@
 
-// const BASE_URL = "https://propcorn-marketplace-hub.onrender.com/api/v1"
-const BASE_URL = "https://propcorn-marketplace-hub.onrender.com/api/v1"
+const BASE_URL = "https://just-explore-it-65.onrender.com/api/v1"
 // const BASE_URL = import.meta.env.VITE_APP_BASE_URL;
 
 export const endpoints = {
