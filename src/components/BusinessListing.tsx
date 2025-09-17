@@ -126,7 +126,7 @@ const BusinessListing: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://propcorn-marketplace-hub.onrender.com/api/v1/property/businesses?limit=50"
+        "https://just-explore-it-65.onrender.com/api/v1/property/businesses?limit=50"
       );
       if (!response.ok) {
         throw new Error("Failed to fetch businesses");
@@ -345,20 +345,6 @@ const BusinessListing: React.FC = () => {
             <p className="text-gray-500">
               Try adjusting your filters or search terms
             </p>
-          </div>
-        )}
-
-        {/* Load More Button */}
-        {!loading && filteredBusinesses.length > 0 && (
-          <div className="text-center">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl px-8 py-4 text-lg shadow-xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300"
-            >
-              <TrendingUp className="mr-2 h-5 w-5" />
-              Load More Businesses
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
           </div>
         )}
       </div>

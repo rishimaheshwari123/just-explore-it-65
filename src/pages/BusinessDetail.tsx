@@ -119,7 +119,7 @@ const BusinessDetail: React.FC = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://propcorn-marketplace-hub.onrender.com/api/v1/property/business/${id}`
+        `https://just-explore-it-65.onrender.com/api/v1/property/business/${id}`
       );
       const data = await response.json();
       if (data.success) {
@@ -140,7 +140,7 @@ const BusinessDetail: React.FC = () => {
   const trackView = async () => {
     try {
       await fetch(
-        `https://propcorn-marketplace-hub.onrender.com/api/v1/property/business/${id}/interaction`,
+        `https://just-explore-it-65.onrender.com/api/v1/property/business/${id}/interaction`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -155,7 +155,7 @@ const BusinessDetail: React.FC = () => {
   const handleCall = (phone: string) => {
     // Track call interaction
     fetch(
-      `https://propcorn-marketplace-hub.onrender.com/api/v1/property/business/${id}/interaction`,
+      `https://just-explore-it-65.onrender.com/api/v1/property/business/${id}/interaction`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -178,7 +178,7 @@ const BusinessDetail: React.FC = () => {
     try {
       setDeleting(true);
       const response = await fetch(
-        `https://propcorn-marketplace-hub.onrender.com/api/v1/property/business/delete/${id}`,
+        `https://just-explore-it-65.onrender.com/api/v1/property/business/delete/${id}`,
         {
           method: "DELETE",
         }

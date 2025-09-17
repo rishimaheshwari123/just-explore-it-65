@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { toast } from "sonner";
 import {
   MapPin,
   Star,
@@ -25,8 +25,8 @@ import {
   ArrowLeft,
   Share2,
   Heart,
-  MessageCircle
-} from 'lucide-react';
+  MessageCircle,
+} from "lucide-react";
 
 interface Business {
   _id: string;
@@ -83,22 +83,24 @@ const BusinessDetail = () => {
   const fetchBusinessDetail = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/v1/property/business/${id}`);
+      const response = await fetch(
+        `https://just-explore-it-65.onrender.com/api/v1/property/business/${id}`
+      );
       const data = await response.json();
-      
+
       if (data.success) {
         setBusiness(data.business);
         // Track view
-        trackInteraction('view');
+        trackInteraction("view");
       } else {
-        console.error('Business not found:', data.message);
-        toast.error('Business not found');
-        navigate('/businesses');
+        console.error("Business not found:", data.message);
+        toast.error("Business not found");
+        navigate("/businesses");
       }
     } catch (error) {
-      console.error('Error fetching business:', error);
-      toast.error('Failed to load business details');
-      navigate('/businesses');
+      console.error("Error fetching business:", error);
+      toast.error("Failed to load business details");
+      navigate("/businesses");
     } finally {
       setLoading(false);
     }
@@ -106,36 +108,42 @@ const BusinessDetail = () => {
 
   const trackInteraction = async (type: string) => {
     try {
-      await fetch(`/api/v1/property/business/${id}/track-interaction`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ type }),
-      });
+      await fetch(
+        `https://just-explore-it-65.onrender.com/api/v1/property/business/${id}/track-interaction`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ type }),
+        }
+      );
     } catch (error) {
-      console.error('Error tracking interaction:', error);
+      console.error("Error tracking interaction:", error);
     }
   };
 
   const handleCall = (phone: string) => {
-    trackInteraction('call');
-    window.open(`tel:${phone}`, '_self');
+    trackInteraction("call");
+    window.open(`tel:${phone}`, "_self");
   };
 
   const handleGetDirections = () => {
     if (business) {
-      trackInteraction('direction');
+      trackInteraction("direction");
       const address = `${business.location.address}, ${business.location.city}, ${business.location.state} ${business.location.pincode}`;
       const encodedAddress = encodeURIComponent(address);
-      window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+      window.open(
+        `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`,
+        "_blank"
+      );
     }
   };
 
   const handleWebsiteClick = () => {
     if (business?.contactInfo.website) {
-      trackInteraction('website');
-      window.open(business.contactInfo.website, '_blank');
+      trackInteraction("website");
+      window.open(business.contactInfo.website, "_blank");
     }
   };
 
@@ -148,25 +156,27 @@ const BusinessDetail = () => {
           url: window.location.href,
         });
       } catch (error) {
-        console.log('Error sharing:', error);
+        console.log("Error sharing:", error);
       }
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
-      toast.success('Link copied to clipboard!');
+      toast.success("Link copied to clipboard!");
     }
   };
 
   const isBusinessOpen = () => {
     if (!business) return false;
-    
+
     const now = new Date();
-    const currentDay = now.toLocaleDateString('en-US', { weekday: 'lowercase' });
+    const currentDay = now.toLocaleDateString("en-US", {
+      weekday: "lowercase",
+    });
     const currentTime = now.toTimeString().slice(0, 5);
-    
+
     const todayHours = business.businessHours[currentDay];
     if (!todayHours || todayHours.isClosed) return false;
-    
+
     return currentTime >= todayHours.open && currentTime <= todayHours.close;
   };
 
@@ -176,10 +186,10 @@ const BusinessDetail = () => {
         key={i}
         className={`h-4 w-4 ${
           i < Math.floor(rating)
-            ? 'text-yellow-400 fill-yellow-400'
+            ? "text-yellow-400 fill-yellow-400"
             : i < rating
-            ? 'text-yellow-400 fill-yellow-400/50'
-            : 'text-gray-300'
+            ? "text-yellow-400 fill-yellow-400/50"
+            : "text-gray-300"
         }`}
       />
     ));
@@ -187,11 +197,11 @@ const BusinessDetail = () => {
 
   const getAmenityIcon = (amenity: string) => {
     switch (amenity.toLowerCase()) {
-      case 'parking available':
+      case "parking available":
         return <Car className="h-4 w-4" />;
-      case 'wifi':
+      case "wifi":
         return <Wifi className="h-4 w-4" />;
-      case 'wheelchair accessible':
+      case "wheelchair accessible":
         return <Shield className="h-4 w-4" />;
       default:
         return <Award className="h-4 w-4" />;
@@ -223,14 +233,17 @@ const BusinessDetail = () => {
       <div className="min-h-screen bg-muted/30 py-8">
         <div className="container mx-auto px-4 max-w-6xl text-center">
           <h1 className="text-2xl font-bold mb-4">Business Not Found</h1>
-          <Button onClick={() => navigate('/businesses')}>Back to Businesses</Button>
+          <Button onClick={() => navigate("/businesses")}>
+            Back to Businesses
+          </Button>
         </div>
       </div>
     );
   }
 
   const isOpen = isBusinessOpen();
-  const mainImage = business.images?.[selectedImage]?.url || '/placeholder-business.jpg';
+  const mainImage =
+    business.images?.[selectedImage]?.url || "/placeholder-business.jpg";
 
   return (
     <div className="min-h-screen bg-muted/30 py-8">
@@ -245,7 +258,7 @@ const BusinessDetail = () => {
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
-          
+
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={handleShare}>
               <Share2 className="h-4 w-4 mr-1" />
@@ -256,8 +269,12 @@ const BusinessDetail = () => {
               size="sm"
               onClick={() => setIsFavorite(!isFavorite)}
             >
-              <Heart className={`h-4 w-4 mr-1 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
-              {isFavorite ? 'Saved' : 'Save'}
+              <Heart
+                className={`h-4 w-4 mr-1 ${
+                  isFavorite ? "fill-red-500 text-red-500" : ""
+                }`}
+              />
+              {isFavorite ? "Saved" : "Save"}
             </Button>
           </div>
         </div>
@@ -270,7 +287,7 @@ const BusinessDetail = () => {
               alt={business.businessInfo.businessName}
               className="w-full h-64 md:h-96 object-cover"
             />
-            
+
             {/* Image Navigation */}
             {business.media?.images?.length > 1 && (
               <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
@@ -280,7 +297,7 @@ const BusinessDetail = () => {
                       key={index}
                       onClick={() => setSelectedImage(index)}
                       className={`w-3 h-3 rounded-full transition-colors ${
-                        index === selectedImage ? 'bg-white' : 'bg-white/50'
+                        index === selectedImage ? "bg-white" : "bg-white/50"
                       }`}
                     />
                   ))}
@@ -302,15 +319,15 @@ const BusinessDetail = () => {
             </div>
 
             <div className="absolute top-4 right-4">
-              <Badge 
+              <Badge
                 className={`${
-                  business.status.isOpen 
-                    ? 'bg-green-500 text-white' 
-                    : 'bg-red-500 text-white'
+                  business.status.isOpen
+                    ? "bg-green-500 text-white"
+                    : "bg-red-500 text-white"
                 }`}
               >
                 <Clock className="h-3 w-3 mr-1" />
-                {business.status.isOpen ? 'Open' : 'Closed'}
+                {business.status.isOpen ? "Open" : "Closed"}
               </Badge>
             </div>
           </div>
@@ -327,7 +344,7 @@ const BusinessDetail = () => {
                     <CardTitle className="text-2xl mb-2">
                       {business.businessName}
                     </CardTitle>
-                    
+
                     {/* Rating */}
                     <div className="flex items-center gap-2 mb-2">
                       <div className="flex items-center">
@@ -349,7 +366,7 @@ const BusinessDetail = () => {
                   </div>
                 </div>
               </CardHeader>
-              
+
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
                   {business.description}
@@ -394,7 +411,11 @@ const BusinessDetail = () => {
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {business.features.map((feature, index) => (
-                      <Badge key={index} variant="outline" className="flex items-center gap-1">
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="flex items-center gap-1"
+                      >
                         {feature}
                       </Badge>
                     ))}
@@ -413,14 +434,25 @@ const BusinessDetail = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {Object.entries(business.businessHours).map(([day, hours]) => (
-                    <div key={day} className="flex justify-between items-center py-2">
-                      <span className="capitalize font-medium">{day}</span>
-                      <span className={!hours.isOpen ? 'text-red-500' : 'text-green-600'}>
-                        {!hours.isOpen ? 'Closed' : `${hours.open} - ${hours.close}`}
-                      </span>
-                    </div>
-                  ))}
+                  {Object.entries(business.businessHours).map(
+                    ([day, hours]) => (
+                      <div
+                        key={day}
+                        className="flex justify-between items-center py-2"
+                      >
+                        <span className="capitalize font-medium">{day}</span>
+                        <span
+                          className={
+                            !hours.isOpen ? "text-red-500" : "text-green-600"
+                          }
+                        >
+                          {!hours.isOpen
+                            ? "Closed"
+                            : `${hours.open} - ${hours.close}`}
+                        </span>
+                      </div>
+                    )
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -434,8 +466,8 @@ const BusinessDetail = () => {
                 <CardTitle>Contact Business</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button 
-                  className="w-full" 
+                <Button
+                  className="w-full"
                   onClick={() => handleCall(business.contactInfo.phone)}
                 >
                   <Phone className="h-4 w-4 mr-2" />
@@ -443,18 +475,20 @@ const BusinessDetail = () => {
                 </Button>
 
                 {business.contactInfo.alternatePhone && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full"
-                    onClick={() => handleCall(business.contactInfo.alternatePhone!)}
+                    onClick={() =>
+                      handleCall(business.contactInfo.alternatePhone!)
+                    }
                   >
                     <Phone className="h-4 w-4 mr-2" />
                     Alt: {business.contactInfo.alternatePhone}
                   </Button>
                 )}
 
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full"
                   onClick={handleGetDirections}
                 >
@@ -463,8 +497,8 @@ const BusinessDetail = () => {
                 </Button>
 
                 {business.contactInfo.website && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full"
                     onClick={handleWebsiteClick}
                   >
@@ -474,10 +508,12 @@ const BusinessDetail = () => {
                 )}
 
                 {business.contactInfo.email && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full"
-                    onClick={() => window.open(`mailto:${business.contactInfo.email}`)}
+                    onClick={() =>
+                      window.open(`mailto:${business.contactInfo.email}`)
+                    }
                   >
                     <Mail className="h-4 w-4 mr-2" />
                     Send Email
@@ -499,7 +535,7 @@ const BusinessDetail = () => {
                   <Phone className="h-4 w-4" />
                   <span>{business.contactInfo.phone}</span>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
                   <span>{business.contactInfo.email}</span>
@@ -508,14 +544,19 @@ const BusinessDetail = () => {
                 {business.contactInfo.website && (
                   <div className="flex items-center gap-2">
                     <Globe className="h-4 w-4" />
-                    <a href={business.contactInfo.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    <a
+                      href={business.contactInfo.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
                       {business.contactInfo.website}
                     </a>
                   </div>
                 )}
 
                 <Separator />
-                
+
                 <div className="flex justify-between items-center">
                   <span className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
@@ -551,7 +592,7 @@ const BusinessDetail = () => {
                   <MessageCircle className="h-4 w-4 mr-2" />
                   Write Review
                 </Button>
-                
+
                 <Button variant="outline" className="w-full">
                   <Share2 className="h-4 w-4 mr-2" />
                   Share Business

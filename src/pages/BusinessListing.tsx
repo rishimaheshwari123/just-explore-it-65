@@ -26,6 +26,9 @@ import {
   List,
   SlidersHorizontal,
 } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import TopBar from "@/components/TopBar";
 
 interface Business {
   _id: string;
@@ -209,11 +212,11 @@ const BusinessListing = () => {
 
       console.log(
         "API URL:",
-        `https://propcorn-marketplace-hub.onrender.com/api/v1/property/businesses?${params.toString()}`
+        `https://just-explore-it-65.onrender.com/api/v1/property/businesses?${params.toString()}`
       );
 
       const response = await fetch(
-        `https://propcorn-marketplace-hub.onrender.com/api/v1/property/businesses?${params.toString()}`
+        `https://just-explore-it-65.onrender.com/api/v1/property/businesses?${params.toString()}`
       );
       const data = await response.json();
 
@@ -251,7 +254,7 @@ const BusinessListing = () => {
   const handleCall = (phone: string, businessId: string) => {
     // Track call interaction
     fetch(
-      `https://propcorn-marketplace-hub.onrender.com/api/v1/property/business/${businessId}/interaction`,
+      `https://just-explore-it-65.onrender.com/api/v1/property/business/${businessId}/interaction`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -524,248 +527,261 @@ const BusinessListing = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      {/* Header */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold mb-6">Find Local Businesses</h1>
+    <>
+      <TopBar />
+      <Header />
+      <div className="min-h-screen bg-muted/30">
+        {/* Header */}
+        <div className="bg-white border-b">
+          <div className="container mx-auto px-4 py-6">
+            <h1 className="text-3xl font-bold mb-6">Find Local Businesses</h1>
 
-          {/* Search Bar */}
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search for businesses, services, or products..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                className="h-12"
-              />
-            </div>
+            {/* Search Bar */}
+            <div className="flex flex-col md:flex-row gap-4 mb-4">
+              <div className="flex-1">
+                <Input
+                  placeholder="Search for businesses, services, or products..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  className="h-12"
+                />
+              </div>
 
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger className="w-full md:w-48 h-12">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={selectedLocation}
-              onValueChange={setSelectedLocation}
-            >
-              <SelectTrigger className="w-full md:w-48 h-12">
-                <SelectValue placeholder="Location" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Locations</SelectItem>
-                {locations.map((location) => (
-                  <SelectItem key={location} value={location}>
-                    {location}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Button onClick={handleSearch} className="h-12 px-8">
-              <Search className="h-4 w-4 mr-2" />
-              Search
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters & Controls */}
-      <div className="bg-white border-b">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
               >
-                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                Filters
-              </Button>
-
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
+                <SelectTrigger className="w-full md:w-48 h-12">
+                  <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="relevance">Relevance</SelectItem>
-                  <SelectItem value="rating">Highest Rated</SelectItem>
-                  <SelectItem value="reviews">Most Reviews</SelectItem>
-                  <SelectItem value="distance">Distance</SelectItem>
-                  <SelectItem value="views">Most Popular</SelectItem>
-                  <SelectItem value="newest">Newest First</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
-            </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">
-                {businesses.length} businesses found
-              </span>
+              <Select
+                value={selectedLocation}
+                onValueChange={setSelectedLocation}
+              >
+                <SelectTrigger className="w-full md:w-48 h-12">
+                  <SelectValue placeholder="Location" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Locations</SelectItem>
+                  {locations.map((location) => (
+                    <SelectItem key={location} value={location}>
+                      {location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-              <div className="flex border rounded-md">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                  className="rounded-r-none"
-                >
-                  <Grid className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                  className="rounded-l-none"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-              </div>
+              <Button onClick={handleSearch} className="h-12 px-8">
+                <Search className="h-4 w-4 mr-2" />
+                Search
+              </Button>
             </div>
           </div>
+        </div>
 
-          {/* Advanced Filters */}
-          {showFilters && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Use Current Location
-                  </label>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="useLocation"
-                      checked={useCurrentLocation}
-                      onChange={(e) => setUseCurrentLocation(e.target.checked)}
-                      className="rounded"
-                    />
-                    <label htmlFor="useLocation" className="text-sm">
-                      Find businesses near me
-                    </label>
-                  </div>
+        {/* Filters & Controls */}
+        <div className="bg-white border-b">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowFilters(!showFilters)}
+                >
+                  <SlidersHorizontal className="h-4 w-4 mr-2" />
+                  Filters
+                </Button>
+
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="relevance">Relevance</SelectItem>
+                    <SelectItem value="rating">Highest Rated</SelectItem>
+                    <SelectItem value="reviews">Most Reviews</SelectItem>
+                    <SelectItem value="distance">Distance</SelectItem>
+                    <SelectItem value="views">Most Popular</SelectItem>
+                    <SelectItem value="newest">Newest First</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  {businesses.length} businesses found
+                </span>
+
+                <div className="flex border rounded-md">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className="rounded-r-none"
+                  >
+                    <Grid className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "ghost"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className="rounded-l-none"
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
                 </div>
+              </div>
+            </div>
 
-                {useCurrentLocation && (
+            {/* Advanced Filters */}
+            {showFilters && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">
-                      Distance Range
+                      Use Current Location
                     </label>
-                    <Select
-                      value={selectedDistance}
-                      onValueChange={setSelectedDistance}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">Within 1 km</SelectItem>
-                        <SelectItem value="2">Within 2 km</SelectItem>
-                        <SelectItem value="5">Within 5 km</SelectItem>
-                        <SelectItem value="10">Within 10 km</SelectItem>
-                        <SelectItem value="20">Within 20 km</SelectItem>
-                        <SelectItem value="50">Within 50 km</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="useLocation"
+                        checked={useCurrentLocation}
+                        onChange={(e) =>
+                          setUseCurrentLocation(e.target.checked)
+                        }
+                        className="rounded"
+                      />
+                      <label htmlFor="useLocation" className="text-sm">
+                        Find businesses near me
+                      </label>
+                    </div>
                   </div>
-                )}
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Location Status</label>
-                  <div className="text-sm text-muted-foreground">
-                    {useCurrentLocation ? (
-                      userLocation ? (
-                        <span className="text-green-600">
-                          ✓ Location detected
-                        </span>
+                  {useCurrentLocation && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Distance Range
+                      </label>
+                      <Select
+                        value={selectedDistance}
+                        onValueChange={setSelectedDistance}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">Within 1 km</SelectItem>
+                          <SelectItem value="2">Within 2 km</SelectItem>
+                          <SelectItem value="5">Within 5 km</SelectItem>
+                          <SelectItem value="10">Within 10 km</SelectItem>
+                          <SelectItem value="20">Within 20 km</SelectItem>
+                          <SelectItem value="50">Within 50 km</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Location Status
+                    </label>
+                    <div className="text-sm text-muted-foreground">
+                      {useCurrentLocation ? (
+                        userLocation ? (
+                          <span className="text-green-600">
+                            ✓ Location detected
+                          </span>
+                        ) : (
+                          <span className="text-orange-600">
+                            ⏳ Detecting location...
+                          </span>
+                        )
                       ) : (
-                        <span className="text-orange-600">
-                          ⏳ Detecting location...
+                        <span className="text-gray-600">
+                          Using selected city
                         </span>
-                      )
-                    ) : (
-                      <span className="text-gray-600">Using selected city</span>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* Results */}
+        <div className="container mx-auto px-4 py-8">
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <Card key={i} className="overflow-hidden">
+                  <div className="animate-pulse">
+                    <div className="h-48 bg-gray-300"></div>
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                      <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                      <div className="h-3 bg-gray-300 rounded w-full"></div>
+                      <div className="flex gap-2">
+                        <div className="h-8 bg-gray-300 rounded flex-1"></div>
+                        <div className="h-8 bg-gray-300 rounded flex-1"></div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          ) : businesses.length === 0 ? (
+            <div className="text-center py-12">
+              <h3 className="text-xl font-semibold mb-2">
+                No businesses found
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                Try adjusting your search criteria or browse all categories
+              </p>
+              <Button
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedCategory("all");
+                  setSelectedLocation("all");
+                  fetchBusinesses();
+                }}
+              >
+                Clear Filters
+              </Button>
+            </div>
+          ) : (
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                  : "space-y-4"
+              }
+            >
+              {businesses.map((business) =>
+                viewMode === "grid" ? (
+                  <BusinessCard key={business._id} business={business} />
+                ) : (
+                  <BusinessListItem key={business._id} business={business} />
+                )
+              )}
             </div>
           )}
         </div>
       </div>
-
-      {/* Results */}
-      <div className="container mx-auto px-4 py-8">
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Card key={i} className="overflow-hidden">
-                <div className="animate-pulse">
-                  <div className="h-48 bg-gray-300"></div>
-                  <div className="p-4 space-y-3">
-                    <div className="h-4 bg-gray-300 rounded w-3/4"></div>
-                    <div className="h-3 bg-gray-300 rounded w-1/2"></div>
-                    <div className="h-3 bg-gray-300 rounded w-full"></div>
-                    <div className="flex gap-2">
-                      <div className="h-8 bg-gray-300 rounded flex-1"></div>
-                      <div className="h-8 bg-gray-300 rounded flex-1"></div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        ) : businesses.length === 0 ? (
-          <div className="text-center py-12">
-            <h3 className="text-xl font-semibold mb-2">No businesses found</h3>
-            <p className="text-muted-foreground mb-4">
-              Try adjusting your search criteria or browse all categories
-            </p>
-            <Button
-              onClick={() => {
-                setSearchTerm("");
-                setSelectedCategory("all");
-                setSelectedLocation("all");
-                fetchBusinesses();
-              }}
-            >
-              Clear Filters
-            </Button>
-          </div>
-        ) : (
-          <div
-            className={
-              viewMode === "grid"
-                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                : "space-y-4"
-            }
-          >
-            {businesses.map((business) =>
-              viewMode === "grid" ? (
-                <BusinessCard key={business._id} business={business} />
-              ) : (
-                <BusinessListItem key={business._id} business={business} />
-              )
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 

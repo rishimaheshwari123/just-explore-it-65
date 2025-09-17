@@ -137,7 +137,7 @@ const FeaturedBusinesses = () => {
       }
 
       const response = await fetch(
-        `https://propcorn-marketplace-hub.onrender.com/api/v1/property/featured-businesses?page=${page}&limit=12`
+        `https://just-explore-it-65.onrender.com/api/v1/property/featured-businesses?page=${page}&limit=12`
       );
 
       if (!response.ok) {
@@ -250,13 +250,16 @@ const FeaturedBusinesses = () => {
   const handleCall = async (businessId: string, phone: string) => {
     try {
       // Track call interaction
-      await fetch(`/api/v1/property/business/${businessId}/track-interaction`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ type: "call" }),
-      });
+      await fetch(
+        `https://just-explore-it-65.onrender.com/api/v1/property/business/${businessId}/track-interaction`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ type: "call" }),
+        }
+      );
 
       // Open phone dialer
       window.open(`tel:${phone}`, "_self");
@@ -272,13 +275,16 @@ const FeaturedBusinesses = () => {
   ) => {
     try {
       // Track direction interaction
-      await fetch(`/api/v1/property/business/${businessId}/track-interaction`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ type: "direction" }),
-      });
+      await fetch(
+        `https://just-explore-it-65.onrender.com/api/v1/property/business/${businessId}/track-interaction`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ type: "direction" }),
+        }
+      );
 
       // Open Google Maps with coordinates for precise navigation
       const url = `https://www.google.com/maps/dir/?api=1&destination=${coordinates.latitude},${coordinates.longitude}`;
@@ -401,12 +407,6 @@ const FeaturedBusinesses = () => {
             <p className="text-lg text-muted-foreground mb-4">
               No featured businesses available at the moment.
             </p>
-            <Button
-              onClick={() => navigate("/add-business")}
-              className="bg-primary hover:bg-primary/90"
-            >
-              List Your Business
-            </Button>
           </div>
         ) : filteredBusinesses.length === 0 ? (
           <div className="text-center py-12">
@@ -416,7 +416,7 @@ const FeaturedBusinesses = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBusinesses.map((business) => {
               const isOpen = isBusinessOpen(business.businessHours);
               const mainImage = business.images?.[0]?.url || "/placeholder.svg";
