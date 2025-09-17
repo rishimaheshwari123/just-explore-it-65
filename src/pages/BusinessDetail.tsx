@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   Phone,
@@ -16,8 +16,8 @@ import {
   Eye,
   Edit,
   Trash2,
-  Navigation
-} from 'lucide-react';
+  Navigation,
+} from "lucide-react";
 
 interface Business {
   _id: string;
@@ -118,20 +118,20 @@ const BusinessDetail: React.FC = () => {
   const fetchBusiness = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8002/api/v1/property/business/${id}`);
+      const response = await fetch(
+        `http://localhost:8000/api/v1/property/business/${id}`
+      );
       const data = await response.json();
-      
       if (data.success) {
         setBusiness(data.business);
-        // Track view
         trackView();
       } else {
-        toast.error('Business not found');
-        navigate('/business-listing');
+        toast.error("Business not found");
+        navigate("/business-listing");
       }
     } catch (error) {
-      console.error('Error fetching business:', error);
-      toast.error('Failed to load business details');
+      console.error("Error fetching business:", error);
+      toast.error("Failed to load business details");
     } finally {
       setLoading(false);
     }
@@ -139,49 +139,59 @@ const BusinessDetail: React.FC = () => {
 
   const trackView = async () => {
     try {
-      await fetch(`http://localhost:8002/api/v1/property/business/${id}/interaction`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'view' })
-      });
+      await fetch(
+        `http://localhost:8000/api/v1/property/business/${id}/interaction`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "view" }),
+        }
+      );
     } catch (error) {
-      console.error('Error tracking view:', error);
+      console.error("Error tracking view:", error);
     }
   };
 
   const handleCall = (phone: string) => {
     // Track call interaction
-    fetch(`http://localhost:8002/api/v1/property/business/${id}/interaction`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'call' })
+    fetch(`http://localhost:8000/api/v1/property/business/${id}/interaction`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "call" }),
     }).catch(console.error);
-    
-    window.open(`tel:${phone}`, '_self');
+
+    window.open(`tel:${phone}`, "_self");
   };
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this business? This action cannot be undone.')) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this business? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
     try {
       setDeleting(true);
-      const response = await fetch(`http://localhost:8002/api/v1/property/business/delete/${id}`, {
-        method: 'DELETE'
-      });
-      
+      const response = await fetch(
+        `http://localhost:8000/api/v1/property/business/delete/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
       const data = await response.json();
-      
+
       if (data.success) {
-        toast.success('Business deleted successfully');
-        navigate('/business-listing');
+        toast.success("Business deleted successfully");
+        navigate("/business-listing");
       } else {
-        toast.error(data.message || 'Failed to delete business');
+        toast.error(data.message || "Failed to delete business");
       }
     } catch (error) {
-      console.error('Error deleting business:', error);
-      toast.error('Failed to delete business');
+      console.error("Error deleting business:", error);
+      toast.error("Failed to delete business");
     } finally {
       setDeleting(false);
     }
@@ -189,13 +199,21 @@ const BusinessDetail: React.FC = () => {
 
   const isBusinessOpen = (businessHours: any) => {
     const now = new Date();
-    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const dayNames = [
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+    ];
     const currentDay = dayNames[now.getDay()];
     const currentTime = now.toTimeString().slice(0, 5);
-    
+
     const todayHours = businessHours[currentDay];
     if (!todayHours || todayHours.isClosed) return false;
-    
+
     return currentTime >= todayHours.open && currentTime <= todayHours.close;
   };
 
@@ -205,26 +223,34 @@ const BusinessDetail: React.FC = () => {
         key={i}
         className={`h-4 w-4 ${
           i < Math.floor(rating)
-            ? 'text-yellow-400 fill-current'
+            ? "text-yellow-400 fill-current"
             : i < rating
-            ? 'text-yellow-400 fill-current opacity-50'
-            : 'text-gray-300'
+            ? "text-yellow-400 fill-current opacity-50"
+            : "text-gray-300"
         }`}
       />
     ));
   };
 
   const formatBusinessHours = (businessHours: any) => {
-    const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    
+    const days = [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+    ];
+    const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
     return days.map((day, index) => {
       const hours = businessHours[day];
       return (
         <div key={day} className="flex justify-between text-sm">
           <span className="font-medium">{dayNames[index]}</span>
-          <span className={hours?.isClosed ? 'text-red-500' : 'text-green-600'}>
-            {hours?.isClosed ? 'Closed' : `${hours?.open} - ${hours?.close}`}
+          <span className={hours?.isClosed ? "text-red-500" : "text-green-600"}>
+            {hours?.isClosed ? "Closed" : `${hours?.open} - ${hours?.close}`}
           </span>
         </div>
       );
@@ -247,7 +273,7 @@ const BusinessDetail: React.FC = () => {
       <div className="min-h-screen bg-muted/30 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold mb-4">Business Not Found</h2>
-          <Button onClick={() => navigate('/business-listing')}>
+          <Button onClick={() => navigate("/business-listing")}>
             Back to Listings
           </Button>
         </div>
@@ -256,25 +282,26 @@ const BusinessDetail: React.FC = () => {
   }
 
   const isOpen = isBusinessOpen(business.businessHours);
-  const mainImage = business.images?.find(img => img.isPrimary)?.url || business.images?.[0]?.url || '/placeholder-business.jpg';
+  const mainImage =
+    business.images?.find((img) => img.isPrimary)?.url ||
+    business.images?.[0]?.url ||
+    "/placeholder-business.jpg";
 
   return (
     <div className="min-h-screen bg-muted/30">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-4"
-          >
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
-          
+
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold mb-2">{business.businessName}</h1>
+              <h1 className="text-3xl font-bold mb-2">
+                {business.businessName}
+              </h1>
               <div className="flex items-center gap-4 mb-4">
                 <Badge>{business.category}</Badge>
                 {business.verification.isVerified && (
@@ -283,21 +310,19 @@ const BusinessDetail: React.FC = () => {
                     Verified
                   </Badge>
                 )}
-                <Badge 
+                <Badge
                   className={`${
-                    isOpen 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-red-500 text-white'
+                    isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
                   }`}
                 >
                   <Clock className="h-3 w-3 mr-1" />
-                  {isOpen ? 'Open' : 'Closed'}
+                  {isOpen ? "Open" : "Closed"}
                 </Badge>
               </div>
             </div>
-            
+
             <div className="flex gap-2">
-              <Button
+              {/* <Button
                 variant="outline"
                 onClick={() => navigate(`/edit-business/${business._id}`)}
               >
@@ -315,7 +340,7 @@ const BusinessDetail: React.FC = () => {
                   <Trash2 className="h-4 w-4 mr-2" />
                 )}
                 Delete
-              </Button>
+              </Button> */}
             </div>
           </div>
         </div>
@@ -358,10 +383,10 @@ const BusinessDetail: React.FC = () => {
                       {business.priceRange}
                     </Badge>
                     <span className="text-muted-foreground text-sm">
-                      {business.priceRange === '$' && 'Budget-friendly'}
-                      {business.priceRange === '$$' && 'Moderate pricing'}
-                      {business.priceRange === '$$$' && 'Premium pricing'}
-                      {business.priceRange === '$$$$' && 'Luxury pricing'}
+                      {business.priceRange === "$" && "Budget-friendly"}
+                      {business.priceRange === "$$" && "Moderate pricing"}
+                      {business.priceRange === "$$$" && "Premium pricing"}
+                      {business.priceRange === "$$$$" && "Luxury pricing"}
                     </span>
                   </div>
                 </CardContent>
@@ -377,31 +402,44 @@ const BusinessDetail: React.FC = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {business.services.map((service, index) => (
-                      <div key={index} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                      <div
+                        key={index}
+                        className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                      >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <h4 className="font-semibold text-lg mb-2">{service.name}</h4>
-                            <p className="text-sm text-muted-foreground mb-3">{service.description}</p>
-                            {service.features && service.features.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mb-2">
-                                {service.features.map((feature, idx) => (
-                                  <Badge key={idx} variant="secondary" className="text-xs">
-                                    {feature}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
+                            <h4 className="font-semibold text-lg mb-2">
+                              {service.name}
+                            </h4>
+                            <p className="text-sm text-muted-foreground mb-3">
+                              {service.description}
+                            </p>
+                            {service.features &&
+                              service.features.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mb-2">
+                                  {service.features.map((feature, idx) => (
+                                    <Badge
+                                      key={idx}
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
+                                      {feature}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
                           </div>
                           {service.price && (
                             <div className="text-right ml-4">
                               <div className="text-lg font-bold text-primary">
                                 ₹{service.price.min}
-                                {service.price.max && service.price.max !== service.price.min && (
-                                  <span> - ₹{service.price.max}</span>
-                                )}
+                                {service.price.max &&
+                                  service.price.max !== service.price.min && (
+                                    <span> - ₹{service.price.max}</span>
+                                  )}
                               </div>
                               <div className="text-xs text-muted-foreground">
-                                {service.price.priceType || 'per service'}
+                                {service.price.priceType || "per service"}
                               </div>
                             </div>
                           )}
@@ -442,29 +480,33 @@ const BusinessDetail: React.FC = () => {
               <CardContent className="space-y-4">
                 <div className="flex items-center gap-3">
                   <Phone className="h-5 w-5 text-primary" />
-                  <p className="font-medium">{business.contactInfo.primaryPhone}</p>
+                  <p className="font-medium">
+                    {business.contactInfo.primaryPhone}
+                  </p>
                 </div>
-                
+
                 {business.contactInfo.secondaryPhone && (
                   <div className="flex items-center gap-3">
                     <Phone className="h-5 w-5 text-primary" />
-                    <p className="font-medium">{business.contactInfo.secondaryPhone}</p>
+                    <p className="font-medium">
+                      {business.contactInfo.secondaryPhone}
+                    </p>
                   </div>
                 )}
-                
+
                 {business.contactInfo.email && (
                   <div className="flex items-center gap-3">
                     <Mail className="h-5 w-5 text-primary" />
                     <p>{business.contactInfo.email}</p>
                   </div>
                 )}
-                
+
                 {business.contactInfo.website && (
                   <div className="flex items-center gap-3">
                     <Globe className="h-5 w-5 text-primary" />
-                    <a 
-                      href={business.contactInfo.website} 
-                      target="_blank" 
+                    <a
+                      href={business.contactInfo.website}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-primary hover:underline"
                     >
@@ -472,13 +514,16 @@ const BusinessDetail: React.FC = () => {
                     </a>
                   </div>
                 )}
-                
+
                 {business.whatsappNumber && (
                   <div className="flex items-center gap-3">
                     <Phone className="h-5 w-5 text-green-600" />
-                    <a 
-                      href={`https://wa.me/${business.whatsappNumber.replace(/[^0-9]/g, '')}`}
-                      target="_blank" 
+                    <a
+                      href={`https://wa.me/${business.whatsappNumber.replace(
+                        /[^0-9]/g,
+                        ""
+                      )}`}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-green-600 hover:underline font-medium"
                     >
@@ -486,15 +531,17 @@ const BusinessDetail: React.FC = () => {
                     </a>
                   </div>
                 )}
-                
+
                 {business.socialMedia && (
                   <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-muted-foreground">Social Media</h4>
+                    <h4 className="font-medium text-sm text-muted-foreground">
+                      Social Media
+                    </h4>
                     <div className="flex flex-wrap gap-2">
                       {business.socialMedia.facebook && (
-                        <a 
-                          href={business.socialMedia.facebook} 
-                          target="_blank" 
+                        <a
+                          href={business.socialMedia.facebook}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline text-sm"
                         >
@@ -502,9 +549,9 @@ const BusinessDetail: React.FC = () => {
                         </a>
                       )}
                       {business.socialMedia.instagram && (
-                        <a 
-                          href={business.socialMedia.instagram} 
-                          target="_blank" 
+                        <a
+                          href={business.socialMedia.instagram}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-pink-600 hover:underline text-sm"
                         >
@@ -512,9 +559,9 @@ const BusinessDetail: React.FC = () => {
                         </a>
                       )}
                       {business.socialMedia.twitter && (
-                        <a 
-                          href={business.socialMedia.twitter} 
-                          target="_blank" 
+                        <a
+                          href={business.socialMedia.twitter}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-400 hover:underline text-sm"
                         >
@@ -522,9 +569,9 @@ const BusinessDetail: React.FC = () => {
                         </a>
                       )}
                       {business.socialMedia.linkedin && (
-                        <a 
-                          href={business.socialMedia.linkedin} 
-                          target="_blank" 
+                        <a
+                          href={business.socialMedia.linkedin}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-700 hover:underline text-sm"
                         >
@@ -534,8 +581,8 @@ const BusinessDetail: React.FC = () => {
                     </div>
                   </div>
                 )}
-                
-                <Button 
+
+                <Button
                   className="w-full"
                   onClick={() => handleCall(business.contactInfo.primaryPhone)}
                 >
@@ -555,12 +602,18 @@ const BusinessDetail: React.FC = () => {
                   <MapPin className="h-5 w-5 text-primary mt-1" />
                   <div>
                     <p>{business.address.street}</p>
-                    <p>{business.address.area}, {business.address.city}</p>
-                    <p>{business.address.state} - {business.address.pincode}</p>
-                    {business.address.landmark && <p>Near {business.address.landmark}</p>}
+                    <p>
+                      {business.address.area}, {business.address.city}
+                    </p>
+                    <p>
+                      {business.address.state} - {business.address.pincode}
+                    </p>
+                    {business.address.landmark && (
+                      <p>Near {business.address.landmark}</p>
+                    )}
                   </div>
                 </div>
-                
+
                 <Button variant="outline" className="w-full">
                   <Navigation className="h-4 w-4 mr-2" />
                   Get Directions
@@ -575,7 +628,9 @@ const BusinessDetail: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-center mb-4">
-                  <div className="text-3xl font-bold mb-2">{business.ratings.average.toFixed(1)}</div>
+                  <div className="text-3xl font-bold mb-2">
+                    {business.ratings.average.toFixed(1)}
+                  </div>
                   <div className="flex justify-center mb-2">
                     {renderStars(business.ratings.average)}
                   </div>
@@ -583,14 +638,18 @@ const BusinessDetail: React.FC = () => {
                     Based on {business.ratings.totalReviews} reviews
                   </p>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4 text-center text-sm">
                   <div>
-                    <div className="font-semibold text-lg">{business.analytics.totalViews}</div>
+                    <div className="font-semibold text-lg">
+                      {business.analytics.totalViews}
+                    </div>
                     <div className="text-muted-foreground">Total Views</div>
                   </div>
                   <div>
-                    <div className="font-semibold text-lg">{business.analytics.totalCalls}</div>
+                    <div className="font-semibold text-lg">
+                      {business.analytics.totalCalls}
+                    </div>
                     <div className="text-muted-foreground">Total Calls</div>
                   </div>
                 </div>
@@ -621,28 +680,34 @@ const BusinessDetail: React.FC = () => {
                     <span className="font-medium">{business.businessType}</span>
                   </div>
                 )}
-                
+
                 {business.establishedYear && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Established</span>
-                    <span className="font-medium">{business.establishedYear}</span>
+                    <span className="font-medium">
+                      {business.establishedYear}
+                    </span>
                   </div>
                 )}
-                
+
                 {business.employeeCount && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Team Size</span>
-                    <span className="font-medium">{business.employeeCount} employees</span>
+                    <span className="font-medium">
+                      {business.employeeCount} employees
+                    </span>
                   </div>
                 )}
-                
+
                 {business.verification && business.verification.trustScore && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Trust Score</span>
-                    <span className="font-medium">{business.verification.trustScore}/100</span>
+                    <span className="font-medium">
+                      {business.verification.trustScore}/100
+                    </span>
                   </div>
                 )}
-                
+
                 {business.subCategory && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Specialty</span>
@@ -651,8 +716,6 @@ const BusinessDetail: React.FC = () => {
                 )}
               </CardContent>
             </Card>
-
-
           </div>
         </div>
       </div>

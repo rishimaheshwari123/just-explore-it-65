@@ -5,134 +5,177 @@ const { uploadImageToCloudinary } = require('../config/imageUploader');
 // Create Business
 const createBusinessCtrl = async (req, res) => {
     try {
+        console.log("📩 Incoming Body =>", req.body);
+
+        // Parse businessData
         let businessData;
-        
-        // Handle both JSON and form data
         if (req.body.businessData) {
-            businessData = JSON.parse(req.body.businessData);
+            try {
+                businessData = JSON.parse(req.body.businessData);
+            } catch (err) {
+                console.error("❌ Error parsing businessData:", err.message);
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid businessData format",
+                });
+            }
         } else {
             businessData = req.body;
         }
 
+        console.log("📝 Parsed BusinessData =>", businessData);
+
         const {
-            // Basic Information
             businessName,
             description,
             category,
             subCategory,
             businessType,
             establishedYear,
-            
-            // Contact Information
-            phone,
-            alternatePhone,
-            email,
-            website,
-            
-            // Location Information
+            employeeCount,
             address,
             area,
             coordinates,
-            
-            // Business Hours
+            phone,
+            alternatePhone,
+            whatsappNumber,
+            email,
+            website,
+            socialMedia,
             businessHours,
-            
-            // Services and Pricing
             services,
             pricing,
-            
-            // Media
-            images,
-            videos,
-            
-            // Additional Information
             tags,
             keywords,
             features,
             paymentMethods,
             amenities,
-            
-            // Vendor ID
-            vendor
+            priceRange,
+            vendor,
         } = businessData;
 
-        // Handle file uploads using express-fileupload
+        // ========== HANDLE FILE UPLOAD ==========
         const uploadedImages = [];
         if (req.files && req.files.images) {
-            const files = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
-            
+            const files = Array.isArray(req.files.images)
+                ? req.files.images
+                : [req.files.images];
+
             for (const file of files) {
                 try {
-                    const result = await uploadImageToCloudinary(file, 'businesses', 600, 80);
+                    const result = await uploadImageToCloudinary(file, "businesses", 600, 80);
                     uploadedImages.push({
                         public_id: result.public_id,
-                        url: result.secure_url
+                        url: result.secure_url,
+                        isPrimary: uploadedImages.length === 0, // first one primary
                     });
                 } catch (uploadError) {
-                    console.error('Error uploading image:', uploadError);
+                    console.error("❌ Error uploading image:", uploadError);
                 }
             }
         }
 
-        // Parse images if coming as string
-        let imagesArray = [];
-        if (images) {
+        // ========== PARSE IMAGES ==========
+        let images = [...uploadedImages];
+        if (req.body.images) {
             try {
-                imagesArray = JSON.parse(images);
-            } catch {
-                imagesArray = images;
+                const parsedImages =
+                    typeof req.body.images === "string"
+                        ? JSON.parse(req.body.images)
+                        : req.body.images;
+
+                if (Array.isArray(parsedImages)) {
+                    images = [
+                        ...images,
+                        ...parsedImages.map((img, i) =>
+                            typeof img === "string"
+                                ? { url: img, isPrimary: images.length === 0 && i === 0 }
+                                : img
+                        ),
+                    ];
+                }
+            } catch (e) {
+                console.error("❌ Error parsing images:", e.message);
             }
         }
+        console.log("📸 Final Images Array =>", images);
 
-        // Combine uploaded images with existing images
-        imagesArray = [...uploadedImages, ...imagesArray]
+        // ========== PARSE VIDEOS ==========
+        let videos = [];
+        if (req.body.videos) {
+            try {
+                const parsedVideos =
+                    typeof req.body.videos === "string"
+                        ? JSON.parse(req.body.videos)
+                        : req.body.videos;
 
-        // Parse services if coming as string
+                if (Array.isArray(parsedVideos)) {
+                    videos = parsedVideos.map((vid) =>
+                        typeof vid === "string" ? { url: vid } : vid
+                    );
+                }
+            } catch (e) {
+                console.error("❌ Error parsing videos:", e.message);
+            }
+        }
+        console.log("🎬 Final Videos Array =>", videos);
+
+        // ========== PARSE SERVICES ==========
         let servicesArray = [];
         if (services) {
             try {
-                servicesArray = JSON.parse(services);
+                servicesArray = Array.isArray(services)
+                    ? services
+                    : JSON.parse(services);
             } catch {
-                servicesArray = services;
+                servicesArray = [];
             }
         }
 
-        // Parse pricing if coming as string
+        // ========== PARSE PRICING ==========
         let pricingArray = [];
         if (pricing) {
             try {
-                pricingArray = JSON.parse(pricing);
+                pricingArray = Array.isArray(pricing) ? pricing : JSON.parse(pricing);
             } catch {
-                pricingArray = pricing;
+                pricingArray = [];
             }
         }
 
-        // Validate required fields
+        console.log("🛠 Services Array =>", servicesArray);
+        console.log("💰 Pricing Array =>", pricingArray);
+
+        // ========== VALIDATIONS ==========
         if (!businessName || !description || !category || !phone || !address || !vendor) {
             return res.status(400).json({
                 success: false,
-                message: "Please provide all required fields: businessName, description, category, phone, address, vendor",
+                message:
+                    "Please provide all required fields: businessName, description, category, phone, address, vendor",
             });
         }
 
-        // Validate address object
         if (!address.street || !address.city || !address.state || !address.pincode) {
             return res.status(400).json({
                 success: false,
-                message: "Please provide complete address: street, city, state, pincode",
+                message:
+                    "Please provide complete address: street, city, state, pincode",
             });
         }
 
-        // Validate coordinates
-        if (!coordinates || !coordinates.latitude || !coordinates.longitude || 
-            coordinates.latitude === 0 || coordinates.longitude === 0) {
+        if (
+            !coordinates ||
+            !coordinates.latitude ||
+            !coordinates.longitude ||
+            coordinates.latitude === 0 ||
+            coordinates.longitude === 0
+        ) {
             return res.status(400).json({
                 success: false,
-                message: "Please provide valid coordinates (latitude and longitude cannot be 0)",
+                message:
+                    "Please provide valid coordinates (latitude and longitude cannot be 0)",
             });
         }
 
-        // Check if vendor exists
         const vendorExists = await Vendor.findById(vendor);
         if (!vendorExists) {
             return res.status(404).json({
@@ -141,64 +184,51 @@ const createBusinessCtrl = async (req, res) => {
             });
         }
 
+        // ========== CREATE BUSINESS ==========
         const business = await Business.create({
             businessName,
             description,
             category,
             subCategory,
-            businessType: businessType || 'Other',
-            establishedYear: establishedYear,
+            businessType: businessType || "Other",
+            establishedYear,
+            employeeCount,
             contactInfo: {
                 primaryPhone: phone,
                 secondaryPhone: alternatePhone,
                 email,
                 website,
-                whatsappNumber: businessData.whatsappNumber,
-                socialMedia: {
-                    facebook: businessData.facebook,
-                    instagram: businessData.instagram,
-                    twitter: businessData.twitter,
-                    linkedin: businessData.linkedin,
-                },
+                whatsappNumber,
+                socialMedia: socialMedia || {},
             },
             address: {
                 street: address.street,
-                area: address.area || area || 'Unknown Area',
+                area: address.area || area || "Unknown Area",
                 city: address.city,
                 state: address.state,
                 pincode: address.pincode,
                 landmark: address.landmark,
             },
-            area: address.area || area || 'Unknown Area',
+            area: address.area || area || "Unknown Area",
             coordinates: {
                 latitude: parseFloat(coordinates?.latitude) || 0,
                 longitude: parseFloat(coordinates?.longitude) || 0,
             },
-            businessHours: businessHours || {
-                monday: { open: '09:00', close: '18:00', isClosed: false },
-                tuesday: { open: '09:00', close: '18:00', isClosed: false },
-                wednesday: { open: '09:00', close: '18:00', isClosed: false },
-                thursday: { open: '09:00', close: '18:00', isClosed: false },
-                friday: { open: '09:00', close: '18:00', isClosed: false },
-                saturday: { open: '09:00', close: '18:00', isClosed: false },
-                sunday: { open: '10:00', close: '17:00', isClosed: false },
-            },
+            businessHours: businessHours,
             services: servicesArray,
-            priceRange: businessData.priceRange || '₹₹',
-            images: imagesArray,
-            videos: businessData.videos || [],
-            tags: tags ? (Array.isArray(tags) ? tags : tags.split(',')) : [],
-            keywords: keywords ? (Array.isArray(keywords) ? keywords : keywords.split(',')) : [],
+            priceRange: priceRange || "₹₹",
+            images,
+            videos,
+            tags: tags ? (Array.isArray(tags) ? tags : tags.split(",")) : [],
+            keywords: keywords ? (Array.isArray(keywords) ? keywords : keywords.split(",")) : [],
             features: features || [],
             paymentMethods: paymentMethods || [],
             amenities: amenities || [],
-            employeeCount: businessData.employeeCount,
             vendor,
         });
 
-        // Update vendor analytics
         await Vendor.findByIdAndUpdate(vendor, {
-            $inc: { 'analytics.totalBusinesses': 1 }
+            $inc: { "analytics.totalBusinesses": 1 },
         });
 
         return res.status(201).json({
@@ -207,7 +237,7 @@ const createBusinessCtrl = async (req, res) => {
             business,
         });
     } catch (error) {
-        console.error("Error creating business:", error);
+        console.error("❌ Error creating business:", error);
         return res.status(500).json({
             success: false,
             message: "Error in creating business API!",
@@ -216,10 +246,16 @@ const createBusinessCtrl = async (req, res) => {
     }
 };
 
+
+
+
+
 // Update Business
 const updateBusinessCtrl = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log("📥 Incoming Body =>", req.body);
+
         const {
             businessName,
             description,
@@ -227,13 +263,11 @@ const updateBusinessCtrl = async (req, res) => {
             subCategory,
             businessType,
             establishedYear,
+            employeeCount,
             address,
             area,
             coordinates,
-            phone,
-            alternatePhone,
-            email,
-            website,
+            contactInfo,
             businessHours,
             services,
             features,
@@ -242,7 +276,7 @@ const updateBusinessCtrl = async (req, res) => {
             paymentMethods,
             amenities,
             images,
-            vendor
+            vendor,
         } = req.body;
 
         // Find business
@@ -254,76 +288,40 @@ const updateBusinessCtrl = async (req, res) => {
             });
         }
 
-        // Parse arrays if coming as strings
+        // ✅ Normalize Images
         let imagesArray = [];
         if (images) {
-            try {
-                imagesArray = JSON.parse(images);
-            } catch {
+            if (typeof images === "string") {
+                try {
+                    imagesArray = JSON.parse(images);
+                } catch {
+                    imagesArray = [images];
+                }
+            } else {
                 imagesArray = images;
             }
+
+            imagesArray = imagesArray.map((img, i) => {
+                if (typeof img === "string") {
+                    return { url: img, isPrimary: i === 0 };
+                }
+                return img;
+            });
         }
 
-        let servicesArray = [];
-        if (services) {
-            try {
-                servicesArray = JSON.parse(services);
-            } catch {
-                servicesArray = services;
-            }
-        }
+        console.log("📸 Final Images =>", imagesArray);
 
-        let featuresArray = [];
-        if (features) {
-            try {
-                featuresArray = JSON.parse(features);
-            } catch {
-                featuresArray = features;
-            }
-        }
-
-        let tagsArray = [];
-        if (tags) {
-            try {
-                tagsArray = JSON.parse(tags);
-            } catch {
-                tagsArray = tags;
-            }
-        }
-
-        let keywordsArray = [];
-        if (keywords) {
-            try {
-                keywordsArray = JSON.parse(keywords);
-            } catch {
-                keywordsArray = keywords;
-            }
-        }
-
-        let paymentMethodsArray = [];
-        if (paymentMethods) {
-            try {
-                paymentMethodsArray = JSON.parse(paymentMethods);
-            } catch {
-                paymentMethodsArray = paymentMethods;
-            }
-        }
-
-        let amenitiesArray = [];
-        if (amenities) {
-            try {
-                amenitiesArray = JSON.parse(amenities);
-            } catch {
-                amenitiesArray = amenities;
-            }
-        }
-
-        // Validate coordinates if provided
-        if (coordinates && coordinates.latitude !== undefined && coordinates.longitude !== undefined) {
+        // Validate coordinates
+        if (
+            coordinates &&
+            coordinates.latitude !== undefined &&
+            coordinates.longitude !== undefined
+        ) {
             if (coordinates.latitude === 0 || coordinates.longitude === 0) {
                 return res.status(400).json({
                     success: false,
-                    message: "Please provide valid coordinates (latitude and longitude cannot be 0)",
+                    message:
+                        "Please provide valid coordinates (latitude and longitude cannot be 0)",
                 });
             }
         }
@@ -336,36 +334,36 @@ const updateBusinessCtrl = async (req, res) => {
             ...(subCategory && { subCategory }),
             ...(businessType && { businessType }),
             ...(establishedYear && { establishedYear }),
+            ...(employeeCount && { employeeCount }),
             ...(address && { address }),
+            ...(contactInfo && { contactInfo }),
             ...(area && { area }),
-            ...(coordinates && { 
+            ...(coordinates && {
                 location: {
-                    type: 'Point',
-                    coordinates: [coordinates.longitude, coordinates.latitude]
+                    type: "Point",
+                    coordinates: [coordinates.longitude, coordinates.latitude],
                 },
-                coordinates 
+                coordinates,
             }),
-            ...(phone && { phone }),
-            ...(alternatePhone && { alternatePhone }),
-            ...(email && { email }),
-            ...(website && { website }),
             ...(businessHours && { businessHours }),
-            ...(servicesArray.length > 0 && { services: servicesArray }),
-            ...(featuresArray.length > 0 && { features: featuresArray }),
-            ...(tagsArray.length > 0 && { tags: tagsArray }),
-            ...(keywordsArray.length > 0 && { keywords: keywordsArray }),
-            ...(paymentMethodsArray.length > 0 && { paymentMethods: paymentMethodsArray }),
-            ...(amenitiesArray.length > 0 && { amenities: amenitiesArray }),
+            ...(services && services.length > 0 && { services }),
+            ...(features && features.length > 0 && { features }),
+            ...(tags && tags.length > 0 && { tags }),
+            ...(keywords && keywords.length > 0 && { keywords }),
+            ...(paymentMethods && paymentMethods.length > 0 && { paymentMethods }),
+            ...(amenities && amenities.length > 0 && { amenities }),
             ...(imagesArray.length > 0 && { images: imagesArray }),
-            ...(vendor && { vendor })
+            ...(vendor && { vendor }),
         };
+
+        console.log("🛠 UpdateData =>", updateData);
 
         // Update business with new data
         const updatedBusiness = await Business.findByIdAndUpdate(
             id,
             { $set: updateData },
             { new: true, runValidators: true }
-        ).populate('vendor', 'name email company');
+        ).populate("vendor", "name email company");
 
         return res.status(200).json({
             success: true,
@@ -373,7 +371,7 @@ const updateBusinessCtrl = async (req, res) => {
             business: updatedBusiness,
         });
     } catch (error) {
-        console.error("Error updating business:", error);
+        console.error("❌ Error updating business:", error);
         return res.status(500).json({
             success: false,
             message: "Error in updating business API!",
@@ -410,52 +408,52 @@ const getBusinessesCtrl = async (req, res) => {
         if (category) {
             filter.category = category;
         }
-        
+
         // console.log('Filter object:', filter);
         // console.log('Category parameter:', category);
 
- if (city || state) {
-    const addressQueries = [];
-    const cityParts = city ? city.split(',').map(part => part.trim()) : [];
-    const stateParts = state ? state.split(',').map(part => part.trim()) : [];
+        if (city || state) {
+            const addressQueries = [];
+            const cityParts = city ? city.split(',').map(part => part.trim()) : [];
+            const stateParts = state ? state.split(',').map(part => part.trim()) : [];
 
-    // Add city-related searches
-    cityParts.forEach(part => {
-        addressQueries.push(
-            { 'address.street': new RegExp(part, 'i') },
-            { 'address.area': new RegExp(part, 'i') },
-            { 'address.city': new RegExp(part, 'i') },
-            { 'address.state': new RegExp(part, 'i') }
-        );
-    });
+            // Add city-related searches
+            cityParts.forEach(part => {
+                addressQueries.push(
+                    { 'address.street': new RegExp(part, 'i') },
+                    { 'address.area': new RegExp(part, 'i') },
+                    { 'address.city': new RegExp(part, 'i') },
+                    { 'address.state': new RegExp(part, 'i') }
+                );
+            });
 
-    // Add state-related searches
-    stateParts.forEach(part => {
-        addressQueries.push(
-            { 'address.street': new RegExp(part, 'i') },
-            { 'address.area': new RegExp(part, 'i') },
-            { 'address.city': new RegExp(part, 'i') },
-            { 'address.state': new RegExp(part, 'i') }
-        );
-    });
+            // Add state-related searches
+            stateParts.forEach(part => {
+                addressQueries.push(
+                    { 'address.street': new RegExp(part, 'i') },
+                    { 'address.area': new RegExp(part, 'i') },
+                    { 'address.city': new RegExp(part, 'i') },
+                    { 'address.state': new RegExp(part, 'i') }
+                );
+            });
 
-    if (addressQueries.length > 0) {
-        filter.$or = filter.$or ? filter.$or.concat(addressQueries) : addressQueries;
-    }
-}
-
-
-if (search) {
-    filter.$or = [
-        { businessName: new RegExp(search, 'i') },
-        { description: new RegExp(search, 'i') },
-        { tags: new RegExp(search, 'i') },
-        { keywords: new RegExp(search, 'i') },
-    ];
-}
+            if (addressQueries.length > 0) {
+                filter.$or = filter.$or ? filter.$or.concat(addressQueries) : addressQueries;
+            }
+        }
 
 
-      
+        if (search) {
+            filter.$or = [
+                { businessName: new RegExp(search, 'i') },
+                { description: new RegExp(search, 'i') },
+                { tags: new RegExp(search, 'i') },
+                { keywords: new RegExp(search, 'i') },
+            ];
+        }
+
+
+
 
         if (minRating) {
             filter['ratings.average'] = { $gte: parseFloat(minRating) };
@@ -482,15 +480,15 @@ if (search) {
         const skip = (parseInt(page) - 1) * parseInt(limit);
 
         console.log('Executing query with filter:', filter);
-        
+
         let businesses;
-        
+
         // If latitude and longitude are provided, use geospatial query
         if (latitude && longitude) {
             const lat = parseFloat(latitude);
             const lng = parseFloat(longitude);
             const distanceInMeters = parseFloat(distance) * 1000; // Convert km to meters
-            
+
             businesses = await Business.aggregate([
                 {
                     $geoNear: {
@@ -545,7 +543,7 @@ if (search) {
                 .limit(parseInt(limit))
                 .lean();
         }
-        
+
         console.log('Found businesses:', businesses.length);
         console.log('Business details:', businesses.map(b => ({ name: b.businessName, category: b.category })));
 
@@ -687,10 +685,10 @@ const getFeaturedBusinessesCtrl = async (req, res) => {
             status: 'active',
             isPremium: true
         })
-        .populate('vendor', 'name company verification.verificationLevel')
-        .sort({ 'ratings.average': -1, createdAt: -1 })
-        .limit(parseInt(limit))
-        .lean();
+            .populate('vendor', 'name company verification.verificationLevel')
+            .sort({ 'ratings.average': -1, createdAt: -1 })
+            .limit(parseInt(limit))
+            .lean();
 
         return res.status(200).json({
             success: true,
@@ -714,14 +712,14 @@ const getTrendingBusinessesCtrl = async (req, res) => {
         const trendingBusinesses = await Business.find({
             'status.isActive': true
         })
-        .populate('vendor', 'name company verification.verificationLevel')
-        .sort({ 
-            'analytics.totalViews': -1, 
-            'analytics.totalCalls': -1,
-            'ratings.averageRating': -1 
-        })
-        .limit(parseInt(limit))
-        .lean();
+            .populate('vendor', 'name company verification.verificationLevel')
+            .sort({
+                'analytics.totalViews': -1,
+                'analytics.totalCalls': -1,
+                'ratings.averageRating': -1
+            })
+            .limit(parseInt(limit))
+            .lean();
 
         return res.status(200).json({
             success: true,
@@ -883,7 +881,7 @@ module.exports = {
     incrementBusinessInteractionCtrl,
     trackBusinessInteractionCtrl,
     getPropertiesByVendorPost,
-    
+
     // Legacy exports for backward compatibility
     createPropertyCtrl: createBusinessCtrl,
     updatePropertyCtrl: updateBusinessCtrl,

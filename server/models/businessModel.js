@@ -8,18 +8,18 @@ const businessSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
-        
+
         businessType: {
             type: String,
             required: true,
-           
+
         },
 
         category: {
             type: String,
             required: true,
             enum: [
-                'Food & Dining', 'Healthcare', 'Education', 'Shopping', 
+                'Food & Dining', 'Healthcare', 'Education', 'Shopping',
                 'Hotels & Travel', 'Fitness & Wellness', 'Beauty & Spa',
                 'Electronics & Technology', 'Automotive', 'Real Estate',
                 'Financial Services', 'Professional Services', 'Home & Garden',
@@ -120,7 +120,7 @@ const businessSchema = new mongoose.Schema(
                 required: true,
             },
         },
-        
+
         // GeoJSON location for geospatial queries
         location: {
             type: {
@@ -173,7 +173,7 @@ const businessSchema = new mongoose.Schema(
         // Pricing Information
         priceRange: {
             type: String,
-        
+
             default: '₹₹',
         },
 
@@ -202,7 +202,7 @@ const businessSchema = new mongoose.Schema(
         features: [{
             type: String,
             enum: [
-                'WiFi Available', 'Parking Available', 'AC Available', 
+                'WiFi Available', 'Parking Available', 'AC Available',
                 'Card Payment Accepted', 'Home Delivery', 'Online Booking',
                 'Wheelchair Accessible', '24/7 Service', 'Emergency Service',
                 'Cash on Delivery', 'Return Policy', 'Warranty Available',
@@ -304,7 +304,7 @@ const businessSchema = new mongoose.Schema(
         status: {
             type: String,
             enum: ['active', 'inactive', 'pending', 'suspended'],
-            default: 'pending',
+            default: 'active',
         },
 
         // Premium Features
@@ -342,8 +342,7 @@ const businessSchema = new mongoose.Schema(
         // Additional Information
         establishedYear: {
             type: Number,
-            min: 1900,
-            max: new Date().getFullYear(),
+
         },
 
         employeeCount: {
@@ -363,7 +362,7 @@ const businessSchema = new mongoose.Schema(
             },
         }],
     },
-    { 
+    {
         timestamps: true,
         toJSON: { virtuals: true },
         toObject: { virtuals: true }
@@ -371,15 +370,15 @@ const businessSchema = new mongoose.Schema(
 );
 
 // Virtual for checking if business is currently open
-businessSchema.virtual('isCurrentlyOpen').get(function() {
+businessSchema.virtual('isCurrentlyOpen').get(function () {
     const now = new Date();
     const days = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
     const currentDay = days[now.getDay()];
     const currentTime = now.toTimeString().substring(0, 5); // HH:MM format
-    
+
     const todayHours = this.businessHours[currentDay];
     if (!todayHours || todayHours.isClosed) return false;
-    
+
     return currentTime >= todayHours.open && currentTime <= todayHours.close;
 });
 
@@ -394,7 +393,7 @@ businessSchema.index({ "ratings.average": -1 });
 businessSchema.index({ status: 1, isPremium: -1 });
 
 // Pre-save middleware to sync coordinates with location
-businessSchema.pre('save', function(next) {
+businessSchema.pre('save', function (next) {
     if (this.coordinates && this.coordinates.latitude && this.coordinates.longitude) {
         this.location = {
             type: 'Point',

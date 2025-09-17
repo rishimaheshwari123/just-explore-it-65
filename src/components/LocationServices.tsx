@@ -1,8 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { MapPin, Navigation, Clock, Phone, Star, Car, Bike, User } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  MapPin,
+  Navigation,
+  Clock,
+  Phone,
+  Star,
+  Car,
+  Bike,
+  User,
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface Business {
   _id: string;
@@ -40,40 +49,45 @@ interface Business {
 }
 
 const LocationServices: React.FC = () => {
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('distance');
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("distance");
   const [loading, setLoading] = useState(false);
   const [nearbyBusinesses, setNearbyBusinesses] = useState<Business[]>([]);
 
   const fetchNearbyBusinesses = async () => {
     if (!userLocation) return;
-    
+
     try {
       setLoading(true);
       const params = new URLSearchParams({
         latitude: userLocation.lat.toString(),
         longitude: userLocation.lng.toString(),
-        distance: '5', // 5km radius
-        limit: '6',
-        sortBy: 'distance'
+        distance: "5", // 5km radius
+        limit: "6",
+        sortBy: "distance",
       });
-      
-      if (selectedCategory !== 'all') {
-        params.append('category', selectedCategory);
+
+      if (selectedCategory !== "all") {
+        params.append("category", selectedCategory);
       }
-      
-      const response = await fetch(`http://localhost:8002/api/v1/property/businesses?${params.toString()}`);
+
+      const response = await fetch(
+        `http://localhost:8000/api/v1/property/businesses?${params.toString()}`
+      );
       const data = await response.json();
-      
+
       if (data.success) {
         setNearbyBusinesses(data.businesses || []);
       } else {
         setNearbyBusinesses([]);
       }
     } catch (error) {
-      console.error('Error fetching nearby businesses:', error);
-      toast.error('Failed to load nearby businesses');
+      console.error("Error fetching nearby businesses:", error);
+      toast.error("Failed to load nearby businesses");
       setNearbyBusinesses([]);
     } finally {
       setLoading(false);
@@ -90,28 +104,36 @@ const LocationServices: React.FC = () => {
     }
   }, [userLocation, selectedCategory, sortBy]);
 
-  const isBusinessOpen = (businessHours: Business['businessHours']) => {
+  const isBusinessOpen = (businessHours: Business["businessHours"]) => {
     const now = new Date();
-    const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const currentDay = now
+      .toLocaleDateString("en-US", { weekday: "long" })
+      .toLowerCase();
     const currentTime = now.toTimeString().slice(0, 5);
-    
+
     const todayHours = businessHours[currentDay];
     if (!todayHours || todayHours.isClosed) return false;
-    
+
     return currentTime >= todayHours.open && currentTime <= todayHours.close;
   };
 
   const formatDistance = (distance?: number) => {
-    if (!distance) return 'N/A';
+    if (!distance) return "N/A";
     if (distance < 1000) {
       return `${Math.round(distance)}m`;
     }
     return `${(distance / 1000).toFixed(1)}km`;
   };
 
-
-
-  const categories = ['all', 'Healthcare', 'Electronics', 'Food', 'Automotive', 'Fitness', 'Education'];
+  const categories = [
+    "all",
+    "Healthcare",
+    "Electronics",
+    "Food",
+    "Automotive",
+    "Fitness",
+    "Education",
+  ];
 
   const getCurrentLocation = () => {
     setLoading(true);
@@ -120,7 +142,7 @@ const LocationServices: React.FC = () => {
         (position) => {
           setUserLocation({
             lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lng: position.coords.longitude,
           });
           setLoading(false);
         },
@@ -144,14 +166,15 @@ const LocationServices: React.FC = () => {
     }
   }, [userLocation, selectedCategory]);
 
-  const filteredBusinesses = nearbyBusinesses.filter(business => 
-    selectedCategory === 'all' || business.category === selectedCategory
+  const filteredBusinesses = nearbyBusinesses.filter(
+    (business) =>
+      selectedCategory === "all" || business.category === selectedCategory
   );
 
   const sortedBusinesses = [...filteredBusinesses].sort((a, b) => {
-    if (sortBy === 'distance') {
+    if (sortBy === "distance") {
       return (a.distance || 0) - (b.distance || 0);
-    } else if (sortBy === 'rating') {
+    } else if (sortBy === "rating") {
       return b.ratings.average - a.ratings.average;
     }
     return 0;
@@ -159,32 +182,37 @@ const LocationServices: React.FC = () => {
 
   const openInMaps = (business: Business) => {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${business.coordinates.latitude},${business.coordinates.longitude}`;
-    window.open(url, '_blank');
+    window.open(url, "_blank");
   };
 
   const viewAllOnMap = () => {
     if (nearbyBusinesses.length === 0) {
-      toast.error('No businesses to show on map');
+      toast.error("No businesses to show on map");
       return;
     }
 
     // Create a Google Maps URL with multiple destinations
     const destinations = nearbyBusinesses
-      .map(business => `${business.coordinates.latitude},${business.coordinates.longitude}`)
-      .join('|');
-    
+      .map(
+        (business) =>
+          `${business.coordinates.latitude},${business.coordinates.longitude}`
+      )
+      .join("|");
+
     // If user location is available, use it as starting point
-    const origin = userLocation 
+    const origin = userLocation
       ? `${userLocation.latitude},${userLocation.longitude}`
-      : '';
-    
-    const baseUrl = 'https://www.google.com/maps/dir/';
-    const url = origin 
-      ? `${baseUrl}${origin}/${destinations.split('|')[0]}` // Show route to first business
-      : `https://www.google.com/maps/search/?api=1&query=${destinations.split('|')[0]}`; // Just show first business location
-    
-    window.open(url, '_blank');
-    toast.success('Opening map view with all businesses');
+      : "";
+
+    const baseUrl = "https://www.google.com/maps/dir/";
+    const url = origin
+      ? `${baseUrl}${origin}/${destinations.split("|")[0]}` // Show route to first business
+      : `https://www.google.com/maps/search/?api=1&query=${
+          destinations.split("|")[0]
+        }`; // Just show first business location
+
+    window.open(url, "_blank");
+    toast.success("Opening map view with all businesses");
   };
 
   return (
@@ -196,23 +224,24 @@ const LocationServices: React.FC = () => {
             Nearby Services
           </h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-6">
-            Discover local businesses and services around you with real-time location data
+            Discover local businesses and services around you with real-time
+            location data
           </p>
-          
+
           {/* Location Status */}
           <div className="flex items-center justify-center gap-2 mb-6">
             <MapPin className="h-5 w-5 text-blue-600" />
             <span className="text-sm text-gray-600">
-              {userLocation ? 'Location detected' : 'Getting your location...'}
+              {userLocation ? "Location detected" : "Getting your location..."}
             </span>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={getCurrentLocation}
               disabled={loading}
             >
               <Navigation className="h-4 w-4 mr-1" />
-              {loading ? 'Locating...' : 'Refresh Location'}
+              {loading ? "Locating..." : "Refresh Location"}
             </Button>
           </div>
         </div>
@@ -237,8 +266,8 @@ const LocationServices: React.FC = () => {
           {/* Sort Options */}
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-600">Sort by:</span>
-            <select 
-              value={sortBy} 
+            <select
+              value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
@@ -262,24 +291,39 @@ const LocationServices: React.FC = () => {
             </div>
           ) : (
             sortedBusinesses.map((business) => (
-              <div key={business._id} className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+              <div
+                key={business._id}
+                className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+              >
                 {/* Business Image */}
                 <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={business.images?.[0]?.url || '/api/placeholder/300/200'} 
+                  <img
+                    src={
+                      business.images?.[0]?.url || "/api/placeholder/300/200"
+                    }
                     alt={business.businessName}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-3 left-3">
-                    <Badge variant={isBusinessOpen(business) ? "default" : "secondary"} className="bg-white/90 text-gray-800">
+                    <Badge
+                      variant={
+                        isBusinessOpen(business) ? "default" : "secondary"
+                      }
+                      className="bg-white/90 text-gray-800"
+                    >
                       <Clock className="h-3 w-3 mr-1" />
-                      {isBusinessOpen(business) ? 'Open' : 'Closed'}
+                      {isBusinessOpen(business) ? "Open" : "Closed"}
                     </Badge>
                   </div>
                   <div className="absolute top-3 right-3">
-                    <Badge variant="outline" className="bg-white/90 text-gray-800">
+                    <Badge
+                      variant="outline"
+                      className="bg-white/90 text-gray-800"
+                    >
                       <MapPin className="h-3 w-3 mr-1" />
-                      {business.distance ? formatDistance(business.distance) : 'N/A'}
+                      {business.distance
+                        ? formatDistance(business.distance)
+                        : "N/A"}
                     </Badge>
                   </div>
                 </div>
@@ -288,8 +332,12 @@ const LocationServices: React.FC = () => {
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="font-bold text-lg text-gray-900 mb-1">{business.businessName}</h3>
-                      <Badge variant="outline" className="text-xs">{business.category}</Badge>
+                      <h3 className="font-bold text-lg text-gray-900 mb-1">
+                        {business.businessName}
+                      </h3>
+                      <Badge variant="outline" className="text-xs">
+                        {business.category}
+                      </Badge>
                     </div>
                   </div>
 
@@ -297,30 +345,40 @@ const LocationServices: React.FC = () => {
                   <div className="flex items-center gap-2 mb-3">
                     <div className="flex items-center">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-semibold text-sm ml-1">{business.ratings.average.toFixed(1)}</span>
+                      <span className="font-semibold text-sm ml-1">
+                        {business.ratings.average.toFixed(1)}
+                      </span>
                     </div>
-                    <span className="text-gray-500 text-sm">({business.ratings.totalReviews} reviews)</span>
+                    <span className="text-gray-500 text-sm">
+                      ({business.ratings.totalReviews} reviews)
+                    </span>
                   </div>
 
                   {/* Address */}
                   <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {business.address.street}, {business.address.area}, {business.address.city}
+                    {business.address.street}, {business.address.area},{" "}
+                    {business.address.city}
                   </p>
 
                   {/* Action Buttons */}
                   <div className="flex gap-2">
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       className="flex-1"
                       onClick={() => openInMaps(business)}
                     >
                       <Navigation className="h-4 w-4 mr-1" />
                       Directions
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
-                      onClick={() => window.open(`tel:${business.contactInfo.primaryPhone}`, '_self')}
+                      onClick={() =>
+                        window.open(
+                          `tel:${business.contactInfo.primaryPhone}`,
+                          "_self"
+                        )
+                      }
                     >
                       <Phone className="h-4 w-4" />
                     </Button>
@@ -351,12 +409,15 @@ const LocationServices: React.FC = () => {
         <div className="text-center mt-12">
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-2xl mx-auto">
             <MapPin className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-blue-900 mb-2">Interactive Map View</h3>
+            <h3 className="font-semibold text-blue-900 mb-2">
+              Interactive Map View
+            </h3>
             <p className="text-blue-700 text-sm mb-4">
-              Click on "Directions" to open Google Maps with turn-by-turn navigation to your selected business.
+              Click on "Directions" to open Google Maps with turn-by-turn
+              navigation to your selected business.
             </p>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="border-blue-300 text-blue-700 hover:bg-blue-100"
               onClick={viewAllOnMap}
               disabled={nearbyBusinesses.length === 0}

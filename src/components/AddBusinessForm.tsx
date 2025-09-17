@@ -1,81 +1,101 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
-import { createBusinessAPI, getBusinessByIdAPI, updateBusinessAPI } from "../service/operations/business"
-import { Plus, X, Upload, MapPin, Clock, Phone, Mail, Globe, Camera } from "lucide-react"
-import { useNavigate } from "react-router-dom"
-import { imageUpload } from "@/service/operations/image"
-import { useSelector } from "react-redux"
-import type { RootState } from "@/redux/store"
-import GooglePlacesAutocomplete from "./GooglePlacesAutocomplete"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import {
+  createBusinessAPI,
+  getBusinessByIdAPI,
+  updateBusinessAPI,
+} from "../service/operations/business";
+import {
+  Plus,
+  X,
+  Upload,
+  MapPin,
+  Clock,
+  Phone,
+  Mail,
+  Globe,
+  Camera,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { imageUpload } from "@/service/operations/image";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
+import GooglePlacesAutocomplete from "./GooglePlacesAutocomplete";
 
 interface BusinessFormData {
-  businessName: string
-  description: string
-  category: string
-  subCategory: string
-  businessType: string
-  establishedYear: string
-  employeeCount: string
+  businessName: string;
+  description: string;
+  category: string;
+  subCategory: string;
+  businessType: string;
+  establishedYear: string;
+  employeeCount: string;
   address: {
-    street: string
-    area: string
-    city: string
-    state: string
-    pincode: string
-    landmark: string
-  }
+    street: string;
+    area: string;
+    city: string;
+    state: string;
+    pincode: string;
+    landmark: string;
+  };
   coordinates: {
-    latitude: number
-    longitude: number
-  }
+    latitude: number;
+    longitude: number;
+  };
   contactInfo: {
-    primaryPhone: string
-    secondaryPhone: string
-    whatsappNumber: string
-    email: string
-    website?: string
+    primaryPhone: string;
+    secondaryPhone: string;
+    whatsappNumber: string;
+    email: string;
+    website?: string;
     socialMedia: {
-      facebook: string
-      instagram: string
-      twitter: string
-      linkedin: string
-    }
-  }
+      facebook: string;
+      instagram: string;
+      twitter: string;
+      linkedin: string;
+    };
+  };
   businessHours: {
     [key: string]: {
-      open: string
-      close: string
-      isClosed: boolean
-    }
-  }
+      open: string;
+      close: string;
+      isClosed: boolean;
+    };
+  };
   services: Array<{
-    name: string
-    description: string
+    name: string;
+    description: string;
     price: {
-      min: number
-      max: number
-      currency: string
-    }
-  }>
-  features: string[]
-  tags: string[]
-  keywords: string[]
-  images: string[]
-  paymentMethods: string[]
-  amenities: string[]
-  priceRange: string
+      min: number;
+      max: number;
+      currency: string;
+    };
+  }>;
+  features: string[];
+  tags: string[];
+  keywords: string[];
+  images: string[];
+  paymentMethods: string[];
+  amenities: string[];
+  priceRange: string;
 }
 
 const BUSINESS_CATEGORIES = [
@@ -95,10 +115,19 @@ const BUSINESS_CATEGORIES = [
   "Entertainment",
   "Sports & Recreation",
   "Government & Community",
-]
+];
 
 const SUBCATEGORIES: { [key: string]: string[] } = {
-  "Food & Dining": ["North Indian", "South Indian", "Chinese", "Italian", "Fast Food", "Bakery", "Cafe", "Bar & Grill"],
+  "Food & Dining": [
+    "North Indian",
+    "South Indian",
+    "Chinese",
+    "Italian",
+    "Fast Food",
+    "Bakery",
+    "Cafe",
+    "Bar & Grill",
+  ],
   Healthcare: [
     "General Physician",
     "Dentist",
@@ -108,10 +137,37 @@ const SUBCATEGORIES: { [key: string]: string[] } = {
     "Orthopedic",
     "Pharmacy",
   ],
-  Education: ["Schools", "Colleges", "Coaching Centers", "Skill Development", "Language Classes", "Music Classes"],
-  Shopping: ["Clothing", "Electronics", "Grocery", "Books", "Jewelry", "Mobile Phones"],
-  "Hotels & Travel": ["Travel Agency", "Hotel", "Resort", "Tour Guide", "Car Rental"],
-  "Fitness & Wellness": ["Gym", "Yoga Center", "Sports Club", "Cricket Academy", "Swimming Pool", "Badminton Court"],
+  Education: [
+    "Schools",
+    "Colleges",
+    "Coaching Centers",
+    "Skill Development",
+    "Language Classes",
+    "Music Classes",
+  ],
+  Shopping: [
+    "Clothing",
+    "Electronics",
+    "Grocery",
+    "Books",
+    "Jewelry",
+    "Mobile Phones",
+  ],
+  "Hotels & Travel": [
+    "Travel Agency",
+    "Hotel",
+    "Resort",
+    "Tour Guide",
+    "Car Rental",
+  ],
+  "Fitness & Wellness": [
+    "Gym",
+    "Yoga Center",
+    "Sports Club",
+    "Cricket Academy",
+    "Swimming Pool",
+    "Badminton Court",
+  ],
   "Beauty & Spa": ["Salon", "Spa", "Beauty Parlor", "Massage Center"],
   "Electronics & Technology": [
     "Software Development",
@@ -120,19 +176,81 @@ const SUBCATEGORIES: { [key: string]: string[] } = {
     "Digital Marketing",
     "Computer Store",
   ],
-  Automotive: ["Car Service", "Bike Service", "Car Wash", "Spare Parts", "Tyre Shop", "Auto Repair"],
-  "Real Estate": ["Property Dealer", "Builder", "Interior Designer", "Architecture"],
-  "Financial Services": ["Bank", "Insurance", "Loan Services", "Investment Advisory"],
-  "Professional Services": ["Legal Services", "Accounting", "Consulting", "IT Services", "Marketing", "Photography"],
-  "Home & Garden": ["Plumbing", "Electrical", "Cleaning", "Pest Control", "AC Repair", "Appliance Repair"],
-  Entertainment: ["Cinema", "Gaming Zone", "Event Management", "DJ Services", "Party Hall"],
-  "Sports & Recreation": ["Sports Club", "Cricket Academy", "Swimming Pool", "Badminton Court"],
-  "Government & Community": ["Government Office", "Community Center", "Public Services", "NGO"],
-}
+  Automotive: [
+    "Car Service",
+    "Bike Service",
+    "Car Wash",
+    "Spare Parts",
+    "Tyre Shop",
+    "Auto Repair",
+  ],
+  "Real Estate": [
+    "Property Dealer",
+    "Builder",
+    "Interior Designer",
+    "Architecture",
+  ],
+  "Financial Services": [
+    "Bank",
+    "Insurance",
+    "Loan Services",
+    "Investment Advisory",
+  ],
+  "Professional Services": [
+    "Legal Services",
+    "Accounting",
+    "Consulting",
+    "IT Services",
+    "Marketing",
+    "Photography",
+  ],
+  "Home & Garden": [
+    "Plumbing",
+    "Electrical",
+    "Cleaning",
+    "Pest Control",
+    "AC Repair",
+    "Appliance Repair",
+  ],
+  Entertainment: [
+    "Cinema",
+    "Gaming Zone",
+    "Event Management",
+    "DJ Services",
+    "Party Hall",
+  ],
+  "Sports & Recreation": [
+    "Sports Club",
+    "Cricket Academy",
+    "Swimming Pool",
+    "Badminton Court",
+  ],
+  "Government & Community": [
+    "Government Office",
+    "Community Center",
+    "Public Services",
+    "NGO",
+  ],
+};
 
-const BUSINESS_TYPES = ["Individual", "Partnership", "Private Limited", "Public Limited", "LLP", "Proprietorship"]
+const BUSINESS_TYPES = [
+  "Individual",
+  "Partnership",
+  "Private Limited",
+  "Public Limited",
+  "LLP",
+  "Proprietorship",
+];
 
-const PAYMENT_METHODS = ["Cash", "Credit Card", "Debit Card", "UPI", "Net Banking", "Wallet", "Cheque"]
+const PAYMENT_METHODS = [
+  "Cash",
+  "Credit Card",
+  "Debit Card",
+  "UPI",
+  "Net Banking",
+  "Wallet",
+  "Cheque",
+];
 
 const AMENITIES = [
   "Parking Available",
@@ -145,44 +263,125 @@ const AMENITIES = [
   "Emergency Service",
   "Free Consultation",
   "Certified Staff",
-]
+];
 
-const DAYS_OF_WEEK = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+const DAYS_OF_WEEK = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+];
 
 // City data with state, pincode and coordinates
 const CITY_DATA = {
-  Mumbai: { state: "Maharashtra", pincode: "400001", lat: 19.076, lng: 72.8777 },
+  Mumbai: {
+    state: "Maharashtra",
+    pincode: "400001",
+    lat: 19.076,
+    lng: 72.8777,
+  },
   Delhi: { state: "Delhi", pincode: "110001", lat: 28.7041, lng: 77.1025 },
-  Bangalore: { state: "Karnataka", pincode: "560001", lat: 12.9716, lng: 77.5946 },
-  Hyderabad: { state: "Telangana", pincode: "500001", lat: 17.385, lng: 78.4867 },
-  Chennai: { state: "Tamil Nadu", pincode: "600001", lat: 13.0827, lng: 80.2707 },
-  Kolkata: { state: "West Bengal", pincode: "700001", lat: 22.5726, lng: 88.3639 },
+  Bangalore: {
+    state: "Karnataka",
+    pincode: "560001",
+    lat: 12.9716,
+    lng: 77.5946,
+  },
+  Hyderabad: {
+    state: "Telangana",
+    pincode: "500001",
+    lat: 17.385,
+    lng: 78.4867,
+  },
+  Chennai: {
+    state: "Tamil Nadu",
+    pincode: "600001",
+    lat: 13.0827,
+    lng: 80.2707,
+  },
+  Kolkata: {
+    state: "West Bengal",
+    pincode: "700001",
+    lat: 22.5726,
+    lng: 88.3639,
+  },
   Pune: { state: "Maharashtra", pincode: "411001", lat: 18.5204, lng: 73.8567 },
-  Ahmedabad: { state: "Gujarat", pincode: "380001", lat: 23.0225, lng: 72.5714 },
+  Ahmedabad: {
+    state: "Gujarat",
+    pincode: "380001",
+    lat: 23.0225,
+    lng: 72.5714,
+  },
   Jaipur: { state: "Rajasthan", pincode: "302001", lat: 26.9124, lng: 75.7873 },
   Surat: { state: "Gujarat", pincode: "395001", lat: 21.1702, lng: 72.8311 },
-  Lucknow: { state: "Uttar Pradesh", pincode: "226001", lat: 26.8467, lng: 80.9462 },
-  Kanpur: { state: "Uttar Pradesh", pincode: "208001", lat: 26.4499, lng: 80.3319 },
-  Nagpur: { state: "Maharashtra", pincode: "440001", lat: 21.1458, lng: 79.0882 },
-  Indore: { state: "Madhya Pradesh", pincode: "452001", lat: 22.7196, lng: 75.8577 },
-  Thane: { state: "Maharashtra", pincode: "400601", lat: 19.2183, lng: 72.9781 },
-  Bhopal: { state: "Madhya Pradesh", pincode: "462001", lat: 23.2599, lng: 77.4126 },
-  Visakhapatnam: { state: "Andhra Pradesh", pincode: "530001", lat: 17.6868, lng: 83.2185 },
-  Pimpri: { state: "Maharashtra", pincode: "411017", lat: 18.6298, lng: 73.8131 },
+  Lucknow: {
+    state: "Uttar Pradesh",
+    pincode: "226001",
+    lat: 26.8467,
+    lng: 80.9462,
+  },
+  Kanpur: {
+    state: "Uttar Pradesh",
+    pincode: "208001",
+    lat: 26.4499,
+    lng: 80.3319,
+  },
+  Nagpur: {
+    state: "Maharashtra",
+    pincode: "440001",
+    lat: 21.1458,
+    lng: 79.0882,
+  },
+  Indore: {
+    state: "Madhya Pradesh",
+    pincode: "452001",
+    lat: 22.7196,
+    lng: 75.8577,
+  },
+  Thane: {
+    state: "Maharashtra",
+    pincode: "400601",
+    lat: 19.2183,
+    lng: 72.9781,
+  },
+  Bhopal: {
+    state: "Madhya Pradesh",
+    pincode: "462001",
+    lat: 23.2599,
+    lng: 77.4126,
+  },
+  Visakhapatnam: {
+    state: "Andhra Pradesh",
+    pincode: "530001",
+    lat: 17.6868,
+    lng: 83.2185,
+  },
+  Pimpri: {
+    state: "Maharashtra",
+    pincode: "411017",
+    lat: 18.6298,
+    lng: 73.8131,
+  },
   Patna: { state: "Bihar", pincode: "800001", lat: 25.5941, lng: 85.1376 },
   Vadodara: { state: "Gujarat", pincode: "390001", lat: 22.3072, lng: 73.1812 },
-}
+};
 
 interface AddBusinessFormProps {
-  mode?: "add" | "edit"
-  businessId?: string
+  mode?: "add" | "edit";
+  businessId?: string;
 }
 
-const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", businessId }) => {
-  const navigate = useNavigate()
-  const user = useSelector((state: RootState) => state.auth?.user ?? null)
-  const [loading, setLoading] = useState(false)
-  const [currentStep, setCurrentStep] = useState(1)
+const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
+  mode = "add",
+  businessId,
+}) => {
+  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth?.user ?? null);
+  const [loading, setLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<BusinessFormData>({
     businessName: "",
     description: "",
@@ -233,7 +432,7 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
     paymentMethods: [],
     amenities: [],
     priceRange: "",
-  })
+  });
 
   const [newService, setNewService] = useState({
     name: "",
@@ -243,11 +442,11 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
       max: 0,
       currency: "INR",
     },
-  })
+  });
 
-  const [newTag, setNewTag] = useState("")
-  const [newKeyword, setNewKeyword] = useState("")
-  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [newTag, setNewTag] = useState("");
+  const [newKeyword, setNewKeyword] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   // Removed unused state variables for hardcoded city suggestions
 
@@ -256,10 +455,10 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
     if (mode === "edit" && businessId) {
       const loadBusinessData = async () => {
         try {
-          setLoading(true)
-          const response = await getBusinessByIdAPI(businessId)
+          setLoading(true);
+          const response = await getBusinessByIdAPI(businessId);
           if (response?.success && response?.business) {
-            const business = response.business
+            const business = response.business;
             setFormData({
               businessName: business.businessName || "",
               description: business.description || "",
@@ -276,7 +475,10 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                 pincode: "",
                 landmark: "",
               },
-              coordinates: business.coordinates || { latitude: 0, longitude: 0 },
+              coordinates: business.coordinates || {
+                latitude: 0,
+                longitude: 0,
+              },
               contactInfo: business.contactInfo || {
                 primaryPhone: "",
                 secondaryPhone: "",
@@ -307,19 +509,19 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
               paymentMethods: business.paymentMethods || [],
               amenities: business.amenities || [],
               priceRange: business.priceRange || "",
-            })
-            toast.success("Business data loaded successfully!")
+            });
+            toast.success("Business data loaded successfully!");
           }
         } catch (error) {
-          console.error("Error loading business data:", error)
-          toast.error("Failed to load business data")
+          console.error("Error loading business data:", error);
+          toast.error("Failed to load business data");
         } finally {
-          setLoading(false)
+          setLoading(false);
         }
-      }
-      loadBusinessData()
+      };
+      loadBusinessData();
     }
-  }, [mode, businessId])
+  }, [mode, businessId]);
 
   // Handle Google Places selection
   const handlePlaceSelect = (placeDetails: any) => {
@@ -337,20 +539,20 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
         latitude: placeDetails.latitude,
         longitude: placeDetails.longitude,
       },
-    }))
+    }));
 
     // Hide city suggestions when place is selected
-    setShowSuggestions(false)
+    setShowSuggestions(false);
 
-    toast.success("Address details filled automatically!")
-  }
+    toast.success("Address details filled automatically!");
+  };
 
   const handleInputChange = (section: string, field: string, value: any) => {
     if (section === "root") {
       setFormData((prev) => ({
         ...prev,
         [field]: value,
-      }))
+      }));
     } else {
       setFormData((prev) => ({
         ...prev,
@@ -358,12 +560,12 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
           ...prev[section as keyof BusinessFormData],
           [field]: value,
         },
-      }))
+      }));
     }
 
     // Auto-set coordinates when city is changed
     if (section === "address" && field === "city") {
-      const cityData = CITY_DATA[value as keyof typeof CITY_DATA]
+      const cityData = CITY_DATA[value as keyof typeof CITY_DATA];
       if (cityData) {
         setFormData((prev) => ({
           ...prev,
@@ -376,10 +578,10 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
             latitude: cityData.lat,
             longitude: cityData.lng,
           },
-        }))
+        }));
       }
     }
-  }
+  };
 
   // Removed handleCityChange function - now using GooglePlacesAutocomplete
 
@@ -389,40 +591,46 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
   const getCoordinatesFromAddress = async (address: string) => {
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=in&q=${encodeURIComponent(address)}`,
-      )
-      const data = await response.json()
+        `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=in&q=${encodeURIComponent(
+          address
+        )}`
+      );
+      const data = await response.json();
 
       if (data && data.length > 0) {
         const coordinates = {
           latitude: Number.parseFloat(data[0].lat),
           longitude: Number.parseFloat(data[0].lon),
-        }
+        };
 
         setFormData((prev) => ({
           ...prev,
           coordinates: coordinates,
-        }))
-        return coordinates
+        }));
+        return coordinates;
       }
     } catch (error) {
-      console.error("Error getting coordinates:", error)
+      console.error("Error getting coordinates:", error);
     }
 
     // Fallback to mock coordinates
     const mockCoordinates = {
       latitude: 19.076 + Math.random() * 0.1,
       longitude: 72.8777 + Math.random() * 0.1,
-    }
+    };
 
     setFormData((prev) => ({
       ...prev,
       coordinates: mockCoordinates,
-    }))
-    return mockCoordinates
-  }
+    }));
+    return mockCoordinates;
+  };
 
-  const handleBusinessHoursChange = (day: string, field: string, value: any) => {
+  const handleBusinessHoursChange = (
+    day: string,
+    field: string,
+    value: any
+  ) => {
     setFormData((prev) => ({
       ...prev,
       businessHours: {
@@ -432,15 +640,15 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
           [field]: value,
         },
       },
-    }))
-  }
+    }));
+  };
 
   const addService = () => {
     if (newService.name.trim()) {
       setFormData((prev) => ({
         ...prev,
         services: [...prev.services, newService],
-      }))
+      }));
       setNewService({
         name: "",
         description: "",
@@ -449,113 +657,223 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
           max: 0,
           currency: "INR",
         },
-      })
+      });
     }
-  }
+  };
 
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
       setFormData((prev) => ({
         ...prev,
         tags: [...prev.tags, newTag.trim()],
-      }))
-      setNewTag("")
+      }));
+      setNewTag("");
     }
-  }
+  };
 
   const removeTag = (index: number) => {
     setFormData((prev) => ({
       ...prev,
       tags: prev.tags.filter((_, i) => i !== index),
-    }))
-  }
+    }));
+  };
 
   const removeService = (index: number) => {
     setFormData((prev) => ({
       ...prev,
       services: prev.services.filter((_, i) => i !== index),
-    }))
-  }
+    }));
+  };
 
   const addKeyword = () => {
     if (newKeyword.trim() && !formData.keywords.includes(newKeyword.trim())) {
       setFormData((prev) => ({
         ...prev,
         keywords: [...prev.keywords, newKeyword.trim()],
-      }))
-      setNewKeyword("")
+      }));
+      setNewKeyword("");
     }
-  }
+  };
 
   const removeKeyword = (index: number) => {
     setFormData((prev) => ({
       ...prev,
       keywords: prev.keywords.filter((_, i) => i !== index),
-    }))
-  }
+    }));
+  };
 
   const handleAmenityChange = (amenity: string, checked: boolean) => {
     setFormData((prev) => ({
       ...prev,
-      amenities: checked ? [...prev.amenities, amenity] : prev.amenities.filter((f) => f !== amenity),
-    }))
-  }
+      amenities: checked
+        ? [...prev.amenities, amenity]
+        : prev.amenities.filter((f) => f !== amenity),
+    }));
+  };
 
   const handlePaymentMethodChange = (method: string, checked: boolean) => {
     setFormData((prev) => ({
       ...prev,
-      paymentMethods: checked ? [...prev.paymentMethods, method] : prev.paymentMethods.filter((f) => f !== method),
-    }))
-  }
+      paymentMethods: checked
+        ? [...prev.paymentMethods, method]
+        : prev.paymentMethods.filter((f) => f !== method),
+    }));
+  };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || [])
-    if (files.length === 0) return
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
     try {
       // Upload images and get URLs
-      const uploadedUrls = await imageUpload(files)
+      const uploadedUrls = await imageUpload(files);
 
       setFormData((prev) => ({
         ...prev,
         images: [...prev.images, ...uploadedUrls].slice(0, 10), // Max 10 images
-      }))
+      }));
     } catch (error) {
-      console.error("Image upload failed:", error)
-      toast.error("Failed to upload images")
+      console.error("Image upload failed:", error);
+      toast.error("Failed to upload images");
     }
-  }
+  };
 
   const removeImage = (index: number) => {
     setFormData((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
-    }))
-  }
+    }));
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const validateStep = (step: number): boolean => {
+    switch (step) {
+      case 1:
+        if (
+          !formData.businessName ||
+          !formData.description ||
+          !formData.category ||
+          !formData.businessType
+        ) {
+          toast.error("Please fill all required fields in Step 1");
+          return false;
+        }
+        if (formData.businessName.length < 3) {
+          toast.error("Business name must be at least 3 characters long");
+          return false;
+        }
+        if (formData.description.length < 10) {
+          toast.error(
+            "Business description must be at least 10 characters long"
+          );
+          return false;
+        }
+        break;
+      case 2:
+        // Step 2 has both contact info and address, so validate both
+        if (!formData.contactInfo.primaryPhone || !formData.contactInfo.email) {
+          toast.error("Please fill required contact information in Step 2");
+          return false;
+        }
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.contactInfo.email)) {
+          toast.error("Please enter a valid email address");
+          return false;
+        }
+        // Phone validation
+        const phoneRegex = /^[6-9]\d{9}$/;
+        if (!phoneRegex.test(formData.contactInfo.primaryPhone)) {
+          toast.error("Please enter a valid 10-digit phone number");
+          return false;
+        }
+        if (
+          !formData.address.street ||
+          !formData.address.area ||
+          !formData.address.city ||
+          !formData.address.state ||
+          !formData.address.pincode
+        ) {
+          toast.error("Please fill all required address fields in Step 2");
+          return false;
+        }
+        // Pincode validation
+        const pincodeRegex = /^\d{6}$/;
+        if (!pincodeRegex.test(formData.address.pincode)) {
+          toast.error("Please enter a valid 6-digit pincode");
+          return false;
+        }
+        break;
+      case 3:
+        // Business hours validation - at least one day should be open
+        const hasOpenDay = Object.values(formData.businessHours).some(
+          (day) => !day.isClosed
+        );
+        if (!hasOpenDay) {
+          toast.error(
+            "Please set business hours for at least one day in Step 3"
+          );
+          return false;
+        }
+        break;
+      case 4:
+        // Services validation - at least one service should be added
+        if (formData.services.length === 0) {
+          toast.error("Please add at least one service in Step 4");
+          return false;
+        }
+        break;
+      case 5:
+        if (formData.tags.length === 0) {
+          toast.error(
+            "Please add at least one tag to help customers find your business"
+          );
+          return false;
+        }
+        if (formData.keywords.length === 0) {
+          toast.error(
+            "Please add at least one keyword for better search visibility"
+          );
+          return false;
+        }
+        if (formData.images.length === 0) {
+          toast.error("Please upload at least one image of your business");
+          return false;
+        }
+        // Validate coordinates before final submission
+        if (
+          !formData.coordinates.latitude ||
+          !formData.coordinates.longitude ||
+          formData.coordinates.latitude === 0 ||
+          formData.coordinates.longitude === 0
+        ) {
+          toast.error("Please select a valid city to set coordinates");
+          return false;
+        }
+        break;
+    }
+    return true;
+  };
 
-    if (currentStep !== 5) {
-      return
+  const nextStep = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep((prev) => (prev < 6 ? prev + 1 : prev));
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) setCurrentStep(currentStep - 1);
+  };
+
+  const handleSubmit = async () => {
+    // Final validation before submission
+    if (!validateStep(5)) {
+      return;
     }
 
-    setLoading(true)
-
-    // Validate coordinates before submitting
-    if (
-      !formData.coordinates.latitude ||
-      !formData.coordinates.longitude ||
-      formData.coordinates.latitude === 0 ||
-      formData.coordinates.longitude === 0
-    ) {
-      toast.error("Please select a valid city to set coordinates")
-      setLoading(false)
-      return
-    }
+    setLoading(true);
 
     try {
-      const submitData = new FormData()
+      const submitData = new FormData();
 
       const businessData = {
         businessName: formData.businessName,
@@ -593,87 +911,43 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
         amenities: formData.amenities,
         priceRange: formData.priceRange,
         vendor: user?._id,
-      }
+      };
 
       // Add business data
-      submitData.append("businessData", JSON.stringify(businessData))
+      submitData.append("businessData", JSON.stringify(businessData));
 
       // Add images as JSON string since they are now URLs
-      submitData.append("images", JSON.stringify(formData.images))
+      submitData.append("images", JSON.stringify(formData.images));
 
-      let response
+      let response;
       if (mode === "edit" && businessId) {
-        response = await updateBusinessAPI(businessId, submitData)
+        response = await updateBusinessAPI(businessId, submitData);
       } else {
-        response = await createBusinessAPI(submitData)
+        response = await createBusinessAPI(submitData);
       }
 
       if (response && response.success) {
-        toast.success(mode === "edit" ? "Business updated successfully!" : "Business listed successfully!")
-        navigate("/dashboard")
+        toast.success(
+          mode === "edit"
+            ? "Business updated successfully!"
+            : "Business listed successfully!"
+        );
+        navigate("/vendor/dashboard");
       } else {
-        toast.error(response?.message || (mode === "edit" ? "Failed to update business" : "Failed to list business"))
+        toast.error(
+          response?.message ||
+            (mode === "edit"
+              ? "Failed to update business"
+              : "Failed to list business")
+        );
       }
     } catch (error) {
-      console.error("Error submitting business:", error)
-      toast.error("Failed to list business")
+      console.error("Error submitting business:", error);
+      toast.error("Failed to list business");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
-  const validateStep = (step: number): boolean => {
-    switch (step) {
-      case 1:
-        if (!formData.businessName || !formData.description || !formData.category || !formData.businessType) {
-          toast.error("Please fill all required fields in Step 1")
-          return false
-        }
-        break
-      case 2:
-        // Step 2 has both contact info and address, so validate both
-        if (!formData.contactInfo.primaryPhone || !formData.contactInfo.email) {
-          toast.error("Please fill required contact information in Step 2")
-          return false
-        }
-        if (
-          !formData.address.street ||
-          !formData.address.area ||
-          !formData.address.city ||
-          !formData.address.state ||
-          !formData.address.pincode
-        ) {
-          toast.error("Please fill all required address fields in Step 2")
-          return false
-        }
-        break
-      case 3:
-        // Business hours validation - at least one day should be open
-        const hasOpenDay = Object.values(formData.businessHours).some((day) => !day.isClosed)
-        if (!hasOpenDay) {
-          toast.error("Please set business hours for at least one day in Step 3")
-          return false
-        }
-        break
-      case 4:
-        // Services validation - optional but if provided should be valid
-        // No strict validation needed for step 4
-        break
-    }
-    return true
-  }
-
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
-      if (currentStep < 5) {
-        setCurrentStep(currentStep + 1)
-      }
-    }
-  }
-
-  const prevStep = () => {
-    if (currentStep > 1) setCurrentStep(currentStep - 1)
-  }
+  };
 
   const renderStep = () => {
     switch (currentStep) {
@@ -681,8 +955,12 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h3 className="text-xl font-semibold mb-2">Business Information</h3>
-              <p className="text-muted-foreground">Tell us about your business</p>
+              <h3 className="text-xl font-semibold mb-2">
+                Business Information
+              </h3>
+              <p className="text-muted-foreground">
+                Tell us about your business
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -691,7 +969,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                 <Input
                   id="businessName"
                   value={formData.businessName}
-                  onChange={(e) => handleInputChange("root", "businessName", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("root", "businessName", e.target.value)
+                  }
                   placeholder="Enter your business name"
                   required
                 />
@@ -702,9 +982,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                 <Select
                   value={formData.category}
                   onValueChange={(value) => {
-                    handleInputChange("root", "category", value)
+                    handleInputChange("root", "category", value);
                     // Reset subcategory when category changes
-                    handleInputChange("root", "subCategory", "")
+                    handleInputChange("root", "subCategory", "");
                   }}
                 >
                   <SelectTrigger>
@@ -724,11 +1004,19 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                 <Label htmlFor="subCategory">Specialty/Subcategory</Label>
                 <Select
                   value={formData.subCategory}
-                  onValueChange={(value) => handleInputChange("root", "subCategory", value)}
+                  onValueChange={(value) =>
+                    handleInputChange("root", "subCategory", value)
+                  }
                   disabled={!formData.category}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder={formData.category ? "Select specialty" : "Select category first"} />
+                    <SelectValue
+                      placeholder={
+                        formData.category
+                          ? "Select specialty"
+                          : "Select category first"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {formData.category &&
@@ -745,7 +1033,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                 <Label htmlFor="businessType">Business Type *</Label>
                 <Select
                   value={formData.businessType}
-                  onValueChange={(value) => handleInputChange("root", "businessType", value)}
+                  onValueChange={(value) =>
+                    handleInputChange("root", "businessType", value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select business type" />
@@ -766,7 +1056,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                   id="establishedYear"
                   type="number"
                   value={formData.establishedYear}
-                  onChange={(e) => handleInputChange("root", "establishedYear", e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("root", "establishedYear", e.target.value)
+                  }
                   placeholder="2020"
                   min="1900"
                   max={new Date().getFullYear()}
@@ -777,7 +1069,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                 <Label htmlFor="employeeCount">Employee Count</Label>
                 <Select
                   value={formData.employeeCount}
-                  onValueChange={(value) => handleInputChange("root", "employeeCount", value)}
+                  onValueChange={(value) =>
+                    handleInputChange("root", "employeeCount", value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select employee count" />
@@ -864,21 +1158,25 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => handleInputChange("root", "description", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("root", "description", e.target.value)
+                }
                 placeholder="Describe your business, services, and what makes you unique..."
                 rows={4}
                 required
               />
             </div>
           </div>
-        )
+        );
 
       case 2:
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
               <h3 className="text-xl font-semibold mb-2">Contact & Location</h3>
-              <p className="text-muted-foreground">How can customers reach you?</p>
+              <p className="text-muted-foreground">
+                How can customers reach you?
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -889,7 +1187,13 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                   <Input
                     id="primaryPhone"
                     value={formData.contactInfo.primaryPhone}
-                    onChange={(e) => handleInputChange("contactInfo", "primaryPhone", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "contactInfo",
+                        "primaryPhone",
+                        e.target.value
+                      )
+                    }
                     placeholder="+91 9876543210"
                     className="pl-10"
                     required
@@ -904,7 +1208,13 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                   <Input
                     id="secondaryPhone"
                     value={formData.contactInfo.secondaryPhone}
-                    onChange={(e) => handleInputChange("contactInfo", "secondaryPhone", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "contactInfo",
+                        "secondaryPhone",
+                        e.target.value
+                      )
+                    }
                     placeholder="+91 9876543210"
                     className="pl-10"
                   />
@@ -918,7 +1228,13 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                   <Input
                     id="whatsappNumber"
                     value={formData.contactInfo.whatsappNumber}
-                    onChange={(e) => handleInputChange("contactInfo", "whatsappNumber", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "contactInfo",
+                        "whatsappNumber",
+                        e.target.value
+                      )
+                    }
                     placeholder="+91 9876543210"
                     className="pl-10"
                   />
@@ -933,7 +1249,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                     id="email"
                     type="email"
                     value={formData.contactInfo.email}
-                    onChange={(e) => handleInputChange("contactInfo", "email", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("contactInfo", "email", e.target.value)
+                    }
                     placeholder="business@example.com"
                     className="pl-10"
                   />
@@ -947,7 +1265,13 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                   <Input
                     id="website"
                     value={formData.contactInfo.website}
-                    onChange={(e) => handleInputChange("contactInfo", "website", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "contactInfo",
+                        "website",
+                        e.target.value
+                      )
+                    }
                     placeholder="https://www.yourbusiness.com"
                     className="pl-10"
                   />
@@ -967,7 +1291,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                   <Textarea
                     id="street"
                     value={formData.address.street}
-                    onChange={(e) => handleInputChange("address", "street", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("address", "street", e.target.value)
+                    }
                     placeholder="Enter complete street address"
                     rows={2}
                     required
@@ -979,7 +1305,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                   <Input
                     id="addressArea"
                     value={formData.address.area}
-                    onChange={(e) => handleInputChange("address", "area", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("address", "area", e.target.value)
+                    }
                     placeholder="Area or locality"
                   />
                 </div>
@@ -1000,14 +1328,16 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                           latitude: placeDetails.latitude,
                           longitude: placeDetails.longitude,
                         },
-                      }))
-                      toast.success("City details filled automatically!")
+                      }));
+                      toast.success("City details filled automatically!");
                     }}
                     placeholder="Search for city..."
                     value={formData.address.city}
                     className="w-full"
                   />
-                  <p className="text-sm text-muted-foreground mt-1">Search and select a city using Google Maps</p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Search and select a city using Google Maps
+                  </p>
                 </div>
 
                 <div>
@@ -1039,7 +1369,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                   <Input
                     id="landmark"
                     value={formData.address.landmark}
-                    onChange={(e) => handleInputChange("address", "landmark", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("address", "landmark", e.target.value)
+                    }
                     placeholder="Near famous landmark"
                   />
                 </div>
@@ -1055,7 +1387,8 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                     />
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Search and select an address to auto-fill street, area, city, state, and pincode
+                    Search and select an address to auto-fill street, area,
+                    city, state, and pincode
                   </p>
                 </div>
 
@@ -1064,7 +1397,10 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                   <Label>Location Coordinates</Label>
                   <div className="grid grid-cols-2 gap-4 mt-2">
                     <div>
-                      <Label htmlFor="latitude" className="text-sm text-muted-foreground">
+                      <Label
+                        htmlFor="latitude"
+                        className="text-sm text-muted-foreground"
+                      >
                         Latitude
                       </Label>
                       <Input
@@ -1079,7 +1415,10 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                       />
                     </div>
                     <div>
-                      <Label htmlFor="longitude" className="text-sm text-muted-foreground">
+                      <Label
+                        htmlFor="longitude"
+                        className="text-sm text-muted-foreground"
+                      >
                         Longitude
                       </Label>
                       <Input
@@ -1108,22 +1447,25 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                                   latitude: position.coords.latitude,
                                   longitude: position.coords.longitude,
                                 },
-                              }))
-                              toast.success("Current location detected!")
+                              }));
+                              toast.success("Current location detected!");
                             },
                             (error) => {
-                              toast.error("Unable to get current location")
-                            },
-                          )
+                              toast.error("Unable to get current location");
+                            }
+                          );
                         } else {
-                          toast.error("Geolocation is not supported by this browser")
+                          toast.error(
+                            "Geolocation is not supported by this browser"
+                          );
                         }
                       }}
                     >
                       <MapPin className="h-4 w-4 mr-1" />
                       Use Current Location
                     </Button>
-                    {(formData.coordinates.latitude !== 0 || formData.coordinates.longitude !== 0) && (
+                    {(formData.coordinates.latitude !== 0 ||
+                      formData.coordinates.longitude !== 0) && (
                       <Badge variant="secondary" className="text-xs">
                         📍 Location Set
                       </Badge>
@@ -1133,19 +1475,24 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
               </div>
             </div>
           </div>
-        )
+        );
 
       case 3:
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
               <h3 className="text-xl font-semibold mb-2">Business Hours</h3>
-              <p className="text-muted-foreground">When are you open for business?</p>
+              <p className="text-muted-foreground">
+                When are you open for business?
+              </p>
             </div>
 
             <div className="space-y-4">
               {DAYS_OF_WEEK.map((day) => (
-                <div key={day} className="flex items-center gap-4 p-4 border rounded-lg">
+                <div
+                  key={day}
+                  className="flex items-center gap-4 p-4 border rounded-lg"
+                >
                   <div className="w-24">
                     <Label className="capitalize font-medium">{day}</Label>
                   </div>
@@ -1153,7 +1500,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                   <div className="flex items-center gap-2">
                     <Checkbox
                       checked={!formData.businessHours[day].isClosed}
-                      onCheckedChange={(checked) => handleBusinessHoursChange(day, "isClosed", !checked)}
+                      onCheckedChange={(checked) =>
+                        handleBusinessHoursChange(day, "isClosed", !checked)
+                      }
                     />
                     <Label className="text-sm">Open</Label>
                   </div>
@@ -1165,7 +1514,13 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                         <Input
                           type="time"
                           value={formData.businessHours[day].open}
-                          onChange={(e) => handleBusinessHoursChange(day, "open", e.target.value)}
+                          onChange={(e) =>
+                            handleBusinessHoursChange(
+                              day,
+                              "open",
+                              e.target.value
+                            )
+                          }
                           className="w-32"
                         />
                       </div>
@@ -1173,25 +1528,37 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                       <Input
                         type="time"
                         value={formData.businessHours[day].close}
-                        onChange={(e) => handleBusinessHoursChange(day, "close", e.target.value)}
+                        onChange={(e) =>
+                          handleBusinessHoursChange(
+                            day,
+                            "close",
+                            e.target.value
+                          )
+                        }
                         className="w-32"
                       />
                     </div>
                   )}
 
-                  {formData.businessHours[day].isClosed && <Badge variant="secondary">Closed</Badge>}
+                  {formData.businessHours[day].isClosed && (
+                    <Badge variant="secondary">Closed</Badge>
+                  )}
                 </div>
               ))}
             </div>
           </div>
-        )
+        );
 
       case 4:
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h3 className="text-xl font-semibold mb-2">Services, Pricing & Media</h3>
-              <p className="text-muted-foreground">What services do you offer and upload photos</p>
+              <h3 className="text-xl font-semibold mb-2">
+                Services, Pricing & Media
+              </h3>
+              <p className="text-muted-foreground">
+                What services do you offer and upload photos
+              </p>
             </div>
 
             {/* Services Section */}
@@ -1201,13 +1568,20 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
               <div className="grid grid-cols-1 md:grid-cols-6 gap-2">
                 <Input
                   value={newService.name}
-                  onChange={(e) => setNewService((prev) => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setNewService((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   placeholder="Service name"
                   className="md:col-span-2"
                 />
                 <Input
                   value={newService.description}
-                  onChange={(e) => setNewService((prev) => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setNewService((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   placeholder="Description"
                   className="md:col-span-2"
                 />
@@ -1243,19 +1617,33 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
 
               <div className="space-y-2">
                 {formData.services.map((service, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div>
                       <span className="font-medium">{service.name}</span>
-                      {service.description && <p className="text-sm text-muted-foreground">{service.description}</p>}
+                      {service.description && (
+                        <p className="text-sm text-muted-foreground">
+                          {service.description}
+                        </p>
+                      )}
                       {(service.price.min > 0 || service.price.max > 0) && (
                         <p className="text-sm font-medium text-green-600">
                           ₹{service.price.min}
-                          {service.price.max > service.price.min && ` - ₹${service.price.max}`}
-                          {service.price.currency !== "INR" && ` ${service.price.currency}`}
+                          {service.price.max > service.price.min &&
+                            ` - ₹${service.price.max}`}
+                          {service.price.currency !== "INR" &&
+                            ` ${service.price.currency}`}
                         </p>
                       )}
                     </div>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => removeService(index)}>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeService(index)}
+                    >
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
@@ -1268,15 +1656,23 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
               <h4 className="font-medium">Price Range</h4>
               <Select
                 value={formData.priceRange}
-                onValueChange={(value) => handleInputChange("root", "priceRange", value)}
+                onValueChange={(value) =>
+                  handleInputChange("root", "priceRange", value)
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select price range" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="budget">Budget Friendly (₹0 - ₹500)</SelectItem>
-                  <SelectItem value="moderate">Moderate (₹500 - ₹2000)</SelectItem>
-                  <SelectItem value="premium">Premium (₹2000 - ₹5000)</SelectItem>
+                  <SelectItem value="budget">
+                    Budget Friendly (₹0 - ₹500)
+                  </SelectItem>
+                  <SelectItem value="moderate">
+                    Moderate (₹500 - ₹2000)
+                  </SelectItem>
+                  <SelectItem value="premium">
+                    Premium (₹2000 - ₹5000)
+                  </SelectItem>
                   <SelectItem value="luxury">Luxury (₹5000+)</SelectItem>
                 </SelectContent>
               </Select>
@@ -1300,17 +1696,12 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
 
               <div className="flex flex-wrap gap-2">
                 {formData.tags.map((tag, index) => (
-                  <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                  <Badge key={index} variant="secondary" className="gap-1.5">
                     {tag}
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="h-4 w-4 p-0 hover:bg-transparent"
+                    <X
+                      className="h-3 w-3 cursor-pointer"
                       onClick={() => removeTag(index)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+                    />
                   </Badge>
                 ))}
               </div>
@@ -1334,9 +1725,12 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
 
               <div className="flex flex-wrap gap-2">
                 {formData.keywords.map((spec, index) => (
-                  <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                  <Badge key={index} variant="secondary">
                     {spec}
-                    <X className="h-3 w-3 cursor-pointer" onClick={() => removeKeyword(index)} />
+                    <X
+                      className="h-3 w-3 cursor-pointer"
+                      onClick={() => removeKeyword(index)}
+                    />
                   </Badge>
                 ))}
               </div>
@@ -1345,30 +1739,37 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
             {/* Image Upload */}
             <div className="space-y-4">
               <h4 className="font-medium flex items-center gap-2">
-                <Camera className="h-4 w-4" />
+                <Camera className="h-5 w-5" />
                 Business Photos (Max 10)
               </h4>
 
-              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
-                <input
+              <div className="border rounded-lg p-4 bg-muted/50">
+                <Label
+                  htmlFor="imageUpload"
+                  className="cursor-pointer flex flex-col items-center justify-center gap-2"
+                >
+                  <Upload className="h-6 w-6 text-muted-foreground" />
+                  <p className="text-sm font-medium">
+                    Click to upload business photos
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    JPG, PNG up to 5MB each
+                  </p>
+                </Label>
+                <Input
                   type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
+                  id="imageUpload"
                   className="hidden"
-                  id="image-upload"
+                  multiple
+                  onChange={handleImageUpload}
+                  accept="image/png, image/jpeg"
                 />
-                <label htmlFor="image-upload" className="cursor-pointer">
-                  <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Click to upload business photos</p>
-                  <p className="text-xs text-muted-foreground mt-1">JPG, PNG up to 5MB each</p>
-                </label>
               </div>
 
               {formData.images.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {formData.images.map((image, index) => (
-                    <div key={index} className="relative group">
+                    <div key={index} className="relative">
                       <img
                         src={image || "/placeholder.svg"}
                         alt={`Business photo ${index + 1}`}
@@ -1376,12 +1777,12 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
                       />
                       <Button
                         type="button"
-                        variant="destructive"
+                        variant="ghost"
                         size="sm"
-                        className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-1 right-1 bg-background hover:bg-secondary rounded-full"
                         onClick={() => removeImage(index)}
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-4 w-4" />
                       </Button>
                     </div>
                   ))}
@@ -1389,27 +1790,34 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
               )}
             </div>
           </div>
-        )
+        );
 
       case 5:
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h3 className="text-xl font-semibold mb-2">Features & Amenities</h3>
-              <p className="text-muted-foreground">Add amenities and payment methods</p>
+              <h3 className="text-xl font-semibold mb-2">
+                Features & Amenities
+              </h3>
+              <p className="text-muted-foreground">
+                Add amenities and payment methods
+              </p>
             </div>
 
             {/* Amenities */}
             <div className="space-y-4">
               <h4 className="font-medium">Amenities & Features</h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {AMENITIES.map((amenity) => (
-                  <div key={amenity} className="flex items-center space-x-2">
+                  <div key={amenity} className="flex items-center gap-2">
                     <Checkbox
+                      id={amenity}
                       checked={formData.amenities.includes(amenity)}
-                      onCheckedChange={(checked) => handleAmenityChange(amenity, checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        handleAmenityChange(amenity, checked as boolean)
+                      }
                     />
-                    <Label className="text-sm">{amenity}</Label>
+                    <Label htmlFor={amenity}>{amenity}</Label>
                   </div>
                 ))}
               </div>
@@ -1418,75 +1826,213 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({ mode = "add", busines
             {/* Payment Methods */}
             <div className="space-y-4">
               <h4 className="font-medium">Payment Methods Accepted</h4>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {PAYMENT_METHODS.map((method) => (
-                  <div key={method} className="flex items-center space-x-2">
+                  <div key={method} className="flex items-center gap-2">
                     <Checkbox
+                      id={method}
                       checked={formData.paymentMethods.includes(method)}
-                      onCheckedChange={(checked) => handlePaymentMethodChange(method, checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        handlePaymentMethodChange(method, checked as boolean)
+                      }
                     />
-                    <Label className="text-sm">{method}</Label>
+                    <Label htmlFor={method}>{method}</Label>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-        )
+        );
+
+      case 6:
+        return (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-semibold mb-2">Review & Submit</h3>
+              <p className="text-muted-foreground">
+                Please review your business information before submitting
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {/* Business Info Summary */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Business Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div>
+                    <strong>Name:</strong> {formData.businessName}
+                  </div>
+                  <div>
+                    <strong>Category:</strong> {formData.category}
+                  </div>
+                  <div>
+                    <strong>Type:</strong> {formData.businessType}
+                  </div>
+                  <div>
+                    <strong>Description:</strong>{" "}
+                    {formData.description.substring(0, 100)}...
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Contact Info Summary */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Contact Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div>
+                    <strong>Phone:</strong> {formData.contactInfo.primaryPhone}
+                  </div>
+                  <div>
+                    <strong>Email:</strong> {formData.contactInfo.email}
+                  </div>
+                  <div>
+                    <strong>Address:</strong> {formData.address.street},{" "}
+                    {formData.address.area}, {formData.address.city}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Services Summary */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Services ({formData.services.length})</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {formData.services.slice(0, 3).map((service, index) => (
+                    <div key={index}>
+                      <strong>{service.name}:</strong> ₹{service.price.min} - ₹
+                      {service.price.max}
+                    </div>
+                  ))}
+                  {formData.services.length > 3 && (
+                    <div>...and {formData.services.length - 3} more</div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Tags & Keywords */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Tags & Keywords</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div>
+                    <strong>Tags:</strong> {formData.tags.join(", ")}
+                  </div>
+                  <div>
+                    <strong>Keywords:</strong> {formData.keywords.join(", ")}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Images */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Images ({formData.images.length})</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="grid grid-cols-2 gap-2">
+                    {formData.images.slice(0, 4).map((image, index) => (
+                      <img
+                        key={index}
+                        src={image || "/placeholder.svg"}
+                        alt={`Business ${index}`}
+                        className="w-full h-20 object-cover rounded-md"
+                      />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="flex justify-end">
+              <Button disabled={loading} onClick={handleSubmit}>
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    {mode === "edit"
+                      ? "Updating Business..."
+                      : "Creating Business..."}
+                  </div>
+                ) : mode === "edit" ? (
+                  "Update Business"
+                ) : (
+                  "Create Business"
+                )}
+              </Button>
+            </div>
+          </div>
+        );
 
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-muted/30 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-center">
-              {mode === "edit" ? "Edit Your Business" : "List Your Business"} - Step {currentStep} of 5
-            </CardTitle>
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardHeader>
+        <CardTitle>
+          {mode === "edit" ? "Edit Your Business" : "List Your Business"} - Step{" "}
+          {currentStep} of 6
+        </CardTitle>
 
-            {/* Progress Bar */}
-            <div className="w-full bg-muted rounded-full h-2 mt-4">
-              <div
-                className="bg-primary h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(currentStep / 5) * 100}%` }}
-              />
-            </div>
-          </CardHeader>
+        {/* Progress Bar */}
+        <div className="w-full bg-muted rounded-full h-2 mt-4">
+          <div
+            className="bg-primary h-2 rounded-full transition-all duration-300"
+            style={{ width: `${(currentStep / 6) * 100}%` }}
+          />
+        </div>
+      </CardHeader>
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {renderStep()}
+      <CardContent>
+        <div className="space-y-6">
+          {renderStep()}
 
-              <div className="flex justify-between mt-8">
-                <Button type="button" variant="outline" onClick={prevStep} disabled={currentStep === 1}>
-                  Previous
-                </Button>
+          <div className="flex justify-between mt-8">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={prevStep}
+              disabled={currentStep === 1}
+            >
+              Previous
+            </Button>
 
-                {currentStep < 5 ? (
-                  <Button type="button" onClick={nextStep}>
-                    Next
-                  </Button>
-                ) : (
-                  <Button type="submit" disabled={loading}>
-                    {loading
-                      ? mode === "edit"
-                        ? "Updating..."
-                        : "Submitting..."
-                      : mode === "edit"
-                        ? "Update Business"
-                        : "List My Business"}
-                  </Button>
-                )}
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  )
-}
+            {currentStep < 6 ? (
+              <Button type="button" onClick={nextStep}>
+                {currentStep === 5 ? "Review & Submit" : "Next"}
+              </Button>
+            ) : null}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
-export default AddBusinessForm
+export default AddBusinessForm;

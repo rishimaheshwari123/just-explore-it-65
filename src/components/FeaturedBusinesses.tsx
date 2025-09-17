@@ -1,9 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { MapPin, Star, Phone, Clock, Navigation, Verified, Eye, Filter } from "lucide-react";
+import {
+  MapPin,
+  Star,
+  Phone,
+  Clock,
+  Navigation,
+  Verified,
+  Eye,
+  Filter,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -87,30 +102,30 @@ const FeaturedBusinesses = () => {
   const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedLocation, setSelectedLocation] = useState<string>('all');
-  const [searchLocation, setSearchLocation] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedLocation, setSelectedLocation] = useState<string>("all");
+  const [searchLocation, setSearchLocation] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [totalBusinesses, setTotalBusinesses] = useState(0);
   const navigate = useNavigate();
 
   const categories = [
-    'Restaurants & Food',
-    'Healthcare & Medical',
-    'Education',
-    'Beauty & Wellness',
-    'Automotive',
-    'Home Services',
-    'Professional Services',
-    'Retail & Shopping',
-    'Entertainment',
-    'Travel & Tourism',
-    'Real Estate',
-    'Technology',
-    'Finance & Banking',
-    'Sports & Fitness',
-    'Pet Services'
+    "Restaurants & Food",
+    "Healthcare & Medical",
+    "Education",
+    "Beauty & Wellness",
+    "Automotive",
+    "Home Services",
+    "Professional Services",
+    "Retail & Shopping",
+    "Entertainment",
+    "Travel & Tourism",
+    "Real Estate",
+    "Technology",
+    "Finance & Banking",
+    "Sports & Fitness",
+    "Pet Services",
   ];
 
   const fetchFeaturedBusinesses = async (page = 1, loadMore = false) => {
@@ -120,23 +135,27 @@ const FeaturedBusinesses = () => {
       } else {
         setLoadingMore(true);
       }
-      
-      const response = await fetch(`http://localhost:8002/api/v1/property/featured-businesses?page=${page}&limit=12`);
-      
+
+      const response = await fetch(
+        `http://localhost:8000/api/v1/property/featured-businesses?page=${page}&limit=12`
+      );
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       if (data.success && Array.isArray(data.businesses)) {
         if (loadMore) {
-          setBusinesses(prev => [...prev, ...data.businesses]);
+          setBusinesses((prev) => [...prev, ...data.businesses]);
         } else {
           setBusinesses(data.businesses);
         }
         setTotalBusinesses(data.total || 0);
-        setHasMore(data.businesses.length === 12 && (page * 12) < (data.total || 0));
+        setHasMore(
+          data.businesses.length === 12 && page * 12 < (data.total || 0)
+        );
       } else {
         if (!loadMore) {
           setBusinesses([]);
@@ -144,11 +163,11 @@ const FeaturedBusinesses = () => {
         setHasMore(false);
       }
     } catch (error) {
-      console.error('Error fetching featured businesses:', error);
+      console.error("Error fetching featured businesses:", error);
       if (!loadMore) {
         setBusinesses([]);
       }
-      toast.error('Failed to load businesses');
+      toast.error("Failed to load businesses");
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -168,25 +187,30 @@ const FeaturedBusinesses = () => {
     let filtered = [...businesses];
 
     // Filter by category
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(business => business.category === selectedCategory);
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(
+        (business) => business.category === selectedCategory
+      );
     }
 
     // Filter by location (city or area)
-    if (selectedLocation !== 'all') {
-      filtered = filtered.filter(business => 
-        business.address.city === selectedLocation || business.area === selectedLocation
+    if (selectedLocation !== "all") {
+      filtered = filtered.filter(
+        (business) =>
+          business.address.city === selectedLocation ||
+          business.area === selectedLocation
       );
     }
 
     // Search by location
     if (searchLocation.trim()) {
       const searchTerm = searchLocation.toLowerCase();
-      filtered = filtered.filter(business => 
-        business.address.city.toLowerCase().includes(searchTerm) ||
-        business.address.area.toLowerCase().includes(searchTerm) ||
-        business.address.state.toLowerCase().includes(searchTerm) ||
-        business.area.toLowerCase().includes(searchTerm)
+      filtered = filtered.filter(
+        (business) =>
+          business.address.city.toLowerCase().includes(searchTerm) ||
+          business.address.area.toLowerCase().includes(searchTerm) ||
+          business.address.state.toLowerCase().includes(searchTerm) ||
+          business.area.toLowerCase().includes(searchTerm)
       );
     }
 
@@ -195,7 +219,7 @@ const FeaturedBusinesses = () => {
 
   const getUniqueLocations = () => {
     const locations = new Set<string>();
-    businesses.forEach(business => {
+    businesses.forEach((business) => {
       locations.add(business.address.city);
       if (business.area) locations.add(business.area);
     });
@@ -210,14 +234,16 @@ const FeaturedBusinesses = () => {
     filterBusinesses();
   }, [selectedCategory, selectedLocation, searchLocation, businesses]);
 
-  const isBusinessOpen = (businessHours: Business['businessHours']) => {
+  const isBusinessOpen = (businessHours: Business["businessHours"]) => {
     const now = new Date();
-    const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const currentDay = now
+      .toLocaleDateString("en-US", { weekday: "long" })
+      .toLowerCase();
     const currentTime = now.toTimeString().slice(0, 5);
-    
+
     const todayHours = businessHours[currentDay];
     if (!todayHours || todayHours.isClosed) return false;
-    
+
     return currentTime >= todayHours.open && currentTime <= todayHours.close;
   };
 
@@ -225,40 +251,43 @@ const FeaturedBusinesses = () => {
     try {
       // Track call interaction
       await fetch(`/api/v1/property/business/${businessId}/track-interaction`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ type: 'call' }),
+        body: JSON.stringify({ type: "call" }),
       });
-      
+
       // Open phone dialer
-      window.open(`tel:${phone}`, '_self');
+      window.open(`tel:${phone}`, "_self");
     } catch (error) {
-      console.error('Error tracking call:', error);
-      window.open(`tel:${phone}`, '_self');
+      console.error("Error tracking call:", error);
+      window.open(`tel:${phone}`, "_self");
     }
   };
 
-  const handleGetDirections = async (businessId: string, coordinates: { latitude: number; longitude: number }) => {
+  const handleGetDirections = async (
+    businessId: string,
+    coordinates: { latitude: number; longitude: number }
+  ) => {
     try {
       // Track direction interaction
       await fetch(`/api/v1/property/business/${businessId}/track-interaction`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ type: 'direction' }),
+        body: JSON.stringify({ type: "direction" }),
       });
-      
+
       // Open Google Maps with coordinates for precise navigation
       const url = `https://www.google.com/maps/dir/?api=1&destination=${coordinates.latitude},${coordinates.longitude}`;
-      window.open(url, '_blank');
-      toast.success('Opening directions in Google Maps...');
+      window.open(url, "_blank");
+      toast.success("Opening directions in Google Maps...");
     } catch (error) {
-      console.error('Error tracking direction:', error);
+      console.error("Error tracking direction:", error);
       const url = `https://www.google.com/maps/dir/?api=1&destination=${coordinates.latitude},${coordinates.longitude}`;
-      window.open(url, '_blank');
+      window.open(url, "_blank");
     }
   };
 
@@ -268,10 +297,10 @@ const FeaturedBusinesses = () => {
         key={i}
         className={`h-3 w-3 ${
           i < Math.floor(rating)
-            ? 'text-yellow-400 fill-yellow-400'
+            ? "text-yellow-400 fill-yellow-400"
             : i < rating
-            ? 'text-yellow-400 fill-yellow-400/50'
-            : 'text-gray-300'
+            ? "text-yellow-400 fill-yellow-400/50"
+            : "text-gray-300"
         }`}
       />
     ));
@@ -300,7 +329,8 @@ const FeaturedBusinesses = () => {
             Featured Businesses
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover top-rated businesses in your area with verified reviews and instant contact options
+            Discover top-rated businesses in your area with verified reviews and
+            instant contact options
           </p>
         </div>
 
@@ -313,7 +343,10 @@ const FeaturedBusinesses = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="text-sm font-medium mb-2 block">Category</label>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
@@ -329,7 +362,10 @@ const FeaturedBusinesses = () => {
             </div>
             <div>
               <label className="text-sm font-medium mb-2 block">Location</label>
-              <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <Select
+                value={selectedLocation}
+                onValueChange={setSelectedLocation}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select location" />
                 </SelectTrigger>
@@ -344,7 +380,9 @@ const FeaturedBusinesses = () => {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Search Location</label>
+              <label className="text-sm font-medium mb-2 block">
+                Search Location
+              </label>
               <Input
                 placeholder="Search by city, area..."
                 value={searchLocation}
@@ -353,7 +391,8 @@ const FeaturedBusinesses = () => {
             </div>
           </div>
           <div className="mt-4 text-sm text-muted-foreground">
-            Showing {filteredBusinesses.length} of {businesses.length} businesses
+            Showing {filteredBusinesses.length} of {businesses.length}{" "}
+            businesses
           </div>
         </div>
 
@@ -362,24 +401,29 @@ const FeaturedBusinesses = () => {
             <p className="text-lg text-muted-foreground mb-4">
               No featured businesses available at the moment.
             </p>
-            <Button onClick={() => navigate('/add-business')} className="bg-primary hover:bg-primary/90">
+            <Button
+              onClick={() => navigate("/add-business")}
+              className="bg-primary hover:bg-primary/90"
+            >
               List Your Business
             </Button>
           </div>
         ) : filteredBusinesses.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
-              No businesses found matching your filters. Try adjusting your search criteria.
+              No businesses found matching your filters. Try adjusting your
+              search criteria.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredBusinesses.map((business) => {
               const isOpen = isBusinessOpen(business.businessHours);
-              const mainImage = business.images?.[0]?.url || '/placeholder.svg';
-              const minPrice = business.pricing?.length > 0 
-                ? Math.min(...business.pricing.map(p => p.price))
-                : null;
+              const mainImage = business.images?.[0]?.url || "/placeholder.svg";
+              const minPrice =
+                business.pricing?.length > 0
+                  ? Math.min(...business.pricing.map((p) => p.price))
+                  : null;
 
               return (
                 <Card
@@ -392,7 +436,7 @@ const FeaturedBusinesses = () => {
                       alt={business.businessName}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    
+
                     {/* Badges */}
                     <div className="absolute top-3 left-3 flex flex-col gap-1">
                       <Badge className="bg-primary text-primary-foreground text-xs">
@@ -408,15 +452,15 @@ const FeaturedBusinesses = () => {
 
                     {/* Status Badge */}
                     <div className="absolute top-3 right-3">
-                      <Badge 
+                      <Badge
                         className={`text-xs ${
-                          isOpen 
-                            ? 'bg-green-500 text-white' 
-                            : 'bg-red-500 text-white'
+                          isOpen
+                            ? "bg-green-500 text-white"
+                            : "bg-red-500 text-white"
                         }`}
                       >
                         <Clock className="h-3 w-3 mr-1" />
-                        {isOpen ? 'Open' : 'Closed'}
+                        {isOpen ? "Open" : "Closed"}
                       </Badge>
                     </div>
 
@@ -474,11 +518,17 @@ const FeaturedBusinesses = () => {
                     {business.services?.length > 0 && (
                       <div className="mb-3">
                         <div className="flex flex-wrap gap-1">
-                          {business.services.slice(0, 2).map((service, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {service.name}
-                            </Badge>
-                          ))}
+                          {business.services
+                            .slice(0, 2)
+                            .map((service, index) => (
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                {service.name}
+                              </Badge>
+                            ))}
                           {business.services.length > 2 && (
                             <Badge variant="outline" className="text-xs">
                               +{business.services.length - 2} more
@@ -494,7 +544,9 @@ const FeaturedBusinesses = () => {
                         size="sm"
                         variant="outline"
                         className="flex-1 text-xs"
-                        onClick={() => handleCall(business._id, business.contactInfo.phone)}
+                        onClick={() =>
+                          handleCall(business._id, business.contactInfo.phone)
+                        }
                       >
                         <Phone className="h-3 w-3 mr-1" />
                         Call
@@ -503,7 +555,12 @@ const FeaturedBusinesses = () => {
                         size="sm"
                         variant="outline"
                         className="flex-1 text-xs"
-                        onClick={() => handleGetDirections(business._id, business.coordinates)}
+                        onClick={() =>
+                          handleGetDirections(
+                            business._id,
+                            business.coordinates
+                          )
+                        }
                       >
                         <Navigation className="h-3 w-3 mr-1" />
                         Directions
@@ -529,8 +586,8 @@ const FeaturedBusinesses = () => {
         {businesses.length > 0 && (
           <div className="text-center mt-12 space-y-4">
             {hasMore && (
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 onClick={loadMoreBusinesses}
                 disabled={loadingMore}
                 variant="outline"
@@ -546,9 +603,9 @@ const FeaturedBusinesses = () => {
                 )}
               </Button>
             )}
-            <Button 
-              size="lg" 
-              onClick={() => navigate('/business-listing')}
+            <Button
+              size="lg"
+              onClick={() => navigate("/business-listing")}
               className="bg-primary hover:bg-primary/90"
             >
               View All Businesses

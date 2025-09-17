@@ -1,10 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import BusinessCard from './BusinessCard';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { ArrowRight, TrendingUp, Filter, Search, MapPin, Star, Clock } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from "react";
+import BusinessCard from "./BusinessCard";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import {
+  ArrowRight,
+  TrendingUp,
+  Filter,
+  Search,
+  MapPin,
+  Star,
+  Clock,
+} from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface Business {
   _id: string;
@@ -84,42 +98,44 @@ const BusinessListing: React.FC = () => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [filteredBusinesses, setFilteredBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedLocation, setSelectedLocation] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('rating');
-  const [priceFilter, setPriceFilter] = useState<string>('all');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedLocation, setSelectedLocation] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("rating");
+  const [priceFilter, setPriceFilter] = useState<string>("all");
+
   const categories = [
-    'Restaurants & Food',
-    'Healthcare & Medical',
-    'Education',
-    'Beauty & Wellness',
-    'Automotive',
-    'Home Services',
-    'Professional Services',
-    'Retail & Shopping',
-    'Entertainment',
-    'Travel & Tourism',
-    'Real Estate',
-    'Technology',
-    'Finance & Banking',
-    'Sports & Fitness',
-    'Pet Services'
+    "Restaurants & Food",
+    "Healthcare & Medical",
+    "Education",
+    "Beauty & Wellness",
+    "Automotive",
+    "Home Services",
+    "Professional Services",
+    "Retail & Shopping",
+    "Entertainment",
+    "Travel & Tourism",
+    "Real Estate",
+    "Technology",
+    "Finance & Banking",
+    "Sports & Fitness",
+    "Pet Services",
   ];
 
   const fetchBusinesses = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8002/api/v1/property/businesses?limit=50');
+      const response = await fetch(
+        "http://localhost:8000/api/v1/property/businesses?limit=50"
+      );
       if (!response.ok) {
-        throw new Error('Failed to fetch businesses');
+        throw new Error("Failed to fetch businesses");
       }
       const data = await response.json();
       setBusinesses(data.businesses || []);
       setFilteredBusinesses(data.businesses || []);
     } catch (error) {
-      console.error('Error fetching businesses:', error);
+      console.error("Error fetching businesses:", error);
       toast({
         title: "Error",
         description: "Failed to load businesses. Please try again.",
@@ -139,39 +155,48 @@ const BusinessListing: React.FC = () => {
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(business => 
-        business.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        business.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        business.area.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        business.description.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (business) =>
+          business.businessName
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          business.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          business.area.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          business.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Category filter
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(business => business.category === selectedCategory);
+    if (selectedCategory !== "all") {
+      filtered = filtered.filter(
+        (business) => business.category === selectedCategory
+      );
     }
 
     // Location filter
-    if (selectedLocation !== 'all') {
-      filtered = filtered.filter(business => business.area === selectedLocation);
+    if (selectedLocation !== "all") {
+      filtered = filtered.filter(
+        (business) => business.area === selectedLocation
+      );
     }
 
     // Price filter
-    if (priceFilter !== 'all') {
-      filtered = filtered.filter(business => business.priceRange === priceFilter);
+    if (priceFilter !== "all") {
+      filtered = filtered.filter(
+        (business) => business.priceRange === priceFilter
+      );
     }
 
     // Sort businesses
     filtered.sort((a, b) => {
       switch (sortBy) {
-        case 'rating':
+        case "rating":
           return b.ratings.average - a.ratings.average;
-        case 'reviews':
+        case "reviews":
           return b.ratings.totalReviews - a.ratings.totalReviews;
-        case 'name':
+        case "name":
           return a.businessName.localeCompare(b.businessName);
-        case 'newest':
+        case "newest":
           return new Date(b._id).getTime() - new Date(a._id).getTime();
         default:
           return 0;
@@ -179,10 +204,19 @@ const BusinessListing: React.FC = () => {
     });
 
     setFilteredBusinesses(filtered);
-  }, [businesses, searchTerm, selectedCategory, selectedLocation, sortBy, priceFilter]);
+  }, [
+    businesses,
+    searchTerm,
+    selectedCategory,
+    selectedLocation,
+    sortBy,
+    priceFilter,
+  ]);
 
-  const uniqueLocations = [...new Set(businesses.map(business => business.area))];
-  const priceRanges = ['₹', '₹₹', '₹₹₹', '₹₹₹₹'];
+  const uniqueLocations = [
+    ...new Set(businesses.map((business) => business.area)),
+  ];
+  const priceRanges = ["₹", "₹₹", "₹₹₹", "₹₹₹₹"];
 
   return (
     <section className="py-16 bg-gradient-to-br from-gray-50 via-white to-purple-50">
@@ -193,7 +227,8 @@ const BusinessListing: React.FC = () => {
             Business Directory
           </h2>
           <p className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Discover top-rated businesses in your area. Verified listings with genuine reviews and instant contact options.
+            Discover top-rated businesses in your area. Verified listings with
+            genuine reviews and instant contact options.
           </p>
         </div>
 
@@ -212,7 +247,10 @@ const BusinessListing: React.FC = () => {
             </div>
 
             {/* Category Filter */}
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
               <SelectTrigger>
                 <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Category" />
@@ -228,7 +266,10 @@ const BusinessListing: React.FC = () => {
             </Select>
 
             {/* Location Filter */}
-            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+            <Select
+              value={selectedLocation}
+              onValueChange={setSelectedLocation}
+            >
               <SelectTrigger>
                 <MapPin className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Location" />
@@ -277,7 +318,8 @@ const BusinessListing: React.FC = () => {
         {/* Results Count */}
         <div className="mb-6">
           <p className="text-gray-600">
-            Showing {filteredBusinesses.length} of {businesses.length} businesses
+            Showing {filteredBusinesses.length} of {businesses.length}{" "}
+            businesses
           </p>
         </div>
 
@@ -297,15 +339,19 @@ const BusinessListing: React.FC = () => {
             <div className="text-gray-400 mb-4">
               <Search className="h-16 w-16 mx-auto mb-4" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-600 mb-2">No businesses found</h3>
-            <p className="text-gray-500">Try adjusting your filters or search terms</p>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+              No businesses found
+            </h3>
+            <p className="text-gray-500">
+              Try adjusting your filters or search terms
+            </p>
           </div>
         )}
 
         {/* Load More Button */}
         {!loading && filteredBusinesses.length > 0 && (
           <div className="text-center">
-            <Button 
+            <Button
               size="lg"
               className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl px-8 py-4 text-lg shadow-xl hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300"
             >

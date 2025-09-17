@@ -1,7 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Star, Phone, Clock, Navigation, Verified, Eye, Home } from "lucide-react";
+import {
+  MapPin,
+  Star,
+  Phone,
+  Clock,
+  Navigation,
+  Verified,
+  Eye,
+  Home,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -69,35 +78,37 @@ const FeaturedProperties = () => {
   const fetchFeaturedProperties = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8002/api/v1/property/getAll?category=Real Estate&limit=8');
-      
+      const response = await fetch(
+        "http://localhost:8000/api/v1/property/getAll?category=Real Estate&limit=8"
+      );
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
-      console.log('Properties API response:', data);
-      
+      console.log("Properties API response:", data);
+
       if (data.success && Array.isArray(data.businesses)) {
         // Filter only Real Estate businesses and take first 8
-        const realEstateBusinesses = data.businesses.filter(business => 
-          business.category === 'Real Estate'
+        const realEstateBusinesses = data.businesses.filter(
+          (business) => business.category === "Real Estate"
         );
         setBusinesses(realEstateBusinesses.slice(0, 8));
       } else if (Array.isArray(data)) {
         // Fallback for direct array response
-        const realEstateBusinesses = data.filter(business => 
-          business.category === 'Real Estate'
+        const realEstateBusinesses = data.filter(
+          (business) => business.category === "Real Estate"
         );
         setBusinesses(realEstateBusinesses.slice(0, 8));
       } else {
-        console.warn('Invalid API response format:', data);
+        console.warn("Invalid API response format:", data);
         setBusinesses([]);
       }
     } catch (error) {
-      console.error('Error fetching featured properties:', error);
+      console.error("Error fetching featured properties:", error);
       setBusinesses([]);
-      toast.error('Failed to load featured properties');
+      toast.error("Failed to load featured properties");
     } finally {
       setLoading(false);
     }
@@ -113,10 +124,10 @@ const FeaturedProperties = () => {
         key={index}
         className={`h-4 w-4 ${
           index < Math.floor(rating)
-            ? 'text-yellow-400 fill-yellow-400'
+            ? "text-yellow-400 fill-yellow-400"
             : index < rating
-            ? 'text-yellow-400 fill-yellow-400/50'
-            : 'text-gray-300'
+            ? "text-yellow-400 fill-yellow-400/50"
+            : "text-gray-300"
         }`}
       />
     ));
@@ -126,40 +137,43 @@ const FeaturedProperties = () => {
     try {
       // Track call analytics
       await fetch(`/api/v1/property/${businessId}/call`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
-      
+
       // Open phone dialer
       window.open(`tel:${phoneNumber}`);
-      toast.success('Opening phone dialer...');
+      toast.success("Opening phone dialer...");
     } catch (error) {
-      console.error('Error tracking call:', error);
+      console.error("Error tracking call:", error);
       window.open(`tel:${phoneNumber}`);
     }
   };
 
-  const handleGetDirections = async (businessId: string, coordinates: { latitude: number; longitude: number }) => {
+  const handleGetDirections = async (
+    businessId: string,
+    coordinates: { latitude: number; longitude: number }
+  ) => {
     try {
       // Track directions analytics
       await fetch(`/api/v1/property/${businessId}/directions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
-      
+
       // Open Google Maps with coordinates for precise navigation
       const url = `https://www.google.com/maps/dir/?api=1&destination=${coordinates.latitude},${coordinates.longitude}`;
-      window.open(url, '_blank');
-      toast.success('Opening directions in Google Maps...');
+      window.open(url, "_blank");
+      toast.success("Opening directions in Google Maps...");
     } catch (error) {
-      console.error('Error tracking directions:', error);
+      console.error("Error tracking directions:", error);
       const url = `https://www.google.com/maps/dir/?api=1&destination=${coordinates.latitude},${coordinates.longitude}`;
-      window.open(url, '_blank');
+      window.open(url, "_blank");
     }
   };
 
   const formatPriceRange = (priceRange?: string) => {
-    if (!priceRange) return 'Price on request';
+    if (!priceRange) return "Price on request";
     return priceRange;
   };
 
@@ -172,7 +186,8 @@ const FeaturedProperties = () => {
               Featured Properties
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Discover premium properties with verified details and instant contact options
+              Discover premium properties with verified details and instant
+              contact options
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -200,7 +215,8 @@ const FeaturedProperties = () => {
             Featured Properties
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover premium properties with verified details and instant contact options
+            Discover premium properties with verified details and instant
+            contact options
           </p>
         </div>
 
@@ -209,14 +225,18 @@ const FeaturedProperties = () => {
             <p className="text-lg text-muted-foreground mb-4">
               No featured properties available at the moment.
             </p>
-            <Button onClick={() => navigate('/add-property')} className="bg-primary hover:bg-primary/90">
+            <Button
+              onClick={() => navigate("/add-property")}
+              className="bg-primary hover:bg-primary/90"
+            >
               List Your Property
             </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {businesses.map((business) => {
-              const mainImage = business.images?.[0]?.url || '/placeholder-property.jpg';
+              const mainImage =
+                business.images?.[0]?.url || "/placeholder-property.jpg";
               const fullAddress = `${business.address.street}, ${business.address.area}, ${business.address.city}`;
 
               return (
@@ -230,7 +250,7 @@ const FeaturedProperties = () => {
                       alt={business.businessName}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    
+
                     {/* Badges */}
                     <div className="absolute top-3 left-3 flex flex-col gap-1">
                       <Badge className="bg-primary text-primary-foreground text-xs">
@@ -246,15 +266,17 @@ const FeaturedProperties = () => {
 
                     {/* Status Badge */}
                     <div className="absolute top-3 right-3">
-                      <Badge 
+                      <Badge
                         className={`text-xs ${
-                          business.status === 'active'
-                            ? 'bg-green-500 text-white' 
-                            : 'bg-red-500 text-white'
+                          business.status === "active"
+                            ? "bg-green-500 text-white"
+                            : "bg-red-500 text-white"
                         }`}
                       >
                         <Home className="h-3 w-3 mr-1" />
-                        {business.status === 'active' ? 'Available' : 'Not Available'}
+                        {business.status === "active"
+                          ? "Available"
+                          : "Not Available"}
                       </Badge>
                     </div>
 
@@ -317,11 +339,17 @@ const FeaturedProperties = () => {
                     {business.features?.length > 0 && (
                       <div className="mb-3">
                         <div className="flex flex-wrap gap-1">
-                          {business.features.slice(0, 2).map((feature, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {feature}
-                            </Badge>
-                          ))}
+                          {business.features
+                            .slice(0, 2)
+                            .map((feature, index) => (
+                              <Badge
+                                key={index}
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                {feature}
+                              </Badge>
+                            ))}
                           {business.features.length > 2 && (
                             <Badge variant="outline" className="text-xs">
                               +{business.features.length - 2} more
@@ -337,7 +365,12 @@ const FeaturedProperties = () => {
                         size="sm"
                         variant="outline"
                         className="flex-1 text-xs"
-                        onClick={() => handleCall(business._id, business.contactInfo.primaryPhone)}
+                        onClick={() =>
+                          handleCall(
+                            business._id,
+                            business.contactInfo.primaryPhone
+                          )
+                        }
                       >
                         <Phone className="h-3 w-3 mr-1" />
                         Call
@@ -346,7 +379,12 @@ const FeaturedProperties = () => {
                         size="sm"
                         variant="outline"
                         className="flex-1 text-xs"
-                        onClick={() => handleGetDirections(business._id, business.coordinates)}
+                        onClick={() =>
+                          handleGetDirections(
+                            business._id,
+                            business.coordinates
+                          )
+                        }
                       >
                         <Navigation className="h-3 w-3 mr-1" />
                         Directions
@@ -371,9 +409,9 @@ const FeaturedProperties = () => {
         {/* View All Button */}
         {businesses.length > 0 && (
           <div className="text-center mt-12">
-            <Button 
-              size="lg" 
-              onClick={() => navigate('/properties')}
+            <Button
+              size="lg"
+              onClick={() => navigate("/properties")}
               className="bg-primary hover:bg-primary/90"
             >
               View All Properties

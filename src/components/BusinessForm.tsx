@@ -1,22 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
-import { ArrowLeft, Save, Plus, X, MapPin, Phone, Mail, Globe, Clock, Upload, Star } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
-import GooglePlacesAutocomplete from './GooglePlacesAutocomplete';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import {
+  ArrowLeft,
+  Save,
+  Plus,
+  X,
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  Clock,
+  Upload,
+  Star,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import GooglePlacesAutocomplete from "./GooglePlacesAutocomplete";
 
 interface BusinessFormProps {
   businessId?: string;
-  mode: 'add' | 'edit';
+  mode: "add" | "edit";
 }
 
 interface BusinessFormData {
@@ -69,74 +87,143 @@ interface BusinessFormData {
 }
 
 const BUSINESS_CATEGORIES = [
-  'Food & Dining',
-  'Shopping & Retail',
-  'Health & Medical',
-  'Beauty & Spa',
-  'Automotive',
-  'Home & Garden',
-  'Professional Services',
-  'Entertainment',
-  'Education & Training',
-  'Travel & Tourism',
-  'Sports & Recreation',
-  'Financial Services',
-  'Government & Community'
+  "Food & Dining",
+  "Shopping & Retail",
+  "Health & Medical",
+  "Beauty & Spa",
+  "Automotive",
+  "Home & Garden",
+  "Professional Services",
+  "Entertainment",
+  "Education & Training",
+  "Travel & Tourism",
+  "Sports & Recreation",
+  "Financial Services",
+  "Government & Community",
 ];
 
 const SUBCATEGORIES: { [key: string]: string[] } = {
-  'Food & Dining': ['Restaurant', 'Fast Food', 'Cafe', 'Bakery', 'Sweet Shop', 'Ice Cream', 'Catering'],
-  'Shopping & Retail': ['Clothing', 'Electronics', 'Grocery', 'Pharmacy', 'Books', 'Gifts', 'Jewelry'],
-  'Health & Medical': ['Hospital', 'Clinic', 'Dental', 'Eye Care', 'Physiotherapy', 'Laboratory', 'Veterinary'],
-  'Beauty & Spa': ['Salon', 'Spa', 'Massage', 'Nail Art', 'Makeup Artist', 'Tattoo', 'Piercing'],
-  'Automotive': ['Car Repair', 'Bike Repair', 'Car Wash', 'Fuel Station', 'Spare Parts', 'Towing'],
-  'Professional Services': ['Legal Services', 'Accounting', 'Consulting', 'IT Services', 'Marketing', 'Photography'],
-  'Home & Garden': ['Plumbing', 'Electrical', 'Cleaning', 'Pest Control', 'AC Repair', 'Appliance Repair'],
-  'Entertainment': ['Cinema', 'Gaming Zone', 'Event Management', 'DJ Services', 'Party Hall'],
-  'Sports & Recreation': ['Sports Club', 'Cricket Academy', 'Swimming Pool', 'Badminton Court'],
-  'Government & Community': ['Government Office', 'Community Center', 'Public Services', 'NGO']
+  "Food & Dining": [
+    "Restaurant",
+    "Fast Food",
+    "Cafe",
+    "Bakery",
+    "Sweet Shop",
+    "Ice Cream",
+    "Catering",
+  ],
+  "Shopping & Retail": [
+    "Clothing",
+    "Electronics",
+    "Grocery",
+    "Pharmacy",
+    "Books",
+    "Gifts",
+    "Jewelry",
+  ],
+  "Health & Medical": [
+    "Hospital",
+    "Clinic",
+    "Dental",
+    "Eye Care",
+    "Physiotherapy",
+    "Laboratory",
+    "Veterinary",
+  ],
+  "Beauty & Spa": [
+    "Salon",
+    "Spa",
+    "Massage",
+    "Nail Art",
+    "Makeup Artist",
+    "Tattoo",
+    "Piercing",
+  ],
+  Automotive: [
+    "Car Repair",
+    "Bike Repair",
+    "Car Wash",
+    "Fuel Station",
+    "Spare Parts",
+    "Towing",
+  ],
+  "Professional Services": [
+    "Legal Services",
+    "Accounting",
+    "Consulting",
+    "IT Services",
+    "Marketing",
+    "Photography",
+  ],
+  "Home & Garden": [
+    "Plumbing",
+    "Electrical",
+    "Cleaning",
+    "Pest Control",
+    "AC Repair",
+    "Appliance Repair",
+  ],
+  Entertainment: [
+    "Cinema",
+    "Gaming Zone",
+    "Event Management",
+    "DJ Services",
+    "Party Hall",
+  ],
+  "Sports & Recreation": [
+    "Sports Club",
+    "Cricket Academy",
+    "Swimming Pool",
+    "Badminton Court",
+  ],
+  "Government & Community": [
+    "Government Office",
+    "Community Center",
+    "Public Services",
+    "NGO",
+  ],
 };
 
 const BUSINESS_TYPES = [
-  'Individual',
-  'Partnership', 
-  'Private Limited',
-  'Public Limited',
-  'LLP',
-  'Proprietorship'
+  "Individual",
+  "Partnership",
+  "Private Limited",
+  "Public Limited",
+  "LLP",
+  "Proprietorship",
 ];
 
 const PAYMENT_METHODS = [
-  'Cash',
-  'Credit Card',
-  'Debit Card',
-  'UPI',
-  'Net Banking',
-  'Wallet',
-  'Cheque'
+  "Cash",
+  "Credit Card",
+  "Debit Card",
+  "UPI",
+  "Net Banking",
+  "Wallet",
+  "Cheque",
 ];
 
 const AMENITIES = [
-  'Parking Available',
-  'WiFi',
-  'Air Conditioning',
-  'Wheelchair Accessible',
-  'Home Delivery',
-  'Online Booking',
-  '24/7 Service',
-  'Emergency Service',
-  'Free Consultation',
-  'Certified Staff'
+  "Parking Available",
+  "WiFi",
+  "Air Conditioning",
+  "Wheelchair Accessible",
+  "Home Delivery",
+  "Online Booking",
+  "24/7 Service",
+  "Emergency Service",
+  "Free Consultation",
+  "Certified Staff",
 ];
 
 const DAYS_OF_WEEK = [
-  'monday',
-  'tuesday', 
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-  'sunday'
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
 ];
 
 // City data with state, pincode and coordinates
@@ -146,40 +233,40 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const [loading, setLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState<BusinessFormData>({
-    businessName: '',
-    description: '',
-    category: '',
-    subCategory: '',
-    businessType: 'Individual',
+    businessName: "",
+    description: "",
+    category: "",
+    subCategory: "",
+    businessType: "Individual",
     establishedYear: new Date().getFullYear(),
     address: {
-      street: '',
-      area: '',
-      city: '',
-      state: '',
-      pincode: '',
-      landmark: ''
+      street: "",
+      area: "",
+      city: "",
+      state: "",
+      pincode: "",
+      landmark: "",
     },
     coordinates: {
       latitude: 0,
-      longitude: 0
+      longitude: 0,
     },
     contactInfo: {
-      primaryPhone: '',
-      secondaryPhone: '',
-      email: '',
-      website: ''
+      primaryPhone: "",
+      secondaryPhone: "",
+      email: "",
+      website: "",
     },
     businessHours: {
-      monday: { open: '09:00', close: '18:00', isOpen: true },
-      tuesday: { open: '09:00', close: '18:00', isOpen: true },
-      wednesday: { open: '09:00', close: '18:00', isOpen: true },
-      thursday: { open: '09:00', close: '18:00', isOpen: true },
-      friday: { open: '09:00', close: '18:00', isOpen: true },
-      saturday: { open: '09:00', close: '18:00', isOpen: true },
-      sunday: { open: '09:00', close: '18:00', isOpen: false }
+      monday: { open: "09:00", close: "18:00", isOpen: true },
+      tuesday: { open: "09:00", close: "18:00", isOpen: true },
+      wednesday: { open: "09:00", close: "18:00", isOpen: true },
+      thursday: { open: "09:00", close: "18:00", isOpen: true },
+      friday: { open: "09:00", close: "18:00", isOpen: true },
+      saturday: { open: "09:00", close: "18:00", isOpen: true },
+      sunday: { open: "09:00", close: "18:00", isOpen: false },
     },
     services: [],
     features: [],
@@ -187,24 +274,24 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
     keywords: [],
     paymentMethods: [],
     amenities: [],
-    images: []
+    images: [],
   });
 
   const [newService, setNewService] = useState({
-    name: '',
-    description: '',
+    name: "",
+    description: "",
     price: {
       min: 0,
       max: 0,
-      currency: 'INR'
-    }
+      currency: "INR",
+    },
   });
 
-  const [newTag, setNewTag] = useState('');
-  const [newKeyword, setNewKeyword] = useState('');
+  const [newTag, setNewTag] = useState("");
+  const [newKeyword, setNewKeyword] = useState("");
 
   useEffect(() => {
-    if (mode === 'edit' && businessId) {
+    if (mode === "edit" && businessId) {
       fetchBusinessData();
     }
   }, [businessId, mode]);
@@ -212,35 +299,46 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
   const fetchBusinessData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8002/api/v1/property/businesses/${businessId}`);
+      const response = await fetch(
+        `http://localhost:8000/api/v1/property/businesses/${businessId}`
+      );
       const data = await response.json();
-      
+
       if (data.success) {
         const business = data.business;
         setFormData({
-          businessName: business.businessName || '',
-          description: business.description || '',
-          category: business.category || '',
-          subCategory: business.subCategory || '',
-          businessType: business.businessType || 'Individual',
+          businessName: business.businessName || "",
+          description: business.description || "",
+          category: business.category || "",
+          subCategory: business.subCategory || "",
+          businessType: business.businessType || "Individual",
           establishedYear: business.establishedYear || new Date().getFullYear(),
           address: {
-            street: business.address?.street || business.fullAddress || '',
-            area: business.address?.area || business.area || '',
-            city: business.address?.city || '',
-            state: business.address?.state || '',
-            pincode: business.address?.pincode || '',
-            landmark: business.address?.landmark || ''
+            street: business.address?.street || business.fullAddress || "",
+            area: business.address?.area || business.area || "",
+            city: business.address?.city || "",
+            state: business.address?.state || "",
+            pincode: business.address?.pincode || "",
+            landmark: business.address?.landmark || "",
           },
           coordinates: {
-            latitude: business.coordinates?.latitude || business.location?.coordinates?.[1] || 0,
-            longitude: business.coordinates?.longitude || business.location?.coordinates?.[0] || 0
+            latitude:
+              business.coordinates?.latitude ||
+              business.location?.coordinates?.[1] ||
+              0,
+            longitude:
+              business.coordinates?.longitude ||
+              business.location?.coordinates?.[0] ||
+              0,
           },
           contactInfo: {
-            primaryPhone: business.contactInfo?.phone || business.phone || '',
-            secondaryPhone: business.contactInfo?.alternatePhone || business.alternatePhone || '',
-            email: business.contactInfo?.email || business.email || '',
-            website: business.contactInfo?.website || business.website || ''
+            primaryPhone: business.contactInfo?.phone || business.phone || "",
+            secondaryPhone:
+              business.contactInfo?.alternatePhone ||
+              business.alternatePhone ||
+              "",
+            email: business.contactInfo?.email || business.email || "",
+            website: business.contactInfo?.website || business.website || "",
           },
           businessHours: business.businessHours || formData.businessHours,
           services: business.services || [],
@@ -249,27 +347,27 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
           keywords: business.keywords || [],
           paymentMethods: business.paymentMethods || [],
           amenities: business.amenities || [],
-          images: business.images || []
+          images: business.images || [],
         });
       }
     } catch (error) {
-      console.error('Error fetching business data:', error);
-      toast.error('Failed to load business data');
+      console.error("Error fetching business data:", error);
+      toast.error("Failed to load business data");
     } finally {
       setLoading(false);
     }
   };
 
   const handleInputChange = (section: string, field: string, value: any) => {
-    if (section === 'root') {
-      setFormData(prev => ({ ...prev, [field]: value }));
+    if (section === "root") {
+      setFormData((prev) => ({ ...prev, [field]: value }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         [section]: {
           ...prev[section as keyof BusinessFormData],
-          [field]: value
-        }
+          [field]: value,
+        },
       }));
     }
   };
@@ -277,142 +375,149 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
   const handlePlaceSelect = (place: any) => {
     if (place && place.address_components) {
       const addressComponents = place.address_components;
-      let city = '';
-      let state = '';
-      let pincode = '';
-      
+      let city = "";
+      let state = "";
+      let pincode = "";
+
       addressComponents.forEach((component: any) => {
         const types = component.types;
-        if (types.includes('locality') || types.includes('administrative_area_level_2')) {
+        if (
+          types.includes("locality") ||
+          types.includes("administrative_area_level_2")
+        ) {
           city = component.long_name;
         }
-        if (types.includes('administrative_area_level_1')) {
+        if (types.includes("administrative_area_level_1")) {
           state = component.long_name;
         }
-        if (types.includes('postal_code')) {
+        if (types.includes("postal_code")) {
           pincode = component.long_name;
         }
       });
-      
+
       const lat = place.geometry?.location?.lat() || 0;
       const lng = place.geometry?.location?.lng() || 0;
-      
-      setFormData(prev => ({
+
+      setFormData((prev) => ({
         ...prev,
         address: {
           ...prev.address,
           city,
           state,
-          pincode
+          pincode,
         },
         coordinates: {
           latitude: lat,
-          longitude: lng
-        }
+          longitude: lng,
+        },
       }));
     }
   };
 
-  const handleBusinessHoursChange = (day: string, field: string, value: any) => {
-    setFormData(prev => ({
+  const handleBusinessHoursChange = (
+    day: string,
+    field: string,
+    value: any
+  ) => {
+    setFormData((prev) => ({
       ...prev,
       businessHours: {
         ...prev.businessHours,
         [day]: {
           ...prev.businessHours[day],
-          [field]: value
-        }
-      }
+          [field]: value,
+        },
+      },
     }));
   };
 
   const addService = () => {
     if (newService.name.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        services: [...prev.services, newService]
+        services: [...prev.services, newService],
       }));
-      setNewService({ 
-        name: '', 
-        description: '', 
+      setNewService({
+        name: "",
+        description: "",
         price: {
           min: 0,
           max: 0,
-          currency: 'INR'
-        }
+          currency: "INR",
+        },
       });
     }
   };
 
   const removeService = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      services: prev.services.filter((_, i) => i !== index)
+      services: prev.services.filter((_, i) => i !== index),
     }));
   };
 
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, newTag.trim()]
+        tags: [...prev.tags, newTag.trim()],
       }));
-      setNewTag('');
+      setNewTag("");
     }
   };
 
   const removeTag = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter((_, i) => i !== index)
+      tags: prev.tags.filter((_, i) => i !== index),
     }));
   };
 
   const addKeyword = () => {
     if (newKeyword.trim() && !formData.keywords.includes(newKeyword.trim())) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        keywords: [...prev.keywords, newKeyword.trim()]
+        keywords: [...prev.keywords, newKeyword.trim()],
       }));
-      setNewKeyword('');
+      setNewKeyword("");
     }
   };
 
   const removeKeyword = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      keywords: prev.keywords.filter((_, i) => i !== index)
+      keywords: prev.keywords.filter((_, i) => i !== index),
     }));
   };
 
   const handleAmenityChange = (amenity: string, checked: boolean) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       amenities: checked
         ? [...prev.amenities, amenity]
-        : prev.amenities.filter(f => f !== amenity)
+        : prev.amenities.filter((f) => f !== amenity),
     }));
   };
 
   const handlePaymentMethodChange = (method: string, checked: boolean) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       paymentMethods: checked
         ? [...prev.paymentMethods, method]
-        : prev.paymentMethods.filter(m => m !== method)
+        : prev.paymentMethods.filter((m) => m !== method),
     }));
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
-      Array.from(files).forEach(file => {
+      Array.from(files).forEach((file) => {
         const reader = new FileReader();
         reader.onload = (event) => {
           if (event.target?.result) {
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
-              images: [...prev.images, event.target!.result as string]
+              images: [...prev.images, event.target!.result as string],
             }));
           }
         };
@@ -422,9 +527,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
   };
 
   const removeImage = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index)
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
@@ -433,9 +538,13 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
     setLoading(true);
 
     // Validate coordinates before submitting
-    if (!formData.coordinates.latitude || !formData.coordinates.longitude || 
-        formData.coordinates.latitude === 0 || formData.coordinates.longitude === 0) {
-      toast.error('Please select a valid city to set coordinates');
+    if (
+      !formData.coordinates.latitude ||
+      !formData.coordinates.longitude ||
+      formData.coordinates.latitude === 0 ||
+      formData.coordinates.longitude === 0
+    ) {
+      toast.error("Please select a valid city to set coordinates");
       setLoading(false);
       return;
     }
@@ -463,28 +572,31 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
         paymentMethods: formData.paymentMethods,
         amenities: formData.amenities,
         images: formData.images,
-        vendor: user?._id || '68c10c881b9aff6e9b853fd5'
+        vendor: user?._id || "68c10c881b9aff6e9b853fd5",
       };
 
-      const url = mode === 'add' 
-        ? 'http://localhost:8002/api/v1/property/create-business'
-        : `http://localhost:8002/api/v1/property/businesses/${businessId}`;
-      
-      const method = mode === 'add' ? 'POST' : 'PUT';
+      const url =
+        mode === "add"
+          ? "http://localhost:8000/api/v1/property/create-business"
+          : `http://localhost:8000/api/v1/property/businesses/${businessId}`;
+
+      const method = mode === "add" ? "POST" : "PUT";
 
       const response = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(submitData)
+        body: JSON.stringify(submitData),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        toast.success(`Business ${mode === 'add' ? 'created' : 'updated'} successfully!`);
-        navigate('/business-listing');
+        toast.success(
+          `Business ${mode === "add" ? "created" : "updated"} successfully!`
+        );
+        navigate("/business-listing");
       } else {
         toast.error(data.message || `Failed to ${mode} business`);
       }
@@ -496,7 +608,7 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
     }
   };
 
-  if (loading && mode === 'edit') {
+  if (loading && mode === "edit") {
     return (
       <div className="min-h-screen bg-muted/30 flex items-center justify-center">
         <div className="text-center">
@@ -511,16 +623,12 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
     <div className="min-h-screen bg-muted/30">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-4"
-          >
+          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
           <h1 className="text-3xl font-bold">
-            {mode === 'add' ? 'Add New Business' : 'Edit Business'}
+            {mode === "add" ? "Add New Business" : "Edit Business"}
           </h1>
         </div>
 
@@ -537,7 +645,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Input
                     id="businessName"
                     value={formData.businessName}
-                    onChange={(e) => handleInputChange('root', 'businessName', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("root", "businessName", e.target.value)
+                    }
                     placeholder="Enter your business name"
                     required
                   />
@@ -548,15 +658,15 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Select
                     value={formData.category}
                     onValueChange={(value) => {
-                      handleInputChange('root', 'category', value);
-                      handleInputChange('root', 'subCategory', '');
+                      handleInputChange("root", "category", value);
+                      handleInputChange("root", "subCategory", "");
                     }}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {BUSINESS_CATEGORIES.map(category => (
+                      {BUSINESS_CATEGORIES.map((category) => (
                         <SelectItem key={category} value={category}>
                           {category}
                         </SelectItem>
@@ -569,18 +679,21 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Label htmlFor="subCategory">Sub Category *</Label>
                   <Select
                     value={formData.subCategory}
-                    onValueChange={(value) => handleInputChange('root', 'subCategory', value)}
+                    onValueChange={(value) =>
+                      handleInputChange("root", "subCategory", value)
+                    }
                     disabled={!formData.category}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select sub category" />
                     </SelectTrigger>
                     <SelectContent>
-                      {formData.category && SUBCATEGORIES[formData.category]?.map(subCategory => (
-                        <SelectItem key={subCategory} value={subCategory}>
-                          {subCategory}
-                        </SelectItem>
-                      ))}
+                      {formData.category &&
+                        SUBCATEGORIES[formData.category]?.map((subCategory) => (
+                          <SelectItem key={subCategory} value={subCategory}>
+                            {subCategory}
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -589,13 +702,15 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Label htmlFor="businessType">Business Type *</Label>
                   <Select
                     value={formData.businessType}
-                    onValueChange={(value) => handleInputChange('root', 'businessType', value)}
+                    onValueChange={(value) =>
+                      handleInputChange("root", "businessType", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select business type" />
                     </SelectTrigger>
                     <SelectContent>
-                      {BUSINESS_TYPES.map(type => (
+                      {BUSINESS_TYPES.map((type) => (
                         <SelectItem key={type} value={type}>
                           {type}
                         </SelectItem>
@@ -610,7 +725,13 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                     id="establishedYear"
                     type="number"
                     value={formData.establishedYear}
-                    onChange={(e) => handleInputChange('root', 'establishedYear', parseInt(e.target.value))}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "root",
+                        "establishedYear",
+                        parseInt(e.target.value)
+                      )
+                    }
                     min="1900"
                     max={new Date().getFullYear()}
                   />
@@ -621,7 +742,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => handleInputChange('root', 'description', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("root", "description", e.target.value)
+                    }
                     placeholder="Describe your business..."
                     rows={3}
                     required
@@ -646,7 +769,13 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Input
                     id="primaryPhone"
                     value={formData.contactInfo.primaryPhone}
-                    onChange={(e) => handleInputChange('contactInfo', 'primaryPhone', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "contactInfo",
+                        "primaryPhone",
+                        e.target.value
+                      )
+                    }
                     placeholder="Primary phone number"
                     required
                   />
@@ -657,7 +786,13 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Input
                     id="secondaryPhone"
                     value={formData.contactInfo.secondaryPhone}
-                    onChange={(e) => handleInputChange('contactInfo', 'secondaryPhone', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "contactInfo",
+                        "secondaryPhone",
+                        e.target.value
+                      )
+                    }
                     placeholder="Secondary phone number"
                   />
                 </div>
@@ -668,7 +803,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                     id="email"
                     type="email"
                     value={formData.contactInfo.email}
-                    onChange={(e) => handleInputChange('contactInfo', 'email', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("contactInfo", "email", e.target.value)
+                    }
                     placeholder="business@example.com"
                     required
                   />
@@ -679,7 +816,13 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Input
                     id="website"
                     value={formData.contactInfo.website}
-                    onChange={(e) => handleInputChange('contactInfo', 'website', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "contactInfo",
+                        "website",
+                        e.target.value
+                      )
+                    }
                     placeholder="https://www.yourbusiness.com"
                   />
                 </div>
@@ -702,7 +845,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Textarea
                     id="street"
                     value={formData.address.street}
-                    onChange={(e) => handleInputChange('address', 'street', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("address", "street", e.target.value)
+                    }
                     placeholder="Enter complete street address"
                     rows={2}
                     required
@@ -714,7 +859,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Input
                     id="area"
                     value={formData.address.area}
-                    onChange={(e) => handleInputChange('address', 'area', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("address", "area", e.target.value)
+                    }
                     placeholder="Area or locality"
                   />
                 </div>
@@ -733,7 +880,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Input
                     id="state"
                     value={formData.address.state}
-                    onChange={(e) => handleInputChange('address', 'state', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("address", "state", e.target.value)
+                    }
                     placeholder="State"
                     readOnly
                   />
@@ -744,7 +893,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Input
                     id="pincode"
                     value={formData.address.pincode}
-                    onChange={(e) => handleInputChange('address', 'pincode', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("address", "pincode", e.target.value)
+                    }
                     placeholder="Pincode"
                   />
                 </div>
@@ -754,7 +905,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   <Input
                     id="landmark"
                     value={formData.address.landmark}
-                    onChange={(e) => handleInputChange('address', 'landmark', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("address", "landmark", e.target.value)
+                    }
                     placeholder="Nearby landmark"
                   />
                 </div>
@@ -772,30 +925,38 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {DAYS_OF_WEEK.map(day => (
+                {DAYS_OF_WEEK.map((day) => (
                   <div key={day} className="flex items-center gap-4">
                     <div className="w-24">
                       <Label className="capitalize">{day}</Label>
                     </div>
                     <Checkbox
                       checked={formData.businessHours[day]?.isOpen || false}
-                      onCheckedChange={(checked) => 
-                        handleBusinessHoursChange(day, 'isOpen', checked)
+                      onCheckedChange={(checked) =>
+                        handleBusinessHoursChange(day, "isOpen", checked)
                       }
                     />
                     <div className="flex items-center gap-2">
                       <Input
                         type="time"
-                        value={formData.businessHours[day]?.open || '09:00'}
-                        onChange={(e) => handleBusinessHoursChange(day, 'open', e.target.value)}
+                        value={formData.businessHours[day]?.open || "09:00"}
+                        onChange={(e) =>
+                          handleBusinessHoursChange(day, "open", e.target.value)
+                        }
                         disabled={!formData.businessHours[day]?.isOpen}
                         className="w-32"
                       />
                       <span>to</span>
                       <Input
                         type="time"
-                        value={formData.businessHours[day]?.close || '18:00'}
-                        onChange={(e) => handleBusinessHoursChange(day, 'close', e.target.value)}
+                        value={formData.businessHours[day]?.close || "18:00"}
+                        onChange={(e) =>
+                          handleBusinessHoursChange(
+                            day,
+                            "close",
+                            e.target.value
+                          )
+                        }
                         disabled={!formData.businessHours[day]?.isOpen}
                         className="w-32"
                       />
@@ -815,33 +976,44 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
                 <Input
                   value={newService.name}
-                  onChange={(e) => setNewService(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setNewService((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   placeholder="Service name"
                   className="md:col-span-2"
                 />
                 <Input
                   value={newService.description}
-                  onChange={(e) => setNewService(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setNewService((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   placeholder="Description"
                   className="md:col-span-2"
                 />
                 <Input
                   type="number"
                   value={newService.price.min}
-                  onChange={(e) => setNewService(prev => ({ 
-                    ...prev, 
-                    price: { ...prev.price, min: Number(e.target.value) } 
-                  }))}
+                  onChange={(e) =>
+                    setNewService((prev) => ({
+                      ...prev,
+                      price: { ...prev.price, min: Number(e.target.value) },
+                    }))
+                  }
                   placeholder="Min Price"
                 />
                 <div className="flex gap-1">
                   <Input
                     type="number"
                     value={newService.price.max}
-                    onChange={(e) => setNewService(prev => ({ 
-                      ...prev, 
-                      price: { ...prev.price, max: Number(e.target.value) } 
-                    }))}
+                    onChange={(e) =>
+                      setNewService((prev) => ({
+                        ...prev,
+                        price: { ...prev.price, max: Number(e.target.value) },
+                      }))
+                    }
                     placeholder="Max Price"
                     className="flex-1"
                   />
@@ -853,16 +1025,22 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
 
               <div className="space-y-2">
                 {formData.services.map((service, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div>
                       <span className="font-medium">{service.name}</span>
                       {service.description && (
-                        <p className="text-sm text-muted-foreground">{service.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {service.description}
+                        </p>
                       )}
                       {(service.price.min > 0 || service.price.max > 0) && (
                         <p className="text-sm font-medium text-green-600">
                           ₹{service.price.min}
-                          {service.price.max > service.price.min && ` - ₹${service.price.max}`}
+                          {service.price.max > service.price.min &&
+                            ` - ₹${service.price.max}`}
                         </p>
                       )}
                     </div>
@@ -893,7 +1071,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                     value={newTag}
                     onChange={(e) => setNewTag(e.target.value)}
                     placeholder="Add tag"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                    onKeyPress={(e) =>
+                      e.key === "Enter" && (e.preventDefault(), addTag())
+                    }
                   />
                   <Button type="button" onClick={addTag} size="sm">
                     <Plus className="h-4 w-4" />
@@ -901,10 +1081,14 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.tags.map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="flex items-center gap-1"
+                    >
                       {tag}
-                      <X 
-                        className="h-3 w-3 cursor-pointer" 
+                      <X
+                        className="h-3 w-3 cursor-pointer"
                         onClick={() => removeTag(index)}
                       />
                     </Badge>
@@ -919,7 +1103,9 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                     value={newKeyword}
                     onChange={(e) => setNewKeyword(e.target.value)}
                     placeholder="Add keyword"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addKeyword())}
+                    onKeyPress={(e) =>
+                      e.key === "Enter" && (e.preventDefault(), addKeyword())
+                    }
                   />
                   <Button type="button" onClick={addKeyword} size="sm">
                     <Plus className="h-4 w-4" />
@@ -927,10 +1113,14 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.keywords.map((keyword, index) => (
-                    <Badge key={index} variant="outline" className="flex items-center gap-1">
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="flex items-center gap-1"
+                    >
                       {keyword}
-                      <X 
-                        className="h-3 w-3 cursor-pointer" 
+                      <X
+                        className="h-3 w-3 cursor-pointer"
                         onClick={() => removeKeyword(index)}
                       />
                     </Badge>
@@ -947,12 +1137,14 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {PAYMENT_METHODS.map(method => (
+                {PAYMENT_METHODS.map((method) => (
                   <div key={method} className="flex items-center space-x-2">
                     <Checkbox
                       id={method}
                       checked={formData.paymentMethods.includes(method)}
-                      onCheckedChange={(checked) => handlePaymentMethodChange(method, checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        handlePaymentMethodChange(method, checked as boolean)
+                      }
                     />
                     <Label htmlFor={method} className="text-sm">
                       {method}
@@ -970,12 +1162,14 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {AMENITIES.map(amenity => (
+                {AMENITIES.map((amenity) => (
                   <div key={amenity} className="flex items-center space-x-2">
                     <Checkbox
                       id={amenity}
                       checked={formData.amenities.includes(amenity)}
-                      onCheckedChange={(checked) => handleAmenityChange(amenity, checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        handleAmenityChange(amenity, checked as boolean)
+                      }
                     />
                     <Label htmlFor={amenity} className="text-sm">
                       {amenity}
@@ -1006,7 +1200,7 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
                   className="mt-2"
                 />
               </div>
-              
+
               {formData.images.length > 0 && (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {formData.images.map((image, index) => (
@@ -1047,7 +1241,7 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              {mode === 'add' ? 'Create Business' : 'Update Business'}
+              {mode === "add" ? "Create Business" : "Update Business"}
             </Button>
           </div>
         </form>

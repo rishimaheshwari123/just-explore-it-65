@@ -1,11 +1,17 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
 import {
   MapPin,
   Star,
@@ -18,8 +24,8 @@ import {
   Filter,
   Grid,
   List,
-  SlidersHorizontal
-} from 'lucide-react';
+  SlidersHorizontal,
+} from "lucide-react";
 
 interface Business {
   _id: string;
@@ -93,43 +99,60 @@ const BusinessListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
-  const [selectedLocation, setSelectedLocation] = useState(searchParams.get('location') || 'all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = useState('relevance');
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("search") || ""
+  );
+  const [selectedCategory, setSelectedCategory] = useState(
+    searchParams.get("category") || "all"
+  );
+  const [selectedLocation, setSelectedLocation] = useState(
+    searchParams.get("location") || "all"
+  );
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [sortBy, setSortBy] = useState("relevance");
   const [showFilters, setShowFilters] = useState(false);
-  const [userLocation, setUserLocation] = useState<{latitude: number, longitude: number} | null>(null);
-  const [selectedDistance, setSelectedDistance] = useState('10'); // km
+  const [userLocation, setUserLocation] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+  const [selectedDistance, setSelectedDistance] = useState("10"); // km
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
 
   const categories = [
-    'Restaurants',
-    'Hotels',
-    'Healthcare',
-    'Education',
-    'Automotive',
-    'Beauty & Spa',
-    'Shopping',
-    'Services',
-    'Entertainment',
-    'Real Estate'
+    "Restaurants",
+    "Hotels",
+    "Healthcare",
+    "Education",
+    "Automotive",
+    "Beauty & Spa",
+    "Shopping",
+    "Services",
+    "Entertainment",
+    "Real Estate",
   ];
 
   const locations = [
-    'Mumbai',
-    'Delhi',
-    'Bangalore',
-    'Chennai',
-    'Kolkata',
-    'Hyderabad',
-    'Pune',
-    'Ahmedabad'
+    "Mumbai",
+    "Delhi",
+    "Bangalore",
+    "Chennai",
+    "Kolkata",
+    "Hyderabad",
+    "Pune",
+    "Ahmedabad",
   ];
 
   useEffect(() => {
     fetchBusinesses();
-  }, [searchTerm, selectedCategory, selectedLocation, sortBy, userLocation, selectedDistance, useCurrentLocation]);
+  }, [
+    searchTerm,
+    selectedCategory,
+    selectedLocation,
+    sortBy,
+    userLocation,
+    selectedDistance,
+    useCurrentLocation,
+  ]);
 
   useEffect(() => {
     if (useCurrentLocation) {
@@ -143,18 +166,20 @@ const BusinessListing = () => {
         (position) => {
           setUserLocation({
             latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+            longitude: position.coords.longitude,
           });
-          toast.success('Location detected successfully!');
+          toast.success("Location detected successfully!");
         },
         (error) => {
-          console.error('Error getting location:', error);
-          toast.error('Unable to get your location. Please enable location services.');
+          console.error("Error getting location:", error);
+          toast.error(
+            "Unable to get your location. Please enable location services."
+          );
           setUseCurrentLocation(false);
         }
       );
     } else {
-      toast.error('Geolocation is not supported by this browser.');
+      toast.error("Geolocation is not supported by this browser.");
       setUseCurrentLocation(false);
     }
   };
@@ -163,40 +188,47 @@ const BusinessListing = () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      
-      if (searchTerm) params.append('search', searchTerm);
-      if (selectedCategory !== 'all') params.append('category', selectedCategory);
-      if (selectedLocation !== 'all' && !useCurrentLocation) params.append('city', selectedLocation);
-      if (sortBy !== 'relevance') params.append('sortBy', sortBy);
-      
+
+      if (searchTerm) params.append("search", searchTerm);
+      if (selectedCategory !== "all")
+        params.append("category", selectedCategory);
+      if (selectedLocation !== "all" && !useCurrentLocation)
+        params.append("city", selectedLocation);
+      if (sortBy !== "relevance") params.append("sortBy", sortBy);
+
       // Set a higher limit to show all businesses
-      params.append('limit', '50');
-      
+      params.append("limit", "50");
+
       // Add location-based parameters
       if (useCurrentLocation && userLocation) {
-        params.append('latitude', userLocation.latitude.toString());
-        params.append('longitude', userLocation.longitude.toString());
-        params.append('distance', selectedDistance);
-        params.append('sortBy', 'distance');
+        params.append("latitude", userLocation.latitude.toString());
+        params.append("longitude", userLocation.longitude.toString());
+        params.append("distance", selectedDistance);
+        params.append("sortBy", "distance");
       }
-      
-      console.log('API URL:', `http://localhost:8002/api/v1/property/businesses?${params.toString()}`);
-      
-      const response = await fetch(`http://localhost:8002/api/v1/property/businesses?${params.toString()}`);
+
+      console.log(
+        "API URL:",
+        `http://localhost:8000/api/v1/property/businesses?${params.toString()}`
+      );
+
+      const response = await fetch(
+        `http://localhost:8000/api/v1/property/businesses?${params.toString()}`
+      );
       const data = await response.json();
-      
-      console.log('API Response:', data);
-      
+
+      console.log("API Response:", data);
+
       if (data.success) {
         setBusinesses(data.businesses || []);
       } else {
-        console.error('Failed to fetch businesses:', data.message);
+        console.error("Failed to fetch businesses:", data.message);
         // Show empty state instead of error for better UX
         setBusinesses([]);
       }
     } catch (error) {
-      console.error('Error fetching businesses:', error);
-      toast.error('Failed to load businesses');
+      console.error("Error fetching businesses:", error);
+      toast.error("Failed to load businesses");
     } finally {
       setLoading(false);
     }
@@ -204,10 +236,10 @@ const BusinessListing = () => {
 
   const handleSearch = () => {
     const params = new URLSearchParams();
-    if (searchTerm) params.append('search', searchTerm);
-    if (selectedCategory !== 'all') params.append('category', selectedCategory);
-    if (selectedLocation !== 'all') params.append('location', selectedLocation);
-    
+    if (searchTerm) params.append("search", searchTerm);
+    if (selectedCategory !== "all") params.append("category", selectedCategory);
+    if (selectedLocation !== "all") params.append("location", selectedLocation);
+
     setSearchParams(params);
     fetchBusinesses();
   };
@@ -218,24 +250,35 @@ const BusinessListing = () => {
 
   const handleCall = (phone: string, businessId: string) => {
     // Track call interaction
-    fetch(`http://localhost:8002/api/v1/property/business/${businessId}/interaction`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'call' })
-    }).catch(console.error);
-    
-    window.open(`tel:${phone}`, '_self');
+    fetch(
+      `http://localhost:8000/api/v1/property/business/${businessId}/interaction`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "call" }),
+      }
+    ).catch(console.error);
+
+    window.open(`tel:${phone}`, "_self");
   };
 
-  const isBusinessOpen = (businessHours: Business['businessHours']) => {
+  const isBusinessOpen = (businessHours: Business["businessHours"]) => {
     const now = new Date();
-    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const dayNames = [
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+    ];
     const currentDay = dayNames[now.getDay()];
     const currentTime = now.toTimeString().slice(0, 5);
-    
+
     const todayHours = businessHours[currentDay];
     if (!todayHours || todayHours.isClosed) return false;
-    
+
     return currentTime >= todayHours.open && currentTime <= todayHours.close;
   };
 
@@ -245,10 +288,10 @@ const BusinessListing = () => {
         key={i}
         className={`h-4 w-4 ${
           i < Math.floor(rating)
-            ? 'text-yellow-400 fill-yellow-400'
+            ? "text-yellow-400 fill-yellow-400"
             : i < rating
-            ? 'text-yellow-400 fill-yellow-400/50'
-            : 'text-gray-300'
+            ? "text-yellow-400 fill-yellow-400/50"
+            : "text-gray-300"
         }`}
       />
     ));
@@ -256,7 +299,10 @@ const BusinessListing = () => {
 
   const BusinessCard = ({ business }: { business: Business }) => {
     const isOpen = isBusinessOpen(business.businessHours);
-    const mainImage = business.images?.find(img => img.isPrimary)?.url || business.images?.[0]?.url || '/placeholder-business.jpg';
+    const mainImage =
+      business.images?.find((img) => img.isPrimary)?.url ||
+      business.images?.[0]?.url ||
+      "/placeholder-business.jpg";
 
     return (
       <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group">
@@ -267,7 +313,7 @@ const BusinessListing = () => {
             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
             onClick={() => handleBusinessClick(business._id)}
           />
-          
+
           {/* Status Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1">
             <Badge className="bg-primary text-primary-foreground text-xs">
@@ -287,15 +333,13 @@ const BusinessListing = () => {
           </div>
 
           <div className="absolute top-2 right-2">
-            <Badge 
+            <Badge
               className={`text-xs ${
-                isOpen 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-red-500 text-white'
+                isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
               }`}
             >
               <Clock className="h-3 w-3 mr-1" />
-              {isOpen ? 'Open' : 'Closed'}
+              {isOpen ? "Open" : "Closed"}
             </Badge>
           </div>
 
@@ -309,13 +353,13 @@ const BusinessListing = () => {
 
         <CardContent className="p-4">
           <div className="mb-2">
-            <h3 
+            <h3
               className="font-semibold text-lg mb-1 line-clamp-1 group-hover:text-primary transition-colors"
               onClick={() => handleBusinessClick(business._id)}
             >
               {business.businessName}
             </h3>
-            
+
             {/* Rating */}
             <div className="flex items-center gap-2 mb-2">
               <div className="flex items-center">
@@ -346,17 +390,19 @@ const BusinessListing = () => {
 
           {/* Action Buttons */}
           <div className="flex gap-2">
-            <Button 
-              size="sm" 
+            <Button
+              size="sm"
               className="flex-1"
-              onClick={() => handleCall(business.contactInfo.primaryPhone, business._id)}
+              onClick={() =>
+                handleCall(business.contactInfo.primaryPhone, business._id)
+              }
             >
               <Phone className="h-4 w-4 mr-1" />
               Call
             </Button>
-            <Button 
-              size="sm" 
-              variant="outline" 
+            <Button
+              size="sm"
+              variant="outline"
               className="flex-1"
               onClick={() => handleBusinessClick(business._id)}
             >
@@ -370,7 +416,10 @@ const BusinessListing = () => {
 
   const BusinessListItem = ({ business }: { business: Business }) => {
     const isOpen = isBusinessOpen(business.businessHours);
-    const mainImage = business.images?.find(img => img.isPrimary)?.url || business.images?.[0]?.url || '/placeholder-business.jpg';
+    const mainImage =
+      business.images?.find((img) => img.isPrimary)?.url ||
+      business.images?.[0]?.url ||
+      "/placeholder-business.jpg";
 
     return (
       <Card className="overflow-hidden hover:shadow-md transition-shadow">
@@ -382,17 +431,17 @@ const BusinessListing = () => {
               className="w-24 h-24 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => handleBusinessClick(business._id)}
             />
-            
+
             <div className="flex-1">
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <h3 
+                  <h3
                     className="font-semibold text-lg mb-1 cursor-pointer hover:text-primary transition-colors"
                     onClick={() => handleBusinessClick(business._id)}
                   >
                     {business.businessName}
                   </h3>
-                  
+
                   <div className="flex items-center gap-2 mb-1">
                     <Badge className="text-xs">{business.category}</Badge>
                     {business.verification.isVerified && (
@@ -403,19 +452,17 @@ const BusinessListing = () => {
                     )}
                   </div>
                 </div>
-                
-                <Badge 
+
+                <Badge
                   className={`text-xs ${
-                    isOpen 
-                      ? 'bg-green-500 text-white' 
-                      : 'bg-red-500 text-white'
+                    isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
                   }`}
                 >
                   <Clock className="h-3 w-3 mr-1" />
-                  {isOpen ? 'Open' : 'Closed'}
+                  {isOpen ? "Open" : "Closed"}
                 </Badge>
               </div>
-              
+
               {/* Rating */}
               <div className="flex items-center gap-2 mb-2">
                 <div className="flex items-center">
@@ -445,15 +492,17 @@ const BusinessListing = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-2">
-                <Button 
+                <Button
                   size="sm"
-                  onClick={() => handleCall(business.contactInfo.primaryPhone, business._id)}
+                  onClick={() =>
+                    handleCall(business.contactInfo.primaryPhone, business._id)
+                  }
                 >
                   <Phone className="h-4 w-4 mr-1" />
                   Call
                 </Button>
-                <Button 
-                  size="sm" 
+                <Button
+                  size="sm"
                   variant="outline"
                   onClick={() => handleBusinessClick(business._id)}
                 >
@@ -461,7 +510,7 @@ const BusinessListing = () => {
                 </Button>
               </div>
             </div>
-            
+
             <div className="flex flex-col items-end gap-2">
               <Badge className="bg-black/10 text-black text-xs flex items-center gap-1">
                 <Eye className="h-3 w-3" />
@@ -480,7 +529,7 @@ const BusinessListing = () => {
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold mb-6">Find Local Businesses</h1>
-          
+
           {/* Search Bar */}
           <div className="flex flex-col md:flex-row gap-4 mb-4">
             <div className="flex-1">
@@ -488,12 +537,15 @@ const BusinessListing = () => {
                 placeholder="Search for businesses, services, or products..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
                 className="h-12"
               />
             </div>
-            
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
               <SelectTrigger className="w-full md:w-48 h-12">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -506,8 +558,11 @@ const BusinessListing = () => {
                 ))}
               </SelectContent>
             </Select>
-            
-            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+
+            <Select
+              value={selectedLocation}
+              onValueChange={setSelectedLocation}
+            >
               <SelectTrigger className="w-full md:w-48 h-12">
                 <SelectValue placeholder="Location" />
               </SelectTrigger>
@@ -520,7 +575,7 @@ const BusinessListing = () => {
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Button onClick={handleSearch} className="h-12 px-8">
               <Search className="h-4 w-4 mr-2" />
               Search
@@ -542,7 +597,7 @@ const BusinessListing = () => {
                 <SlidersHorizontal className="h-4 w-4 mr-2" />
                 Filters
               </Button>
-              
+
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-48">
                   <SelectValue />
@@ -557,25 +612,25 @@ const BusinessListing = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
                 {businesses.length} businesses found
               </span>
-              
+
               <div className="flex border rounded-md">
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  variant={viewMode === "grid" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => setViewMode("grid")}
                   className="rounded-r-none"
                 >
                   <Grid className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  variant={viewMode === "list" ? "default" : "ghost"}
                   size="sm"
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode("list")}
                   className="rounded-l-none"
                 >
                   <List className="h-4 w-4" />
@@ -583,13 +638,15 @@ const BusinessListing = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Advanced Filters */}
           {showFilters && (
             <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Use Current Location</label>
+                  <label className="text-sm font-medium">
+                    Use Current Location
+                  </label>
                   <div className="flex items-center space-x-2">
                     <input
                       type="checkbox"
@@ -603,11 +660,16 @@ const BusinessListing = () => {
                     </label>
                   </div>
                 </div>
-                
+
                 {useCurrentLocation && (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Distance Range</label>
-                    <Select value={selectedDistance} onValueChange={setSelectedDistance}>
+                    <label className="text-sm font-medium">
+                      Distance Range
+                    </label>
+                    <Select
+                      value={selectedDistance}
+                      onValueChange={setSelectedDistance}
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -622,15 +684,19 @@ const BusinessListing = () => {
                     </Select>
                   </div>
                 )}
-                
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Location Status</label>
                   <div className="text-sm text-muted-foreground">
                     {useCurrentLocation ? (
                       userLocation ? (
-                        <span className="text-green-600">✓ Location detected</span>
+                        <span className="text-green-600">
+                          ✓ Location detected
+                        </span>
                       ) : (
-                        <span className="text-orange-600">⏳ Detecting location...</span>
+                        <span className="text-orange-600">
+                          ⏳ Detecting location...
+                        </span>
                       )
                     ) : (
                       <span className="text-gray-600">Using selected city</span>
@@ -670,22 +736,27 @@ const BusinessListing = () => {
             <p className="text-muted-foreground mb-4">
               Try adjusting your search criteria or browse all categories
             </p>
-            <Button onClick={() => {
-              setSearchTerm('');
-              setSelectedCategory('all');
-              setSelectedLocation('all');
-              fetchBusinesses();
-            }}>
+            <Button
+              onClick={() => {
+                setSearchTerm("");
+                setSelectedCategory("all");
+                setSelectedLocation("all");
+                fetchBusinesses();
+              }}
+            >
               Clear Filters
             </Button>
           </div>
         ) : (
-          <div className={viewMode === 'grid' 
-            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
-            : 'space-y-4'
-          }>
-            {businesses.map((business) => 
-              viewMode === 'grid' ? (
+          <div
+            className={
+              viewMode === "grid"
+                ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                : "space-y-4"
+            }
+          >
+            {businesses.map((business) =>
+              viewMode === "grid" ? (
                 <BusinessCard key={business._id} business={business} />
               ) : (
                 <BusinessListItem key={business._id} business={business} />
