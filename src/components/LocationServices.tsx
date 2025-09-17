@@ -76,7 +76,7 @@ const LocationServices: React.FC = () => {
       }
 
       const response = await fetch(
-        `http://localhost:8002/api/v1/property/businesses?${params.toString()}`
+        `https://just-explore-it-65.onrender.com/api/v1/property/businesses?${params.toString()}`
       );
       const data = await response.json();
 
