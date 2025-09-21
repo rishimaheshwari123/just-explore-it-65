@@ -12,6 +12,10 @@ import {
   Plus,
   BarChart3,
   Bell,
+  Shield,
+  Activity,
+  Star,
+  MessageSquare,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";

@@ -14,6 +14,10 @@ import {
   Bell,
   Users,
   Trophy,
+  Store,
+  Star,
+  Activity,
+  BarChart3,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getVendorBusinessAPI } from "../../service/operations/business";

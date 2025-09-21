@@ -45,6 +45,13 @@ const inquirySchema = new mongoose.Schema(
             required: true,
         },
         
+        // User Reference (if logged in)
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: false,
+        },
+        
         // Inquiry Type
         inquiryType: {
             type: String,

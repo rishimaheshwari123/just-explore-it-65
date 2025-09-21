@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import BusinessInquiryModal from "@/components/BusinessInquiryModal";
+import BusinessReviewModal from "@/components/BusinessReviewModal";
 import {
   ArrowLeft,
   Phone,
@@ -601,6 +602,8 @@ const BusinessDetail: React.FC = () => {
                   </Button>
                   
                   <BusinessInquiryModal business={business} />
+                  
+                  <BusinessReviewModal business={business} />
                 </div>
               </CardContent>
             </Card>

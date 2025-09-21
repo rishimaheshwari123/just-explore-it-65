@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { MessageSquare, Phone, Mail, Clock, Star, MapPin } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 interface Business {
   _id: string;
@@ -67,6 +69,8 @@ const BusinessInquiryModal: React.FC<BusinessInquiryModalProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { user } = useSelector((state: RootState) => state.auth);
+  
   const [formData, setFormData] = useState<InquiryFormData>({
     name: "",
     email: "",
@@ -115,6 +119,18 @@ const BusinessInquiryModal: React.FC<BusinessInquiryModalProps> = ({
     { value: "evening", label: "Evening (5 PM - 9 PM)" }
   ];
 
+  // Auto-fill user data if logged in
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || ""
+      }));
+    }
+  }, [user]);
+
   const handleInputChange = (field: string, value: any) => {
     if (field.includes('.')) {
       const [parent, child] = field.split('.');
@@ -154,7 +170,8 @@ const BusinessInquiryModal: React.FC<BusinessInquiryModalProps> = ({
           },
           body: JSON.stringify({
             ...formData,
-            businessId: business._id
+            businessId: business._id,
+            userId: JSON.parse(localStorage.getItem('user') || 'null')?._id || null
           }),
         }
       );

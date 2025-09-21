@@ -8,7 +8,9 @@ const {
     getInquiryDetailsCtrl,
     replyToInquiryCtrl,
     updateInquiryStatusCtrl,
-    getBusinessInquiriesCtrl
+    getBusinessInquiriesCtrl,
+    getUserInquiriesCtrl,
+    userReplyToInquiryCtrl
 } = require("../controllers/inquriyCtrl")
 const router = express.Router()
 
@@ -25,6 +27,10 @@ router.get("/vendor/:vendorId", getVendorInquiriesCtrl)
 router.get("/details/:inquiryId", getInquiryDetailsCtrl)
 router.post("/reply/:inquiryId", replyToInquiryCtrl)
 router.put("/status/:inquiryId", updateInquiryStatusCtrl)
+
+// User Routes
+router.get("/user/:userId", getUserInquiriesCtrl)
+router.post("/user-reply/:inquiryId", userReplyToInquiryCtrl)
 
 // Admin Routes
 router.get("/admin/all", getAllInquiriesCtrl)

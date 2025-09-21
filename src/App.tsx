@@ -34,6 +34,9 @@ import AddBusiness from "./pages/AddBusiness";
 import EditBusiness from "./pages/EditBusiness";
 import VendorGetInquiry from "./pages/vendor/VendorGetInquiry";
 import BusinessManagement from "./pages/admin/BusinessManagement";
+import UserLogin from "./pages/UserLogin";
+import UserRegister from "./pages/UserRegister";
+import UserProfile from "./pages/user/UserProfile";
 
 const queryClient = new QueryClient();
 
@@ -203,6 +206,32 @@ const App = () => {
                 />
               </Route>
             )}
+
+            {/* User Routes */}
+            <Route
+              path="/user/login"
+              element={
+                <OpenRoute>
+                  <UserLogin />
+                </OpenRoute>
+              }
+            />
+            <Route
+              path="/user/register"
+              element={
+                <OpenRoute>
+                  <UserRegister />
+                </OpenRoute>
+              }
+            />
+            <Route
+              path="/user/profile"
+              element={
+                <PrivateRoute>
+                  <UserProfile />
+                </PrivateRoute>
+              }
+            />
 
             {/* 404 */}
             <Route path="*" element={<NotFound />} />

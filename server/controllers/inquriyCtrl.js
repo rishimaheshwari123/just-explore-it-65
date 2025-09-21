@@ -12,6 +12,7 @@ const createBusinessInquiryCtrl = async (req, res) => {
             subject, 
             message, 
             businessId,
+            userId,
             inquiryType,
             priority,
             preferredContact,
@@ -46,6 +47,7 @@ const createBusinessInquiryCtrl = async (req, res) => {
             message,
             business: businessId,
             vendor: business.vendor._id,
+            user: userId || null,
             inquiryType: inquiryType || 'general',
             priority: priority || 'medium',
             preferredContact: preferredContact || 'any',
@@ -337,6 +339,99 @@ const getBusinessInquiriesCtrl = async (req, res) => {
     }
 };
 
+// Get User's Inquiries
+const getUserInquiriesCtrl = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { status, page = 1, limit = 10 } = req.query;
+        
+        const filter = { user: userId };
+        if (status) filter.status = status;
+
+        const inquiries = await Inquiry.find(filter)
+            .populate('business', 'businessName category contactInfo images')
+            .populate('vendor', 'name company')
+            .sort({ createdAt: -1 })
+            .limit(limit * 1)
+            .skip((page - 1) * limit);
+
+        const total = await Inquiry.countDocuments(filter);
+
+        res.status(200).json({
+            success: true,
+            inquiries,
+            pagination: {
+                current: page,
+                pages: Math.ceil(total / limit),
+                total
+            }
+        });
+    } catch (error) {
+        console.error("Get user inquiries error:", error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Something went wrong' 
+        });
+    }
+};
+
+// User Reply to Inquiry (Follow-up)
+const userReplyToInquiryCtrl = async (req, res) => {
+    try {
+        const { inquiryId } = req.params;
+        const { message, userId } = req.body;
+
+        if (!message) {
+            return res.status(400).json({ 
+                success: false,
+                error: "Reply message is required" 
+            });
+        }
+
+        const inquiry = await Inquiry.findById(inquiryId);
+        if (!inquiry) {
+            return res.status(404).json({ 
+                success: false,
+                error: "Inquiry not found" 
+            });
+        }
+
+        // Check if user owns this inquiry
+        if (inquiry.user && inquiry.user.toString() !== userId) {
+            return res.status(403).json({ 
+                success: false,
+                error: "Unauthorized to reply to this inquiry" 
+            });
+        }
+
+        // Add user follow-up message to internal notes
+        inquiry.internalNotes.push({
+            note: `Customer follow-up: ${message}`,
+            addedBy: userId,
+            addedAt: new Date()
+        });
+
+        // Update status if it was resolved
+        if (inquiry.status === 'resolved') {
+            inquiry.status = 'in_progress';
+        }
+
+        await inquiry.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Follow-up message sent successfully",
+            inquiry
+        });
+    } catch (error) {
+        console.error("User reply to inquiry error:", error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Something went wrong' 
+        });
+    }
+};
+
 // Legacy function for backward compatibility
 const createInquiryCtrl = createBusinessInquiryCtrl;
 const getInquriyCtrl = getAllInquiriesCtrl;
@@ -350,5 +445,7 @@ module.exports = {
     getInquiryDetailsCtrl,
     replyToInquiryCtrl,
     updateInquiryStatusCtrl,
-    getBusinessInquiriesCtrl
+    getBusinessInquiriesCtrl,
+    getUserInquiriesCtrl,
+    userReplyToInquiryCtrl
 };

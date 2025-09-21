@@ -10,7 +10,7 @@ function PrivateRoute({ children }) {
 
   if (user?.role === "admin") {
     return children;
-  } else if (user?.role === "vendor") {
+  } else if (user?.role === "vendor" || user?.role === "user") {
     return children;
   }
 

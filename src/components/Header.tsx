@@ -9,9 +9,27 @@ import {
   Phone,
   MapPin,
   Loader2,
+  User,
+  LogOut,
+  Settings,
+  ChevronDown,
+  Shield,
+  Store,
+  LayoutDashboard,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/redux/store";
+import { logout } from "@/redux/authSlice";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const menuLinks = [
   { label: "Home", href: "/" },
@@ -24,9 +42,20 @@ const Header = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [currentLocation, setCurrentLocation] = useState<string>("");
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const { user, token } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    toast.success("Logged out successfully");
+    navigate('/');
   };
 
   // Get current location using geolocation API
@@ -181,13 +210,111 @@ const Header = () => {
               </button>
             </div>
 
-            {/* Desktop Login Button */}
-            <Link
-              to={"/login"}
-              className="hidden md:block px-4 py-2 rounded-full text-purple-600 border border-purple-600 hover:bg-purple-600 hover:text-white transition-colors font-semibold"
-            >
-              Login / Signup
-            </Link>
+            {/* Desktop Auth Section */}
+            <div className="hidden md:flex items-center space-x-3">
+              {user && token ? (
+                // Logged in user dropdown with dashboard access
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center space-x-2 px-3 py-2 rounded-full border border-purple-600 hover:bg-purple-50 transition-colors">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.profileImage?.url} />
+                      <AvatarFallback className="bg-purple-600 text-white">
+                        {user.name?.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium text-gray-700">{user.name}</span>
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <div className="px-3 py-2 border-b">
+                      <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                    </div>
+                    
+                    {/* Dashboard Links based on user role */}
+                    {user.role === 'user' && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/user/profile" className="flex items-center space-x-2">
+                          <LayoutDashboard className="h-4 w-4" />
+                          <span>My Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    
+                    {user.role === 'vendor' && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/vendor/dashboard" className="flex items-center space-x-2">
+                          <Store className="h-4 w-4" />
+                          <span>Vendor Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    
+                    {user.role === 'admin' && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin/dashboard" className="flex items-center space-x-2">
+                          <Shield className="h-4 w-4" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    
+                    <DropdownMenuItem asChild>
+                      <Link to="/user/profile" className="flex items-center space-x-2">
+                        <User className="h-4 w-4" />
+                        <span>Profile Settings</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="flex items-center space-x-2 text-red-600">
+                      <LogOut className="h-4 w-4" />
+                      <span>Logout</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                // Not logged in - smart login dropdown
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 transition-all font-semibold">
+                    <span>Login</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild>
+                      <Link to="/user/login" className="flex items-center space-x-2">
+                        <User className="h-4 w-4 text-purple-600" />
+                        <div>
+                          <p className="font-medium">User Login</p>
+                          <p className="text-xs text-gray-500">For customers</p>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem asChild>
+                      <Link to="/vendor/login" className="flex items-center space-x-2">
+                        <Store className="h-4 w-4 text-green-600" />
+                        <div>
+                          <p className="font-medium">Vendor Login</p>
+                          <p className="text-xs text-gray-500">For business owners</p>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/login" className="flex items-center space-x-2">
+                        <Shield className="h-4 w-4 text-red-600" />
+                        <div>
+                          <p className="font-medium">Admin Login</p>
+                          <p className="text-xs text-gray-500">For administrators</p>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -231,9 +358,135 @@ const Header = () => {
             <span>+91 98765 43210</span>
           </div>
 
-          <button className="mt-6 w-full px-4 py-2 rounded-full text-white bg-purple-600 hover:bg-purple-700 transition-colors font-semibold">
-            Login / Signup
-          </button>
+          {/* Mobile Auth Section */}
+          <div className="mt-6 space-y-3">
+            {user && token ? (
+              // Logged in user section with dashboard access
+              <>
+                <div className="flex items-center space-x-3 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={user.profileImage?.url} />
+                    <AvatarFallback className="bg-gradient-to-r from-purple-600 to-pink-600 text-white">
+                      {user.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-gray-800">{user.name}</p>
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                    <p className="text-xs text-purple-600 font-medium capitalize">{user.role} Account</p>
+                  </div>
+                </div>
+                
+                {/* Dashboard Link based on role */}
+                {user.role === 'user' && (
+                  <Link
+                    to={"/user/profile"}
+                    className="flex items-center justify-center space-x-2 w-full px-4 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 transition-all font-semibold"
+                    onClick={toggleSidebar}
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    <span>My Dashboard</span>
+                  </Link>
+                )}
+                
+                {user.role === 'vendor' && (
+                  <Link
+                    to={"/vendor/dashboard"}
+                    className="flex items-center justify-center space-x-2 w-full px-4 py-3 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all font-semibold"
+                    onClick={toggleSidebar}
+                  >
+                    <Store className="h-4 w-4" />
+                    <span>Vendor Dashboard</span>
+                  </Link>
+                )}
+                
+                {user.role === 'admin' && (
+                  <Link
+                    to={"/admin/dashboard"}
+                    className="flex items-center justify-center space-x-2 w-full px-4 py-3 rounded-full bg-gradient-to-r from-red-600 to-rose-600 text-white hover:from-red-700 hover:to-rose-700 transition-all font-semibold"
+                    onClick={toggleSidebar}
+                  >
+                    <Shield className="h-4 w-4" />
+                    <span>Admin Dashboard</span>
+                  </Link>
+                )}
+                
+                <Link
+                  to={"/user/profile"}
+                  className="flex items-center justify-center space-x-2 w-full px-4 py-2 rounded-full text-purple-600 border border-purple-600 hover:bg-purple-600 hover:text-white transition-colors font-semibold"
+                  onClick={toggleSidebar}
+                >
+                  <User className="h-4 w-4" />
+                  <span>Profile Settings</span>
+                </Link>
+                
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    toggleSidebar();
+                  }}
+                  className="flex items-center justify-center space-x-2 w-full px-4 py-2 rounded-full text-red-600 border border-red-600 hover:bg-red-600 hover:text-white transition-colors font-semibold"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </button>
+              </>
+            ) : (
+              // Not logged in - smart login options
+              <>
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1">Choose Login Type</h3>
+                  <p className="text-sm text-gray-600">Select your account type to continue</p>
+                </div>
+                
+                <Link
+                  to={"/user/login"}
+                  className="flex items-center space-x-3 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 transition-all font-semibold"
+                  onClick={toggleSidebar}
+                >
+                  <User className="h-5 w-5" />
+                  <div className="text-left">
+                    <p className="font-semibold">User Login</p>
+                    <p className="text-xs opacity-90">For customers & users</p>
+                  </div>
+                </Link>
+                
+                <Link
+                  to={"/vendor/login"}
+                  className="flex items-center space-x-3 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all font-semibold"
+                  onClick={toggleSidebar}
+                >
+                  <Store className="h-5 w-5" />
+                  <div className="text-left">
+                    <p className="font-semibold">Vendor Login</p>
+                    <p className="text-xs opacity-90">For business owners</p>
+                  </div>
+                </Link>
+                
+                <Link
+                  to={"/login"}
+                  className="flex items-center space-x-3 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-red-600 to-rose-600 text-white hover:from-red-700 hover:to-rose-700 transition-all font-semibold"
+                  onClick={toggleSidebar}
+                >
+                  <Shield className="h-5 w-5" />
+                  <div className="text-left">
+                    <p className="font-semibold">Admin Login</p>
+                    <p className="text-xs opacity-90">For administrators</p>
+                  </div>
+                </Link>
+                
+                <div className="pt-3 border-t border-gray-200">
+                  <Link
+                    to={"/user/register"}
+                    className="block w-full px-4 py-2 rounded-full text-purple-600 border border-purple-600 hover:bg-purple-600 hover:text-white transition-colors font-semibold text-center"
+                    onClick={toggleSidebar}
+                  >
+                    Create New Account
+                  </Link>
+                </div>
+              </>
+            )}
+          </div>
 
           {/* Social media icons */}
           <div className="mt-6 pt-4 border-t border-gray-200">
