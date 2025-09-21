@@ -33,6 +33,7 @@ import BusinessDetail from "./pages/BusinessDetail";
 import AddBusiness from "./pages/AddBusiness";
 import EditBusiness from "./pages/EditBusiness";
 import VendorGetInquiry from "./pages/vendor/VendorGetInquiry";
+import BusinessManagement from "./pages/admin/BusinessManagement";
 
 const queryClient = new QueryClient();
 
@@ -129,6 +130,14 @@ const App = () => {
                   element={
                     <PrivateRoute>
                       <GetBlog />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="businesses"
+                  element={
+                    <PrivateRoute>
+                      <BusinessManagement />
                     </PrivateRoute>
                   }
                 />

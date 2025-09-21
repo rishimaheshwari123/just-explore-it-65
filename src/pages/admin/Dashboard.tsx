@@ -175,24 +175,24 @@ const Dashboard = () => {
 
   const quickActions = [
     {
+      title: "Manage Vendors",
+      description: "View and manage vendor accounts",
+      icon: Users,
+      link: "/admin/vendors",
+      color: "bg-green-600 hover:bg-green-700",
+    },
+    {
+      title: "Manage Businesses",
+      description: "View and manage business listings",
+      icon: Building2,
+      link: "/admin/businesses",
+      color: "bg-blue-600 hover:bg-blue-700",
+    },
+    {
       title: "Add New Blog",
       description: "Create and publish new blog posts",
       icon: Plus,
       link: "/admin/add-blog",
-      color: "bg-blue-600 hover:bg-blue-700",
-    },
-    {
-      title: "Manage Vendors",
-      description: "View and manage vendor accounts",
-      icon: Users,
-      link: "/admin/vendor-management",
-      color: "bg-green-600 hover:bg-green-700",
-    },
-    {
-      title: "View Analytics",
-      description: "Check platform performance metrics",
-      icon: BarChart3,
-      link: "/admin/analytics",
       color: "bg-purple-600 hover:bg-purple-700",
     },
   ];

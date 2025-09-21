@@ -18,6 +18,7 @@ import {
 import { Link } from "react-router-dom";
 import { getVendorBusinessAPI } from "../../service/operations/business";
 import { toast } from 'sonner';
+import VendorBusinessStats from "@/components/VendorBusinessStats";
 
 const VendorDashboard = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -317,23 +318,7 @@ const VendorDashboard = () => {
       </Card>
 
       {/* Business Performance Analytics */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
-            Business Performance
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              <TrendingUp className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 font-medium">Business Analytics</p>
-              <p className="text-sm text-gray-500">Focus on business listings and performance</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <VendorBusinessStats vendorId={user?._id || ''} />
     </div>
   );
 };
