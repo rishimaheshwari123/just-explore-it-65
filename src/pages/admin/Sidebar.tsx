@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Home, BarChart3, Users, Plus, FileText, LogOut, Building2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, BarChart3, Users, Plus, FileText, LogOut, Building2, MessageSquare } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken, setUser } from "@/redux/authSlice";
 import { toast } from "react-toastify";
@@ -56,6 +56,7 @@ const Sidebar = () => {
     { to: "/admin/dashboard", icon: BarChart3, label: "Dashboard", color: "text-green-600" },
     { to: "/admin/vendors", icon: Users, label: "Manage Vendors", color: "text-purple-600" },
     { to: "/admin/businesses", icon: Building2, label: "Manage Businesses", color: "text-cyan-600" },
+    { to: "/admin/support", icon: MessageSquare, label: "Support Center", color: "text-red-600" },
     { to: "/admin/add-blog", icon: Plus, label: "Add Blog", color: "text-orange-600" },
     { to: "/admin/get-blog", icon: FileText, label: "Get Blog", color: "text-indigo-600" },
   ];

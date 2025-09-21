@@ -193,6 +193,13 @@ const Dashboard = () => {
       color: "bg-blue-600 hover:bg-blue-700",
     },
     {
+      title: "Support Management",
+      description: "Manage customer support tickets",
+      icon: MessageSquare,
+      link: "/admin/support",
+      color: "bg-red-600 hover:bg-red-700",
+    },
+    {
       title: "Add New Blog",
       description: "Create and publish new blog posts",
       icon: Plus,

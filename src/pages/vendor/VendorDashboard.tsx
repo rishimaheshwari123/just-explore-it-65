@@ -163,6 +163,13 @@ const VendorDashboard = () => {
       link: "/vendor/get-inquiry",
       color: "bg-purple-600 hover:bg-purple-700",
     },
+    {
+      title: "Support Center",
+      description: "Get help and raise support tickets",
+      icon: Activity,
+      link: "/vendor/support",
+      color: "bg-red-600 hover:bg-red-700",
+    },
   ];
 
   // Recent Activities

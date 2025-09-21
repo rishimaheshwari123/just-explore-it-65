@@ -289,13 +289,12 @@ const BusinessListing = () => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`h-4 w-4 ${
-          i < Math.floor(rating)
-            ? "text-yellow-400 fill-yellow-400"
-            : i < rating
+        className={`h-4 w-4 ${i < Math.floor(rating)
+          ? "text-yellow-400 fill-yellow-400"
+          : i < rating
             ? "text-yellow-400 fill-yellow-400/50"
             : "text-gray-300"
-        }`}
+          }`}
       />
     ));
   };
@@ -337,9 +336,8 @@ const BusinessListing = () => {
 
           <div className="absolute top-2 right-2">
             <Badge
-              className={`text-xs ${
-                isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
-              }`}
+              className={`text-xs ${isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                }`}
             >
               <Clock className="h-3 w-3 mr-1" />
               {isOpen ? "Open" : "Closed"}
@@ -395,21 +393,22 @@ const BusinessListing = () => {
           <div className="flex gap-2">
             <Button
               size="sm"
-              className="flex-1"
+              className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+              onClick={() => handleBusinessClick(business._id)}
+            >
+              <Eye className="h-4 w-4 mr-1" />
+              View Business
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="flex-1 border-green-600 text-green-600 hover:bg-green-600 hover:text-white"
               onClick={() =>
                 handleCall(business.contactInfo.primaryPhone, business._id)
               }
             >
               <Phone className="h-4 w-4 mr-1" />
-              Call
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="flex-1"
-              onClick={() => handleBusinessClick(business._id)}
-            >
-              View Details
+              Call Now
             </Button>
           </div>
         </CardContent>
@@ -457,9 +456,8 @@ const BusinessListing = () => {
                 </div>
 
                 <Badge
-                  className={`text-xs ${
-                    isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                  }`}
+                  className={`text-xs ${isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                    }`}
                 >
                   <Clock className="h-3 w-3 mr-1" />
                   {isOpen ? "Open" : "Closed"}

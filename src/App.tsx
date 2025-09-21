@@ -37,6 +37,8 @@ import BusinessManagement from "./pages/admin/BusinessManagement";
 import UserLogin from "./pages/UserLogin";
 import UserRegister from "./pages/UserRegister";
 import UserProfile from "./pages/user/UserProfile";
+import VendorSupport from "./pages/vendor/VendorSupport";
+import AdminSupport from "./pages/admin/AdminSupport";
 
 const queryClient = new QueryClient();
 
@@ -144,6 +146,14 @@ const App = () => {
                     </PrivateRoute>
                   }
                 />
+                <Route
+                  path="support"
+                  element={
+                    <PrivateRoute>
+                      <AdminSupport />
+                    </PrivateRoute>
+                  }
+                />
               </Route>
             )}
             {user?.role === "vendor" && (
@@ -201,6 +211,14 @@ const App = () => {
                   element={
                     <PrivateRoute>
                       <VendorGetInquiry />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="support"
+                  element={
+                    <PrivateRoute>
+                      <VendorSupport />
                     </PrivateRoute>
                   }
                 />
