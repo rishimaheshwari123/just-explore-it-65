@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import BusinessInquiryModal from "@/components/BusinessInquiryModal";
 import {
   ArrowLeft,
   Phone,
@@ -17,6 +18,7 @@ import {
   Edit,
   Trash2,
   Navigation,
+  MessageSquare,
 } from "lucide-react";
 
 interface Business {
@@ -118,8 +120,9 @@ const BusinessDetail: React.FC = () => {
   const fetchBusiness = async () => {
     try {
       setLoading(true);
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
       const response = await fetch(
-        `https://just-explore-it-65.onrender.com/api/v1/property/business/${id}`
+        `${BASE_URL}/property/business/${id}`
       );
       const data = await response.json();
       if (data.success) {
@@ -139,8 +142,9 @@ const BusinessDetail: React.FC = () => {
 
   const trackView = async () => {
     try {
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
       await fetch(
-        `https://just-explore-it-65.onrender.com/api/v1/property/business/${id}/interaction`,
+        `${BASE_URL}/property/business/${id}/interaction`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -154,8 +158,9 @@ const BusinessDetail: React.FC = () => {
 
   const handleCall = (phone: string) => {
     // Track call interaction
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
     fetch(
-      `https://just-explore-it-65.onrender.com/api/v1/property/business/${id}/interaction`,
+      `${BASE_URL}/property/business/${id}/interaction`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -177,8 +182,9 @@ const BusinessDetail: React.FC = () => {
 
     try {
       setDeleting(true);
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
       const response = await fetch(
-        `https://just-explore-it-65.onrender.com/api/v1/property/business/delete/${id}`,
+        `${BASE_URL}/property/business/delete/${id}`,
         {
           method: "DELETE",
         }
@@ -585,13 +591,17 @@ const BusinessDetail: React.FC = () => {
                   </div>
                 )}
 
-                <Button
-                  className="w-full"
-                  onClick={() => handleCall(business.contactInfo.primaryPhone)}
-                >
-                  <Phone className="h-4 w-4 mr-2" />
-                  Call Now
-                </Button>
+                <div className="space-y-3">
+                  <Button
+                    className="w-full"
+                    onClick={() => handleCall(business.contactInfo.primaryPhone)}
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    Call Now
+                  </Button>
+                  
+                  <BusinessInquiryModal business={business} />
+                </div>
               </CardContent>
             </Card>
 

@@ -1,6 +1,5 @@
 
-const BASE_URL = "https://just-explore-it-65.onrender.com/api/v1"
-// const BASE_URL = import.meta.env.VITE_APP_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
 
 export const endpoints = {
   LOGIN_API: BASE_URL + "/auth/login",
@@ -49,6 +48,21 @@ export const contact = {
 export const inquiry = {
   CREATE_INQUIRY_API: BASE_URL + "/inquiry/create",
   GET_INQUIRY_API: BASE_URL + "/inquiry/getAll",
+}
+
+export const inquiryEndpoints = {
+  // Business Inquiry APIs
+  CREATE_BUSINESS_INQUIRY_API: BASE_URL + "/inquiry/business/create",
+  GET_BUSINESS_INQUIRIES_API: BASE_URL + "/inquiry/business/:businessId",
+  
+  // Vendor Inquiry Management APIs
+  GET_VENDOR_INQUIRIES_API: BASE_URL + "/inquiry/vendor/:vendorId",
+  GET_INQUIRY_DETAILS_API: BASE_URL + "/inquiry/details/:inquiryId",
+  REPLY_TO_INQUIRY_API: BASE_URL + "/inquiry/reply/:inquiryId",
+  UPDATE_INQUIRY_STATUS_API: BASE_URL + "/inquiry/status/:inquiryId",
+  
+  // Admin APIs
+  GET_ALL_INQUIRIES_API: BASE_URL + "/inquiry/admin/all",
 }
 export const blog = {
   CREATE_BLOG_API: BASE_URL + "/blog/create",

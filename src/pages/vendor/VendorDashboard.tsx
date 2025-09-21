@@ -137,12 +137,25 @@ const VendorDashboard = () => {
   }, [user]);
 
   const quickActions = [
-    // Property quick actions removed
+    {
+      title: "Add New Business",
+      description: "List a new business on the platform",
+      icon: Plus,
+      link: "/vendor/add-business",
+      color: "bg-green-600 hover:bg-green-700",
+    },
+    {
+      title: "Manage Businesses",
+      description: "View and edit your business listings",
+      icon: Building2,
+      link: "/vendor/businesses",
+      color: "bg-blue-600 hover:bg-blue-700",
+    },
     {
       title: "Check Inquiries",
       description: "Respond to customer inquiries",
       icon: MessageSquare,
-      link: "/vendor/inquiries",
+      link: "/vendor/get-inquiry",
       color: "bg-purple-600 hover:bg-purple-700",
     },
   ];

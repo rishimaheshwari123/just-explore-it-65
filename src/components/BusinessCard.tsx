@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Star, Phone, MessageCircle, Navigation, Globe, Clock, MapPin, Shield, Camera, Users, Calendar, Award, Heart, Share2, Eye } from 'lucide-react';
+import { Star, Phone, MessageCircle, Navigation, Globe, Clock, MapPin, Shield, Camera, Users, Calendar, Award, Heart, Share2, Eye, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import BusinessInquiryModal from '@/components/BusinessInquiryModal';
 
 interface Business {
   _id: string;
@@ -383,37 +384,53 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-4 gap-2">
-          <Button
-            onClick={handleCall}
-            size="sm"
-            className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center"
-          >
-            <Phone className="h-4 w-4" />
-          </Button>
-          <Button
-            onClick={handleWhatsApp}
-            size="sm"
-            className="bg-green-500 hover:bg-green-600 text-white flex items-center justify-center"
-          >
-            <MessageCircle className="h-4 w-4" />
-          </Button>
-          <Button
-            onClick={handleDirections}
-            size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center"
-          >
-            <Navigation className="h-4 w-4" />
-          </Button>
-          {contactInfo.website && (
+        <div className="space-y-2">
+          <div className="grid grid-cols-4 gap-2">
             <Button
-              onClick={handleWebsite}
+              onClick={handleCall}
               size="sm"
-              className="bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center"
+              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center"
             >
-              <Globe className="h-4 w-4" />
+              <Phone className="h-4 w-4" />
             </Button>
-          )}
+            <Button
+              onClick={handleWhatsApp}
+              size="sm"
+              className="bg-green-500 hover:bg-green-600 text-white flex items-center justify-center"
+            >
+              <MessageCircle className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={handleDirections}
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center"
+            >
+              <Navigation className="h-4 w-4" />
+            </Button>
+            {contactInfo.website && (
+              <Button
+                onClick={handleWebsite}
+                size="sm"
+                className="bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center"
+              >
+                <Globe className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          
+          {/* Send Inquiry Button */}
+          <BusinessInquiryModal 
+            business={business}
+            trigger={
+              <Button
+                size="sm"
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+              >
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Send Inquiry
+              </Button>
+            }
+          />
         </div>
       </div>
     </div>

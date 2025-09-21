@@ -1,101 +1,104 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Mail, Search, Filter, Eye, Reply, Clock, User, Phone, MapPin, Calendar, MessageSquare, CheckCircle, XCircle } from 'lucide-react';
+import { Mail, Search, Filter, Eye, Clock, User, Phone, MapPin, Calendar, MessageSquare, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface BusinessInquiry {
   _id: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
-  businessName: string;
-  businessId: string;
+  name: string;
+  email: string;
+  phone: string;
   subject: string;
   message: string;
-  inquiryType: 'service' | 'pricing' | 'booking' | 'general';
-  status: 'new' | 'replied' | 'closed';
-  priority: 'low' | 'medium' | 'high';
+  inquiryType: 'general' | 'service' | 'pricing' | 'booking' | 'complaint' | 'other';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'new' | 'read' | 'replied' | 'in_progress' | 'resolved' | 'closed';
+  preferredContact: string;
+  bestTimeToContact: string;
   createdAt: string;
-  repliedAt?: string;
-  reply?: string;
+  readAt?: string;
+  business: {
+    _id: string;
+    businessName: string;
+    category: string;
+    images?: Array<{
+      url: string;
+      isPrimary: boolean;
+    }>;
+  };
+  customerLocation?: {
+    city: string;
+    area: string;
+    pincode: string;
+  };
+  serviceInterest?: Array<{
+    serviceName: string;
+    budget: {
+      min: number;
+      max: number;
+    };
+  }>;
 }
 
 const VendorBusinessInquiry = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
   const [inquiries, setInquiries] = useState<BusinessInquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterType, setFilterType] = useState('all');
   const [selectedInquiry, setSelectedInquiry] = useState<BusinessInquiry | null>(null);
-  const [replyMessage, setReplyMessage] = useState('');
-  const [isReplyDialogOpen, setIsReplyDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
-  // Mock data - replace with actual API call
+  // Fetch actual inquiries from API
   useEffect(() => {
-    const mockInquiries: BusinessInquiry[] = [
-      {
-        _id: '1',
-        customerName: 'Rahul Kumar',
-        customerEmail: 'rahul@email.com',
-        customerPhone: '+91 9876543210',
-        businessName: 'Sharma Electronics',
-        businessId: '1',
-        subject: 'Mobile Repair Service',
-        message: 'Hi, I need to repair my iPhone 12. The screen is cracked and touch is not working properly. Can you please let me know the cost and time required?',
-        inquiryType: 'service',
-        status: 'new',
-        priority: 'high',
-        createdAt: '2024-01-20T10:30:00Z'
-      },
-      {
-        _id: '2',
-        customerName: 'Priya Sharma',
-        customerEmail: 'priya@email.com',
-        customerPhone: '+91 9876543211',
-        businessName: 'Gupta Restaurant',
-        businessId: '2',
-        subject: 'Catering Service Inquiry',
-        message: 'Hello, I am planning a birthday party for 50 people. Can you provide catering services? Please share the menu and pricing details.',
-        inquiryType: 'pricing',
-        status: 'replied',
-        priority: 'medium',
-        createdAt: '2024-01-19T14:15:00Z',
-        repliedAt: '2024-01-19T16:30:00Z',
-        reply: 'Thank you for your inquiry. We do provide catering services for parties. Our party menu starts from ₹300 per person. I will send you the detailed menu via email.'
-      },
-      {
-        _id: '3',
-        customerName: 'Amit Patel',
-        customerEmail: 'amit@email.com',
-        customerPhone: '+91 9876543212',
-        businessName: 'Sharma Electronics',
-        businessId: '1',
-        subject: 'Laptop Service Booking',
-        message: 'I want to book a service for my Dell laptop. It is running very slow and heating up. When can I bring it to your store?',
-        inquiryType: 'booking',
-        status: 'closed',
-        priority: 'low',
-        createdAt: '2024-01-18T09:45:00Z',
-        repliedAt: '2024-01-18T11:20:00Z',
-        reply: 'You can bring your laptop anytime between 10 AM to 7 PM. Our technician will diagnose the issue and provide you with a quote.'
+    if (user?._id) {
+      fetchInquiries();
+    }
+  }, [user]);
+
+  const fetchInquiries = async () => {
+    try {
+      setLoading(true);
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://just-explore-it-65.onrender.com/api/v1";
+      const response = await fetch(`${BASE_URL}/inquiry/vendor/${user._id}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        // Sort by new inquiries first, then by creation date (newest first)
+        const sortedInquiries = data.inquiries.sort((a: BusinessInquiry, b: BusinessInquiry) => {
+          // First priority: new status
+          if (a.status === 'new' && b.status !== 'new') return -1;
+          if (b.status === 'new' && a.status !== 'new') return 1;
+          
+          // Second priority: creation date (newest first)
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        
+        setInquiries(sortedInquiries);
+      } else {
+        toast.error('Failed to fetch inquiries');
       }
-    ];
-    
-    setTimeout(() => {
-      setInquiries(mockInquiries);
+    } catch (error) {
+      console.error('Error fetching inquiries:', error);
+      toast.error('Failed to fetch inquiries');
+    } finally {
       setLoading(false);
-    }, 1000);
-  }, []);
+    }
+  };
 
   const filteredInquiries = inquiries.filter(inquiry => {
-    const matchesSearch = inquiry.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = inquiry.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          inquiry.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         inquiry.businessName.toLowerCase().includes(searchTerm.toLowerCase());
+                         inquiry.business.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         inquiry.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = filterStatus === 'all' || inquiry.status === filterStatus;
     const matchesType = filterType === 'all' || inquiry.inquiryType === filterType;
     
@@ -105,7 +108,10 @@ const VendorBusinessInquiry = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new': return 'bg-blue-100 text-blue-800';
+      case 'read': return 'bg-yellow-100 text-yellow-800';
       case 'replied': return 'bg-green-100 text-green-800';
+      case 'in_progress': return 'bg-orange-100 text-orange-800';
+      case 'resolved': return 'bg-purple-100 text-purple-800';
       case 'closed': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
@@ -113,7 +119,8 @@ const VendorBusinessInquiry = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800';
+      case 'urgent': return 'bg-red-100 text-red-800';
+      case 'high': return 'bg-orange-100 text-orange-800';
       case 'medium': return 'bg-yellow-100 text-yellow-800';
       case 'low': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -125,29 +132,22 @@ const VendorBusinessInquiry = () => {
       case 'service': return <MessageSquare className="h-4 w-4" />;
       case 'pricing': return <Phone className="h-4 w-4" />;
       case 'booking': return <Calendar className="h-4 w-4" />;
+      case 'complaint': return <AlertCircle className="h-4 w-4" />;
       case 'general': return <Mail className="h-4 w-4" />;
+      case 'other': return <Mail className="h-4 w-4" />;
       default: return <Mail className="h-4 w-4" />;
     }
   };
 
-  const handleReply = (inquiry: BusinessInquiry) => {
+  const handleViewInquiry = (inquiry: BusinessInquiry) => {
     setSelectedInquiry(inquiry);
-    setReplyMessage('');
-    setIsReplyDialogOpen(true);
+    setIsViewDialogOpen(true);
   };
 
-  const submitReply = () => {
-    if (selectedInquiry && replyMessage.trim()) {
-      // Update inquiry status to replied
-      setInquiries(prev => prev.map(inquiry => 
-        inquiry._id === selectedInquiry._id 
-          ? { ...inquiry, status: 'replied', reply: replyMessage, repliedAt: new Date().toISOString() }
-          : inquiry
-      ));
-      setIsReplyDialogOpen(false);
-      setReplyMessage('');
-      setSelectedInquiry(null);
-    }
+  const getBusinessImage = (inquiry: BusinessInquiry) => {
+    return inquiry.business.images?.find(img => img.isPrimary)?.url || 
+           inquiry.business.images?.[0]?.url || 
+           '/placeholder-business.jpg';
   };
 
   const formatDate = (dateString: string) => {
@@ -226,9 +226,9 @@ const VendorBusinessInquiry = () => {
                   <CheckCircle className="h-8 w-8 text-green-600" />
                   <div>
                     <p className="text-2xl font-bold text-gray-900">
-                      {inquiries.filter(i => i.status === 'replied').length}
+                      {inquiries.filter(i => i.status === 'replied' || i.status === 'resolved').length}
                     </p>
-                    <p className="text-sm text-gray-600">Replied</p>
+                    <p className="text-sm text-gray-600">Processed</p>
                   </div>
                 </div>
               </CardContent>
@@ -236,12 +236,12 @@ const VendorBusinessInquiry = () => {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
-                  <XCircle className="h-8 w-8 text-gray-600" />
+                  <AlertCircle className="h-8 w-8 text-orange-600" />
                   <div>
                     <p className="text-2xl font-bold text-gray-900">
-                      {inquiries.filter(i => i.status === 'closed').length}
+                      {inquiries.filter(i => i.priority === 'high' || i.priority === 'urgent').length}
                     </p>
-                    <p className="text-sm text-gray-600">Closed</p>
+                    <p className="text-sm text-gray-600">High Priority</p>
                   </div>
                 </div>
               </CardContent>
@@ -267,7 +267,10 @@ const VendorBusinessInquiry = () => {
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="new">New</SelectItem>
+                <SelectItem value="read">Read</SelectItem>
                 <SelectItem value="replied">Replied</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="resolved">Resolved</SelectItem>
                 <SelectItem value="closed">Closed</SelectItem>
               </SelectContent>
             </Select>
@@ -277,10 +280,12 @@ const VendorBusinessInquiry = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="general">General</SelectItem>
                 <SelectItem value="service">Service</SelectItem>
                 <SelectItem value="pricing">Pricing</SelectItem>
                 <SelectItem value="booking">Booking</SelectItem>
-                <SelectItem value="general">General</SelectItem>
+                <SelectItem value="complaint">Complaint</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -298,26 +303,38 @@ const VendorBusinessInquiry = () => {
         ) : (
           <div className="space-y-4">
             {filteredInquiries.map((inquiry) => (
-              <Card key={inquiry._id} className="hover:shadow-md transition-shadow">
+              <Card key={inquiry._id} className={`hover:shadow-md transition-shadow ${inquiry.status === 'new' ? 'border-l-4 border-l-blue-500 bg-blue-50/30' : ''}`}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        {getTypeIcon(inquiry.inquiryType)}
-                        <CardTitle className="text-lg font-semibold text-gray-900">
-                          {inquiry.subject}
-                        </CardTitle>
-                        <Badge className={getPriorityColor(inquiry.priority)}>
-                          {inquiry.priority}
-                        </Badge>
+                    <div className="flex items-start gap-3 flex-1">
+                      <img
+                        src={getBusinessImage(inquiry)}
+                        alt={inquiry.business.businessName}
+                        className="w-12 h-12 rounded-lg object-cover"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          {getTypeIcon(inquiry.inquiryType)}
+                          <CardTitle className="text-lg font-semibold text-gray-900">
+                            {inquiry.subject}
+                          </CardTitle>
+                          <Badge className={getPriorityColor(inquiry.priority)}>
+                            {inquiry.priority}
+                          </Badge>
+                          {inquiry.status === 'new' && (
+                            <Badge className="bg-blue-100 text-blue-800 animate-pulse">
+                              NEW
+                            </Badge>
+                          )}
+                        </div>
+                        <CardDescription className="text-sm text-gray-600">
+                          Business: {inquiry.business.businessName} • Category: {inquiry.business.category}
+                        </CardDescription>
                       </div>
-                      <CardDescription className="text-sm text-gray-600">
-                        Business: {inquiry.businessName}
-                      </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className={getStatusColor(inquiry.status)}>
-                        {inquiry.status}
+                        {inquiry.status.replace('_', ' ')}
                       </Badge>
                     </div>
                   </div>
@@ -328,104 +345,209 @@ const VendorBusinessInquiry = () => {
                     <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                       <div className="flex items-center gap-1">
                         <User className="h-4 w-4" />
-                        <span>{inquiry.customerName}</span>
+                        <span>{inquiry.name}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Mail className="h-4 w-4" />
-                        <span>{inquiry.customerEmail}</span>
+                        <span>{inquiry.email}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Phone className="h-4 w-4" />
-                        <span>{inquiry.customerPhone}</span>
+                        <span>{inquiry.phone}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
                         <span>{formatDate(inquiry.createdAt)}</span>
                       </div>
-                    </div>
-                    
-                    {/* Message */}
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-gray-700">{inquiry.message}</p>
-                    </div>
-                    
-                    {/* Reply if exists */}
-                    {inquiry.reply && (
-                      <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Reply className="h-4 w-4 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-800">Your Reply</span>
-                          <span className="text-xs text-blue-600">
-                            {inquiry.repliedAt && formatDate(inquiry.repliedAt)}
-                          </span>
+                      {inquiry.customerLocation?.city && (
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-4 w-4" />
+                          <span>{inquiry.customerLocation.city}</span>
                         </div>
-                        <p className="text-blue-700">{inquiry.reply}</p>
-                      </div>
-                    )}
+                      )}
+                    </div>
+                    
+                    {/* Message Preview */}
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <p className="text-gray-700 line-clamp-3">{inquiry.message}</p>
+                      {inquiry.message.length > 150 && (
+                        <button 
+                          onClick={() => handleViewInquiry(inquiry)}
+                          className="text-blue-600 text-sm mt-2 hover:underline"
+                        >
+                          Read more...
+                        </button>
+                      )}
+                    </div>
+                    
+                    {/* Additional Info */}
+                    <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+                      <span>Preferred Contact: {inquiry.preferredContact}</span>
+                      <span>•</span>
+                      <span>Best Time: {inquiry.bestTimeToContact}</span>
+                      {inquiry.serviceInterest && inquiry.serviceInterest.length > 0 && (
+                        <>
+                          <span>•</span>
+                          <span>Services: {inquiry.serviceInterest.length} interested</span>
+                        </>
+                      )}
+                    </div>
                     
                     {/* Actions */}
                     <div className="flex gap-2 pt-2">
-                      <Dialog open={isReplyDialogOpen && selectedInquiry?._id === inquiry._id} onOpenChange={setIsReplyDialogOpen}>
+                      <Dialog open={isViewDialogOpen && selectedInquiry?._id === inquiry._id} onOpenChange={setIsViewDialogOpen}>
                         <DialogTrigger asChild>
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => handleReply(inquiry)}
-                            disabled={inquiry.status === 'closed'}
+                            onClick={() => handleViewInquiry(inquiry)}
                           >
-                            <Reply className="h-4 w-4 mr-1" />
-                            {inquiry.status === 'new' ? 'Reply' : 'Update Reply'}
+                            <Eye className="h-4 w-4 mr-1" />
+                            View Details
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
+                        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
                           <DialogHeader>
-                            <DialogTitle>Reply to Inquiry</DialogTitle>
+                            <DialogTitle>Inquiry Details</DialogTitle>
                             <DialogDescription>
-                              Replying to: {inquiry.subject} from {inquiry.customerName}
+                              From {inquiry.name} for {inquiry.business.businessName}
                             </DialogDescription>
                           </DialogHeader>
-                          <div className="space-y-4">
-                            <div className="bg-gray-50 p-4 rounded-lg">
-                              <p className="text-sm font-medium text-gray-700 mb-2">Original Message:</p>
-                              <p className="text-gray-600">{inquiry.message}</p>
+                          
+                          {selectedInquiry && (
+                            <div className="space-y-6">
+                              {/* Customer Info */}
+                              <Card>
+                                <CardHeader>
+                                  <CardTitle className="text-lg">Customer Information</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-600">Name:</span>
+                                      <p className="font-medium">{selectedInquiry.name}</p>
+                                    </div>
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-600">Phone:</span>
+                                      <p className="font-medium">{selectedInquiry.phone}</p>
+                                    </div>
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-600">Email:</span>
+                                      <p className="font-medium">{selectedInquiry.email}</p>
+                                    </div>
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-600">Preferred Contact:</span>
+                                      <p className="font-medium capitalize">{selectedInquiry.preferredContact}</p>
+                                    </div>
+                                  </div>
+                                  
+                                  {selectedInquiry.customerLocation?.city && (
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-600">Location:</span>
+                                      <p className="font-medium">
+                                        {selectedInquiry.customerLocation.area && `${selectedInquiry.customerLocation.area}, `}
+                                        {selectedInquiry.customerLocation.city}
+                                        {selectedInquiry.customerLocation.pincode && ` - ${selectedInquiry.customerLocation.pincode}`}
+                                      </p>
+                                    </div>
+                                  )}
+                                </CardContent>
+                              </Card>
+
+                              {/* Inquiry Details */}
+                              <Card>
+                                <CardHeader>
+                                  <CardTitle className="text-lg">Inquiry Details</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-600">Subject:</span>
+                                    <p className="font-medium">{selectedInquiry.subject}</p>
+                                  </div>
+                                  <div>
+                                    <span className="text-sm font-medium text-gray-600">Message:</span>
+                                    <p className="whitespace-pre-wrap bg-gray-50 p-3 rounded-lg mt-1">{selectedInquiry.message}</p>
+                                  </div>
+                                  <div className="grid grid-cols-3 gap-4">
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-600">Type:</span>
+                                      <p className="font-medium capitalize">{selectedInquiry.inquiryType.replace('_', ' ')}</p>
+                                    </div>
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-600">Priority:</span>
+                                      <Badge className={getPriorityColor(selectedInquiry.priority)}>
+                                        {selectedInquiry.priority}
+                                      </Badge>
+                                    </div>
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-600">Best Time:</span>
+                                      <p className="font-medium capitalize">{selectedInquiry.bestTimeToContact}</p>
+                                    </div>
+                                  </div>
+                                </CardContent>
+                              </Card>
+
+                              {/* Service Interest */}
+                              {selectedInquiry.serviceInterest && selectedInquiry.serviceInterest.length > 0 && (
+                                <Card>
+                                  <CardHeader>
+                                    <CardTitle className="text-lg">Service Interest</CardTitle>
+                                  </CardHeader>
+                                  <CardContent>
+                                    <div className="space-y-2">
+                                      {selectedInquiry.serviceInterest.map((service, index) => (
+                                        <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                          <span className="font-medium">{service.serviceName}</span>
+                                          <span className="text-sm text-gray-600">
+                                            Budget: ₹{service.budget.min} - ₹{service.budget.max}
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              )}
+
+                              {/* Contact Actions */}
+                              <div className="flex gap-2">
+                                <Button
+                                  onClick={() => window.open(`tel:${selectedInquiry.phone}`, '_self')}
+                                  className="flex-1"
+                                >
+                                  <Phone className="h-4 w-4 mr-2" />
+                                  Call Customer
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => window.open(`mailto:${selectedInquiry.email}`, '_self')}
+                                  className="flex-1"
+                                >
+                                  <Mail className="h-4 w-4 mr-2" />
+                                  Send Email
+                                </Button>
+                              </div>
                             </div>
-                            <Textarea
-                              placeholder="Type your reply here..."
-                              value={replyMessage}
-                              onChange={(e) => setReplyMessage(e.target.value)}
-                              rows={6}
-                            />
-                            <div className="flex gap-2 justify-end">
-                              <Button variant="outline" onClick={() => setIsReplyDialogOpen(false)}>
-                                Cancel
-                              </Button>
-                              <Button onClick={submitReply} disabled={!replyMessage.trim()}>
-                                Send Reply
-                              </Button>
-                            </div>
-                          </div>
+                          )}
                         </DialogContent>
                       </Dialog>
                       
-                      <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-1" />
-                        View Details
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(`tel:${inquiry.phone}`, '_self')}
+                      >
+                        <Phone className="h-4 w-4 mr-1" />
+                        Call
                       </Button>
                       
-                      {inquiry.status !== 'closed' && (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={() => {
-                            setInquiries(prev => prev.map(i => 
-                              i._id === inquiry._id ? { ...i, status: 'closed' } : i
-                            ));
-                          }}
-                        >
-                          <XCircle className="h-4 w-4 mr-1" />
-                          Close
-                        </Button>
-                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(`mailto:${inquiry.email}`, '_self')}
+                      >
+                        <Mail className="h-4 w-4 mr-1" />
+                        Email
+                      </Button>
                     </div>
                   </div>
                 </CardContent>
