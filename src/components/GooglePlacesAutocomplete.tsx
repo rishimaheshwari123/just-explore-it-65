@@ -123,6 +123,10 @@ const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({
     if (types.includes('postal_code')) {
       pincode = component.long_name;
     }
+    // Fallback for postal code
+    if (types.includes('postal_code_prefix') && !pincode) {
+      pincode = component.long_name;
+    }
     if (types.includes('country')) {
       country = component.long_name;
     }

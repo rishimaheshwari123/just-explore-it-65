@@ -1357,11 +1357,24 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
                   <Input
                     id="pincode"
                     value={formData.address.pincode}
-                    placeholder="Pincode (auto-filled)"
-                    readOnly
-                    className="bg-muted"
+                    placeholder="Enter 6-digit pincode"
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                      setFormData(prev => ({
+                        ...prev,
+                        address: {
+                          ...prev.address,
+                          pincode: value
+                        }
+                      }));
+                    }}
+                    maxLength={6}
+                    className={formData.address.pincode ? "bg-green-50 border-green-200" : ""}
                     required
                   />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formData.address.pincode ? "✓ Pincode entered" : "Enter manually if not auto-filled"}
+                  </p>
                 </div>
 
                 <div className="md:col-span-2">
