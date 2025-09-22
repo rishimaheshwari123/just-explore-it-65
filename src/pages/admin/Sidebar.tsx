@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Home, BarChart3, Users, Plus, FileText, LogOut, Building2, MessageSquare } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, BarChart3, Users, Plus, FileText, LogOut, Building2, MessageSquare, Shield } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken, setUser } from "@/redux/authSlice";
 import { toast } from "react-toastify";
@@ -55,6 +55,7 @@ const Sidebar = () => {
   const allMenuItems = [
     { to: "/", icon: Home, label: "Back To Home", color: "text-blue-600", permission: null },
     { to: "/admin/dashboard", icon: BarChart3, label: "Dashboard", color: "text-green-600", permission: null },
+    { to: "/admin/admin-management", icon: Shield, label: "Admin Management", color: "text-red-600", permission: "super_admin_only" },
     { to: "/admin/users", icon: Users, label: "Users Management", color: "text-blue-600", permission: "manageUsers" },
     { to: "/admin/vendors", icon: Users, label: "Manage Vendors", color: "text-purple-600", permission: "manageVendors" },
     { to: "/admin/businesses", icon: Building2, label: "Manage Businesses", color: "text-cyan-600", permission: "editBusiness" },
@@ -69,6 +70,11 @@ const Sidebar = () => {
   const menuItems = allMenuItems.filter(item => {
     // Always show items without permission requirements
     if (!item.permission) return true;
+    
+    // Special case for super_admin_only items
+    if (item.permission === 'super_admin_only') {
+      return user?.role === 'super_admin';
+    }
     
     // For super_admin, show all items
     if (user?.role === 'super_admin') return true;

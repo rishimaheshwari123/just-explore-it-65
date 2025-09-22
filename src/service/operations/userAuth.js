@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 import { setUser, setToken } from "../../redux/authSlice";
 import { apiConnector } from "../apiConnector";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
 
 // User API endpoints
 const USER_ENDPOINTS = {

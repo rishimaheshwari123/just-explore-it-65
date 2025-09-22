@@ -114,26 +114,45 @@ const AdminManagement = () => {
   const handleAddAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Call API to create admin
-      toast.success('Admin added successfully');
-      setIsAddAdminOpen(false);
-      setNewAdmin({
-        name: '',
-        email: '',
-        password: '',
-        role: 'admin',
-        permissions: {
-          manageVendors: false,
-          addBusiness: false,
-          editBusiness: false,
-          supportCenter: false,
-          blogs: false,
-          manageUsers: false,
-          subscriptionLogs: false,
-          exportData: false,
-        }
+      // Call register API to create admin
+      const response = await fetch('http://localhost:8000/api/v1/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          name: newAdmin.name,
+          email: newAdmin.email,
+          password: newAdmin.password,
+          role: newAdmin.role,
+          permissions: newAdmin.permissions
+        })
       });
-      fetchAdmins();
+
+      if (response.ok) {
+        toast.success('Admin added successfully');
+        setIsAddAdminOpen(false);
+        setNewAdmin({
+          name: '',
+          email: '',
+          password: '',
+          role: 'admin',
+          permissions: {
+            manageVendors: false,
+            addBusiness: false,
+            editBusiness: false,
+            supportCenter: false,
+            blogs: false,
+            manageUsers: false,
+            subscriptionLogs: false,
+            exportData: false,
+          }
+        });
+        fetchAdmins();
+      } else {
+        throw new Error('Failed to create admin');
+      }
     } catch (error) {
       toast.error('Failed to add admin');
     }
@@ -146,14 +165,17 @@ const AdminManagement = () => {
 
     try {
       await editPermissionAPI(selectedAdmin._id, {
+        name: selectedAdmin.name,
+        email: selectedAdmin.email,
+        role: selectedAdmin.role,
         permissions: selectedAdmin.permissions
       });
-      toast.success('Admin permissions updated successfully');
+      toast.success('Admin updated successfully');
       setIsEditAdminOpen(false);
       setSelectedAdmin(null);
       fetchAdmins();
     } catch (error) {
-      toast.error('Failed to update admin permissions');
+      toast.error('Failed to update admin');
     }
   };
 
@@ -549,14 +571,63 @@ const AdminManagement = () => {
       <Dialog open={isEditAdminOpen} onOpenChange={setIsEditAdminOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Edit Admin Permissions</DialogTitle>
+            <DialogTitle>Edit Admin</DialogTitle>
             <DialogDescription>
-              Update permissions for {selectedAdmin?.name}
+              Update admin details and permissions for {selectedAdmin?.name}
             </DialogDescription>
           </DialogHeader>
           
           {selectedAdmin && (
             <form onSubmit={handleEditAdmin} className="space-y-4">
+              {/* Basic Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-name">Full Name</Label>
+                  <Input
+                    id="edit-name"
+                    value={selectedAdmin.name}
+                    onChange={(e) => setSelectedAdmin({
+                      ...selectedAdmin,
+                      name: e.target.value
+                    })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-email">Email</Label>
+                  <Input
+                    id="edit-email"
+                    type="email"
+                    value={selectedAdmin.email}
+                    onChange={(e) => setSelectedAdmin({
+                      ...selectedAdmin,
+                      email: e.target.value
+                    })}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="edit-role">Role</Label>
+                <Select
+                  value={selectedAdmin.role}
+                  onValueChange={(value) => setSelectedAdmin({
+                    ...selectedAdmin,
+                    role: value as 'admin' | 'super_admin'
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="super_admin">Super Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Permissions */}
               <div>
                 <Label className="text-base font-medium">Permissions</Label>
                 <div className="grid grid-cols-2 gap-3 mt-2">
@@ -594,7 +665,7 @@ const AdminManagement = () => {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Update Permissions</Button>
+                <Button type="submit">Update Admin</Button>
               </div>
             </form>
           )}

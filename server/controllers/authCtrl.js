@@ -151,48 +151,57 @@ const editPermissionCtrl = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      isvendor,
-      isProperties,
-      isInquiry,
-      isBlog,
-      isAppicatoin,
-      isJob,
-      name, email, type
+      name, 
+      email, 
+      role,
+      permissions
     } = req.body;
 
-    console.log(id)
+    console.log("Updating admin:", id, req.body);
     const user = await authModel.findById(id);
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: "Admin not found",
       });
     }
 
-    // Update permissions
-    user.isvendor = isvendor ?? user.isvendor;
-    user.isProperties = isProperties ?? user.isProperties;
-    user.isInquiry = isInquiry ?? user.isInquiry;
-    user.isBlog = isBlog ?? user.isBlog;
-    user.isAppicatoin = isAppicatoin ?? user.isAppicatoin;
-    user.isJob = isJob ?? user.isJob;
-    user.name = name ?? user.name;
-    user.email = email ?? user.email;
-    user.type = type ?? user.email;
+    // Update basic info
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (role) user.role = role;
+
+    // Update permissions if provided
+    if (permissions) {
+      user.permissions = {
+        manageVendors: permissions.manageVendors ?? user.permissions.manageVendors,
+        addBusiness: permissions.addBusiness ?? user.permissions.addBusiness,
+        editBusiness: permissions.editBusiness ?? user.permissions.editBusiness,
+        supportCenter: permissions.supportCenter ?? user.permissions.supportCenter,
+        blogs: permissions.blogs ?? user.permissions.blogs,
+        manageUsers: permissions.manageUsers ?? user.permissions.manageUsers,
+        subscriptionLogs: permissions.subscriptionLogs ?? user.permissions.subscriptionLogs,
+        exportData: permissions.exportData ?? user.permissions.exportData,
+      };
+    }
 
     await user.save();
 
+    // Remove password from response
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
     return res.status(200).json({
       success: true,
-      message: "User permissions updated successfully",
-      user,
+      message: "Admin updated successfully",
+      user: userResponse,
     });
   } catch (error) {
-    console.error("Permission update error:", error);
+    console.error("Admin update error:", error);
     return res.status(500).json({
       success: false,
-      message: "Failed to update permissions",
+      message: "Failed to update admin",
     });
   }
 };

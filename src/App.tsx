@@ -19,6 +19,7 @@ import VendorLogin from "./pages/VendorLogin";
 import VendorManagement from "./pages/admin/VendorManagement";
 import VendorLayout from "./pages/vendor/VendorLayout";
 import VendorDashboard from "./pages/vendor/VendorDashboard";
+import AdminManagement from "./pages/admin/AdminManagement";
 
 import VendorAddBusiness from "./pages/vendor/VendorAddBusiness";
 import VendorBusinesses from "./pages/vendor/VendorBusinesses";
@@ -113,6 +114,16 @@ const App = () => {
                   element={
                     <PrivateRoute>
                       <Dashboard />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="admin-management"
+                  element={
+                    <PrivateRoute>
+                      <ProtectedRoute requiredRole="super_admin">
+                        <AdminManagement />
+                      </ProtectedRoute>
                     </PrivateRoute>
                   }
                 />
