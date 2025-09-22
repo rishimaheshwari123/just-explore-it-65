@@ -43,6 +43,7 @@ import VendorSupport from "./pages/vendor/VendorSupport";
 import AdminSupport from "./pages/admin/AdminSupport";
 import UsersManagement from "./pages/admin/UsersManagement";
 import SubscriptionLogs from "./pages/admin/SubscriptionLogs";
+import CreateAdd from "./pages/admin/CreateAdd";
 
 const queryClient = new QueryClient();
 
@@ -173,6 +174,16 @@ const App = () => {
                     <PrivateRoute>
                       <ProtectedRoute requiredPermission="supportCenter">
                         <AdminSupport />
+                      </ProtectedRoute>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="ads"
+                  element={
+                    <PrivateRoute>
+                      <ProtectedRoute requiredPermission="ads">
+                        <CreateAdd />
                       </ProtectedRoute>
                     </PrivateRoute>
                   }

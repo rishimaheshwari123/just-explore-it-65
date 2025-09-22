@@ -1,6 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Home, BarChart3, Users, Plus, FileText, LogOut, Building2, MessageSquare, Shield } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Home,
+  BarChart3,
+  Users,
+  Plus,
+  FileText,
+  LogOut,
+  Building2,
+  MessageSquare,
+  Shield,
+} from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken, setUser } from "@/redux/authSlice";
 import { toast } from "react-toastify";
@@ -53,37 +65,110 @@ const Sidebar = () => {
 
   // Define all menu items with their required permissions
   const allMenuItems = [
-    { to: "/", icon: Home, label: "Back To Home", color: "text-blue-600", permission: null },
-    { to: "/admin/dashboard", icon: BarChart3, label: "Dashboard", color: "text-green-600", permission: null },
-    { to: "/admin/admin-management", icon: Shield, label: "Admin Management", color: "text-red-600", permission: "super_admin_only" },
-    { to: "/admin/users", icon: Users, label: "Users Management", color: "text-blue-600", permission: "manageUsers" },
-    { to: "/admin/vendors", icon: Users, label: "Manage Vendors", color: "text-purple-600", permission: "manageVendors" },
-    { to: "/admin/businesses", icon: Building2, label: "Manage Businesses", color: "text-cyan-600", permission: "editBusiness" },
-    { to: "/admin/add-business", icon: Plus, label: "Add Business", color: "text-emerald-600", permission: "addBusiness" },
-    { to: "/admin/support", icon: MessageSquare, label: "Support Center", color: "text-red-600", permission: "supportCenter" },
-    { to: "/admin/add-blog", icon: Plus, label: "Add Blog", color: "text-orange-600", permission: "blogs" },
-    { to: "/admin/get-blog", icon: FileText, label: "Get Blog", color: "text-indigo-600", permission: "blogs" },
-    { to: "/admin/subscription-logs", icon: FileText, label: "Subscription Logs", color: "text-pink-600", permission: "subscriptionLogs" },
+    {
+      to: "/",
+      icon: Home,
+      label: "Back To Home",
+      color: "text-blue-600",
+      permission: null,
+    },
+    {
+      to: "/admin/dashboard",
+      icon: BarChart3,
+      label: "Dashboard",
+      color: "text-green-600",
+      permission: null,
+    },
+    {
+      to: "/admin/admin-management",
+      icon: Shield,
+      label: "Admin Management",
+      color: "text-red-600",
+      permission: "super_admin_only",
+    },
+    {
+      to: "/admin/users",
+      icon: Users,
+      label: "Users Management",
+      color: "text-blue-600",
+      permission: "manageUsers",
+    },
+    {
+      to: "/admin/vendors",
+      icon: Users,
+      label: "Manage Vendors",
+      color: "text-purple-600",
+      permission: "manageVendors",
+    },
+    {
+      to: "/admin/businesses",
+      icon: Building2,
+      label: "Manage Businesses",
+      color: "text-cyan-600",
+      permission: "editBusiness",
+    },
+    {
+      to: "/admin/add-business",
+      icon: Plus,
+      label: "Add Business",
+      color: "text-emerald-600",
+      permission: "addBusiness",
+    },
+    {
+      to: "/admin/support",
+      icon: MessageSquare,
+      label: "Support Center",
+      color: "text-red-600",
+      permission: "supportCenter",
+    },
+    {
+      to: "/admin/add-blog",
+      icon: Plus,
+      label: "Add Blog",
+      color: "text-orange-600",
+      permission: "blogs",
+    },
+    {
+      to: "/admin/get-blog",
+      icon: FileText,
+      label: "Get Blog",
+      color: "text-indigo-600",
+      permission: "blogs",
+    },
+    {
+      to: "/admin/subscription-logs",
+      icon: FileText,
+      label: "Subscription Logs",
+      color: "text-pink-600",
+      permission: "subscriptionLogs",
+    },
+    {
+      to: "/admin/ads",
+      icon: FileText,
+      label: "Ads ",
+      color: "text-pink-600",
+      permission: "ads",
+    },
   ];
 
   // Filter menu items based on user permissions
-  const menuItems = allMenuItems.filter(item => {
+  const menuItems = allMenuItems.filter((item) => {
     // Always show items without permission requirements
     if (!item.permission) return true;
-    
+
     // Special case for super_admin_only items
-    if (item.permission === 'super_admin_only') {
-      return user?.role === 'super_admin';
+    if (item.permission === "super_admin_only") {
+      return user?.role === "super_admin";
     }
-    
+
     // For super_admin, show all items
-    if (user?.role === 'super_admin') return true;
-    
+    if (user?.role === "super_admin") return true;
+
     // For admin, check specific permissions
-    if (user?.role === 'admin') {
+    if (user?.role === "admin") {
       return user?.permissions?.[item.permission] === true;
     }
-    
+
     // Hide for other roles
     return false;
   });
@@ -97,25 +182,33 @@ const Sidebar = () => {
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        <div className={`${isCollapsed ? "hidden" : "flex"} items-center space-x-2`}>
+        <div
+          className={`${
+            isCollapsed ? "hidden" : "flex"
+          } items-center space-x-2`}
+        >
           <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-sm">A</span>
           </div>
           <span className="font-bold text-gray-800 text-lg">Admin Panel</span>
         </div>
-        
+
         <Button
           variant="ghost"
           size="sm"
           onClick={handleToggle}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
         </Button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
+      {/* Navigation - Added overflow-y-auto here */}
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -124,22 +217,24 @@ const Sidebar = () => {
               to={item.to}
               className={({ isActive }) =>
                 `flex items-center space-x-3 px-3 py-3 rounded-lg transition-all duration-200 group ${
-                  isActive 
-                    ? "bg-blue-50 border-r-4 border-blue-600 text-blue-700" 
+                  isActive
+                    ? "bg-blue-50 border-r-4 border-blue-600 text-blue-700"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <Icon 
+                  <Icon
                     className={`h-5 w-5 flex-shrink-0 ${
                       isActive ? "text-blue-600" : item.color
-                    } group-hover:scale-110 transition-transform`} 
+                    } group-hover:scale-110 transition-transform`}
                   />
-                  <span className={`font-medium ${
-                    isCollapsed ? "hidden" : "block"
-                  } transition-all duration-200`}>
+                  <span
+                    className={`font-medium ${
+                      isCollapsed ? "hidden" : "block"
+                    } transition-all duration-200`}
+                  >
                     {item.label}
                   </span>
                 </>
@@ -154,9 +249,11 @@ const Sidebar = () => {
       {/* User Profile & Logout */}
       <div className="p-4 space-y-3">
         {/* User Profile */}
-        <div className={`flex items-center space-x-3 p-3 rounded-lg bg-gray-50 ${
-          isCollapsed ? "justify-center" : ""
-        }`}>
+        <div
+          className={`flex items-center space-x-3 p-3 rounded-lg bg-gray-50 ${
+            isCollapsed ? "justify-center" : ""
+          }`}
+        >
           <Avatar className="h-8 w-8">
             <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold">
               {user?.name?.charAt(0).toUpperCase() || "U"}
@@ -165,11 +262,10 @@ const Sidebar = () => {
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">
-                {user?.name?.charAt(0).toUpperCase() + user?.name?.slice(1) || "User"}
+                {user?.name?.charAt(0).toUpperCase() + user?.name?.slice(1) ||
+                  "User"}
               </p>
-              <p className="text-xs text-gray-500 truncate">
-                Administrator
-              </p>
+              <p className="text-xs text-gray-500 truncate">Administrator</p>
             </div>
           )}
         </div>

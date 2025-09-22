@@ -17,9 +17,19 @@ import TopBar from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, Plus, List, TrendingUp, Users, Star, Eye } from "lucide-react";
+import {
+  Building2,
+  Plus,
+  List,
+  TrendingUp,
+  Users,
+  Star,
+  Eye,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import AdSlider from "@/components/AdSlider";
+import FloatingAd from "@/components/FloatingAd";
 
 const Index = () => {
   const [activeFilter, setActiveFilter] = useState<"all" | "businesses">("all");
@@ -27,7 +37,7 @@ const Index = () => {
     totalBusinesses: 0,
     totalReviews: 0,
     totalUsers: 0,
-    featuredBusinesses: 0
+    featuredBusinesses: 0,
   });
   const [recentReviews, setRecentReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,21 +47,27 @@ const Index = () => {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
-        
+        const BASE_URL =
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+
         // Fetch businesses for stats
         const businessResponse = await fetch(`${BASE_URL}/property/get-all`);
         const businessData = await businessResponse.json();
-        
+
         if (businessData.success) {
           const businesses = businessData.properties || [];
-          const featured = businesses.filter((b: any) => b.premiumFeatures?.featuredListing);
-          
+          const featured = businesses.filter(
+            (b: any) => b.premiumFeatures?.featuredListing
+          );
+
           setStats({
             totalBusinesses: businesses.length,
-            totalReviews: businesses.reduce((acc: number, b: any) => acc + (b.ratings?.totalReviews || 0), 0),
+            totalReviews: businesses.reduce(
+              (acc: number, b: any) => acc + (b.ratings?.totalReviews || 0),
+              0
+            ),
             totalUsers: Math.floor(businesses.length * 2.5), // Estimated users
-            featuredBusinesses: featured.length
+            featuredBusinesses: featured.length,
           });
         }
       } catch (error) {
@@ -70,6 +86,8 @@ const Index = () => {
       <Header />
       <HeroBanner />
       <SearchSection />
+      <AdSlider />
+      <FloatingAd />
 
       {/* Dynamic Stats Section */}
       <div className="container mx-auto px-4 py-8">
@@ -85,7 +103,7 @@ const Index = () => {
               <div className="text-sm text-gray-600">Total Businesses</div>
             </CardContent>
           </Card>
-          
+
           <Card className="text-center hover:shadow-lg transition-shadow">
             <CardContent className="p-4">
               <div className="flex items-center justify-center mb-2">
@@ -97,7 +115,7 @@ const Index = () => {
               <div className="text-sm text-gray-600">Customer Reviews</div>
             </CardContent>
           </Card>
-          
+
           <Card className="text-center hover:shadow-lg transition-shadow">
             <CardContent className="p-4">
               <div className="flex items-center justify-center mb-2">
@@ -109,7 +127,7 @@ const Index = () => {
               <div className="text-sm text-gray-600">Happy Users</div>
             </CardContent>
           </Card>
-          
+
           <Card className="text-center hover:shadow-lg transition-shadow">
             <CardContent className="p-4">
               <div className="flex items-center justify-center mb-2">

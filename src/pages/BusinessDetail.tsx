@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import BusinessInquiryModal from "@/components/BusinessInquiryModal";
 import BusinessReviewModal from "@/components/BusinessReviewModal";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   ArrowLeft,
   Phone,
@@ -21,6 +22,9 @@ import {
   Navigation,
   MessageSquare,
 } from "lucide-react";
+import TopBar from "@/components/TopBar";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 interface Business {
   _id: string;
@@ -111,6 +115,7 @@ const BusinessDetail: React.FC = () => {
   const [business, setBusiness] = useState<Business | null>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [activeTab, setActiveTab] = useState("description");
 
   useEffect(() => {
     if (id) {
@@ -121,10 +126,9 @@ const BusinessDetail: React.FC = () => {
   const fetchBusiness = async () => {
     try {
       setLoading(true);
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
-      const response = await fetch(
-        `${BASE_URL}/property/business/${id}`
-      );
+      const BASE_URL =
+        import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+      const response = await fetch(`${BASE_URL}/property/business/${id}`);
       const data = await response.json();
       if (data.success) {
         setBusiness(data.business);
@@ -143,32 +147,26 @@ const BusinessDetail: React.FC = () => {
 
   const trackView = async () => {
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
-      await fetch(
-        `${BASE_URL}/property/business/${id}/interaction`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "view" }),
-        }
-      );
+      const BASE_URL =
+        import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+      await fetch(`${BASE_URL}/property/business/${id}/interaction`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "view" }),
+      });
     } catch (error) {
       console.error("Error tracking view:", error);
     }
   };
 
   const handleCall = (phone: string) => {
-    // Track call interaction
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
-    fetch(
-      `${BASE_URL}/property/business/${id}/interaction`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "call" }),
-      }
-    ).catch(console.error);
-
+    const BASE_URL =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+    fetch(`${BASE_URL}/property/business/${id}/interaction`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "call" }),
+    }).catch(console.error);
     window.open(`tel:${phone}`, "_self");
   };
 
@@ -180,19 +178,17 @@ const BusinessDetail: React.FC = () => {
     ) {
       return;
     }
-
     try {
       setDeleting(true);
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+      const BASE_URL =
+        import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
       const response = await fetch(
         `${BASE_URL}/property/business/delete/${id}`,
         {
           method: "DELETE",
         }
       );
-
       const data = await response.json();
-
       if (data.success) {
         toast.success("Business deleted successfully");
         navigate("/business-listing");
@@ -220,10 +216,8 @@ const BusinessDetail: React.FC = () => {
     ];
     const currentDay = dayNames[now.getDay()];
     const currentTime = now.toTimeString().slice(0, 5);
-
     const todayHours = businessHours[currentDay];
     if (!todayHours || todayHours.isClosed) return false;
-
     return currentTime >= todayHours.open && currentTime <= todayHours.close;
   };
 
@@ -234,8 +228,6 @@ const BusinessDetail: React.FC = () => {
         className={`h-4 w-4 ${
           i < Math.floor(rating)
             ? "text-yellow-400 fill-current"
-            : i < rating
-            ? "text-yellow-400 fill-current opacity-50"
             : "text-gray-300"
         }`}
       />
@@ -253,7 +245,6 @@ const BusinessDetail: React.FC = () => {
       "sunday",
     ];
     const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
     return days.map((day, index) => {
       const hours = businessHours[day];
       return (
@@ -297,445 +288,513 @@ const BusinessDetail: React.FC = () => {
     business.images?.[0]?.url ||
     "/placeholder-business.jpg";
 
-  return (
-    <div className="min-h-screen bg-muted/30">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-6">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
+  // Formatted address for Google Maps query
+  const formattedAddress = `${business.address.street}, ${business.address.area}, ${business.address.city}, ${business.address.state}, ${business.address.pincode}`;
 
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">
-                {business.businessName}
-              </h1>
-              <div className="flex items-center gap-4 mb-4">
-                <Badge>{business.category}</Badge>
-                {business.verification.isVerified && (
-                  <Badge className="bg-green-500 text-white flex items-center gap-1">
-                    <Verified className="h-3 w-3" />
-                    Verified
+  return (
+    <>
+      <TopBar />
+      <Header />
+      <div className="min-h-screen bg-muted/30">
+        <div className="container mx-auto px-4 py-8">
+          {/* Header */}
+          <div className="mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => navigate(-1)}
+              className="mb-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+
+            <div className="flex justify-between items-start">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">
+                  {business.businessName}
+                </h1>
+                <div className="flex items-center gap-4 mb-4">
+                  <Badge>{business.category}</Badge>
+                  {business.verification.isVerified && (
+                    <Badge className="bg-green-500 text-white flex items-center gap-1">
+                      <Verified className="h-3 w-3" />
+                      Verified
+                    </Badge>
+                  )}
+                  <Badge
+                    className={`${
+                      isOpen
+                        ? "bg-green-500 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    <Clock className="h-3 w-3 mr-1" />
+                    {isOpen ? "Open" : "Closed"}
                   </Badge>
-                )}
-                <Badge
-                  className={`${
-                    isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                  }`}
-                >
-                  <Clock className="h-3 w-3 mr-1" />
-                  {isOpen ? "Open" : "Closed"}
-                </Badge>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                {/* Optional Edit/Delete Buttons */}
+                {/* <Button variant="outline" onClick={() => navigate(`/edit-business/${business._id}`)}><Edit className="h-4 w-4 mr-2" />Edit</Button>
+              <Button variant="destructive" onClick={handleDelete} disabled={deleting}><Trash2 className="h-4 w-4 mr-2" />Delete</Button> */}
               </div>
             </div>
-
-            <div className="flex gap-2">
-              {/* <Button
-                variant="outline"
-                onClick={() => navigate(`/edit-business/${business._id}`)}
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={deleting}
-              >
-                {deleting ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                ) : (
-                  <Trash2 className="h-4 w-4 mr-2" />
-                )}
-                Delete
-              </Button> */}
-            </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Image */}
-            <Card>
-              <CardContent className="p-0">
-                <img
-                  src={mainImage}
-                  alt={business.businessName}
-                  className="w-full h-64 object-cover rounded-lg"
-                />
-              </CardContent>
-            </Card>
-
-            {/* Description */}
-            <Card>
-              <CardHeader>
-                <CardTitle>About</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
-                  {business.description}
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Price Range */}
-            {business.priceRange && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content Area */}
+            <div className="lg:col-span-2 space-y-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>Price Range</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="text-lg px-4 py-2">
-                      {business.priceRange}
-                    </Badge>
-                    <span className="text-muted-foreground text-sm">
-                      {business.priceRange === "$" && "Budget-friendly"}
-                      {business.priceRange === "$$" && "Moderate pricing"}
-                      {business.priceRange === "$$$" && "Premium pricing"}
-                      {business.priceRange === "$$$$" && "Luxury pricing"}
-                    </span>
-                  </div>
+                <CardContent className="p-0">
+                  <img
+                    src={mainImage}
+                    alt={business.businessName}
+                    className="w-full h-64 object-cover rounded-lg"
+                  />
                 </CardContent>
               </Card>
-            )}
 
-            {/* Services */}
-            {business.services && business.services.length > 0 && (
+              {/* Tabbed Section */}
+              <Card>
+                <CardContent className="p-6">
+                  <Tabs
+                    value={activeTab}
+                    onValueChange={setActiveTab}
+                    className="w-full"
+                  >
+                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-5 h-auto">
+                      <TabsTrigger value="description" className="p-3">
+                        Description
+                      </TabsTrigger>
+                      {business.features && business.features.length > 0 && (
+                        <TabsTrigger value="features" className="p-3">
+                          Features
+                        </TabsTrigger>
+                      )}
+                      {business.services && business.services.length > 0 && (
+                        <TabsTrigger value="services" className="p-3">
+                          Services
+                        </TabsTrigger>
+                      )}
+                      <TabsTrigger value="reviews" className="p-3">
+                        Reviews
+                      </TabsTrigger>
+                      <TabsTrigger value="info" className="p-3">
+                        Info
+                      </TabsTrigger>
+                    </TabsList>
+
+                    {/* Description Tab Content */}
+                    <TabsContent value="description" className="mt-4">
+                      <h3 className="text-xl font-semibold mb-2">
+                        About {business.businessName}
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {business.description}
+                      </p>
+                      {business.priceRange && (
+                        <div className="mt-4">
+                          <h4 className="font-semibold mb-2">Price Range</h4>
+                          <Badge
+                            variant="outline"
+                            className="text-lg px-4 py-2"
+                          >
+                            {business.priceRange}
+                          </Badge>
+                          <span className="text-muted-foreground text-sm ml-2">
+                            {business.priceRange === "$" && "Budget-friendly"}
+                            {business.priceRange === "$$" && "Moderate pricing"}
+                            {business.priceRange === "$$$" && "Premium pricing"}
+                            {business.priceRange === "$$$$" && "Luxury pricing"}
+                          </span>
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    {/* Features Tab Content */}
+                    {business.features && business.features.length > 0 && (
+                      <TabsContent value="features" className="mt-4">
+                        <h3 className="text-xl font-semibold mb-2">Features</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {business.features.map((feature, index) => (
+                            <Badge key={index} variant="secondary">
+                              {feature}
+                            </Badge>
+                          ))}
+                        </div>
+                      </TabsContent>
+                    )}
+
+                    {/* Services Tab Content */}
+                    {business.services && business.services.length > 0 && (
+                      <TabsContent value="services" className="mt-4">
+                        <h3 className="text-xl font-semibold mb-2">
+                          Services & Pricing
+                        </h3>
+                        <div className="space-y-4">
+                          {business.services.map((service, index) => (
+                            <div
+                              key={index}
+                              className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                            >
+                              <div className="flex justify-between items-start">
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-lg mb-2">
+                                    {service.name}
+                                  </h4>
+                                  <p className="text-sm text-muted-foreground mb-3">
+                                    {service.description}
+                                  </p>
+                                  {service.features &&
+                                    service.features.length > 0 && (
+                                      <div className="flex flex-wrap gap-1 mb-2">
+                                        {service.features.map(
+                                          (feature, idx) => (
+                                            <Badge
+                                              key={idx}
+                                              variant="secondary"
+                                              className="text-xs"
+                                            >
+                                              {feature}
+                                            </Badge>
+                                          )
+                                        )}
+                                      </div>
+                                    )}
+                                </div>
+                                {service.price && (
+                                  <div className="text-right ml-4">
+                                    <div className="text-lg font-bold text-primary">
+                                      ₹{service.price.min}
+                                      {service.price.max &&
+                                        service.price.max !==
+                                          service.price.min && (
+                                          <span> - ₹{service.price.max}</span>
+                                        )}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {service.price.priceType || "per service"}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </TabsContent>
+                    )}
+
+                    {/* Reviews Tab Content */}
+                    <TabsContent value="reviews" className="mt-4">
+                      <h3 className="text-xl font-semibold mb-2">
+                        Rating & Reviews
+                      </h3>
+                      <div className="text-center mb-4">
+                        <div className="text-4xl font-bold mb-2 text-primary">
+                          {business.ratings.average.toFixed(1)}
+                        </div>
+                        <div className="flex justify-center mb-2">
+                          {renderStars(business.ratings.average)}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Based on {business.ratings.totalReviews} reviews
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 text-center text-sm">
+                        <div>
+                          <div className="font-semibold text-lg">
+                            {business.analytics.totalViews}
+                          </div>
+                          <div className="text-muted-foreground">
+                            Total Views
+                          </div>
+                        </div>
+                        <div>
+                          <div className="font-semibold text-lg">
+                            {business.analytics.totalCalls}
+                          </div>
+                          <div className="text-muted-foreground">
+                            Total Calls
+                          </div>
+                        </div>
+                      </div>
+                      {/* Add more detailed reviews here later if available */}
+                    </TabsContent>
+
+                    {/* Info Tab Content */}
+                    <TabsContent value="info" className="mt-4">
+                      <h3 className="text-xl font-semibold mb-4">
+                        Business Information
+                      </h3>
+                      <div className="space-y-3">
+                        {business.businessType && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Business Type
+                            </span>
+                            <span className="font-medium">
+                              {business.businessType}
+                            </span>
+                          </div>
+                        )}
+                        {business.establishedYear && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Established
+                            </span>
+                            <span className="font-medium">
+                              {business.establishedYear}
+                            </span>
+                          </div>
+                        )}
+                        {business.employeeCount && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Team Size
+                            </span>
+                            <span className="font-medium">
+                              {business.employeeCount} employees
+                            </span>
+                          </div>
+                        )}
+                        {business.verification &&
+                          business.verification.trustScore && (
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">
+                                Trust Score
+                              </span>
+                              <span className="font-medium">
+                                {business.verification.trustScore}/100
+                              </span>
+                            </div>
+                          )}
+                        {business.subCategory && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">
+                              Specialty
+                            </span>
+                            <span className="font-medium">
+                              {business.subCategory}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <CardTitle>Ratings & Reviews</CardTitle>
+                    <div className="flex items-center mt-2 gap-2">
+                      <div className="text-2xl font-bold text-primary">
+                        {business.ratings.average.toFixed(1)}
+                      </div>
+                      <div className="flex">
+                        {renderStars(business.ratings.average)}
+                      </div>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Based on {business.ratings.totalReviews} reviews
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 text-center text-sm mt-4">
+                      <div>
+                        <div className="font-semibold text-lg">
+                          {business.analytics.totalViews}
+                        </div>
+                        <div className="text-muted-foreground">Total Views</div>
+                      </div>
+                      <div>
+                        <div className="font-semibold text-lg">
+                          {business.analytics.totalCalls}
+                        </div>
+                        <div className="text-muted-foreground">Total Calls</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardHeader>
+
+                {/* Review Modal */}
+                <BusinessReviewModal business={business} />
+              </Card>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Services & Pricing</CardTitle>
+                  <CardTitle>Contact</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {business.services.map((service, index) => (
-                      <div
-                        key={index}
-                        className="p-4 border rounded-lg hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-lg mb-2">
-                              {service.name}
-                            </h4>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              {service.description}
-                            </p>
-                            {service.features &&
-                              service.features.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mb-2">
-                                  {service.features.map((feature, idx) => (
-                                    <Badge
-                                      key={idx}
-                                      variant="secondary"
-                                      className="text-xs"
-                                    >
-                                      {feature}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-                          </div>
-                          {service.price && (
-                            <div className="text-right ml-4">
-                              <div className="text-lg font-bold text-primary">
-                                ₹{service.price.min}
-                                {service.price.max &&
-                                  service.price.max !== service.price.min && (
-                                    <span> - ₹{service.price.max}</span>
-                                  )}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {service.price.priceType || "per service"}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Features */}
-            {business.features && business.features.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Features</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {business.features.map((feature, index) => (
-                      <Badge key={index} variant="secondary">
-                        {feature}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Contact Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Phone className="h-5 w-5 text-primary" />
-                  <p className="font-medium">
-                    {business.contactInfo.primaryPhone}
-                  </p>
-                </div>
-
-                {business.contactInfo.secondaryPhone && (
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-primary" />
-                    <p className="font-medium">
-                      {business.contactInfo.secondaryPhone}
-                    </p>
-                  </div>
-                )}
-
-                {business.contactInfo.email && (
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-5 w-5 text-primary" />
-                    <p>{business.contactInfo.email}</p>
-                  </div>
-                )}
-
-                {business.contactInfo.website && (
-                  <div className="flex items-center gap-3">
-                    <Globe className="h-5 w-5 text-primary" />
-                    <a
-                      href={business.contactInfo.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      Visit Website
-                    </a>
-                  </div>
-                )}
-
-                {business.whatsappNumber && (
-                  <div className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-green-600" />
-                    <a
-                      href={`https://wa.me/${business.whatsappNumber.replace(
-                        /[^0-9]/g,
-                        ""
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-green-600 hover:underline font-medium"
-                    >
-                      WhatsApp: {business.whatsappNumber}
-                    </a>
-                  </div>
-                )}
-
-                {business.socialMedia && (
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-muted-foreground">
-                      Social Media
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {business.socialMedia.facebook && (
-                        <a
-                          href={business.socialMedia.facebook}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline text-sm"
-                        >
-                          Facebook
-                        </a>
-                      )}
-                      {business.socialMedia.instagram && (
-                        <a
-                          href={business.socialMedia.instagram}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-pink-600 hover:underline text-sm"
-                        >
-                          Instagram
-                        </a>
-                      )}
-                      {business.socialMedia.twitter && (
-                        <a
-                          href={business.socialMedia.twitter}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-400 hover:underline text-sm"
-                        >
-                          Twitter
-                        </a>
-                      )}
-                      {business.socialMedia.linkedin && (
-                        <a
-                          href={business.socialMedia.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-700 hover:underline text-sm"
-                        >
-                          LinkedIn
-                        </a>
-                      )}
+                    {/* Contact details */}
+                    <div className="flex items-center gap-3">
+                      <Phone className="h-5 w-5 text-primary" />
+                      <p className="font-medium">
+                        {business.contactInfo.primaryPhone}
+                      </p>
                     </div>
-                  </div>
-                )}
-
-                <div className="space-y-3">
-                  <Button
-                    className="w-full"
-                    onClick={() => handleCall(business.contactInfo.primaryPhone)}
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call Now
-                  </Button>
-                  
-                  <BusinessInquiryModal business={business} />
-                  
-                  <BusinessReviewModal business={business} />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Address */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Address</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-start gap-3 mb-4">
-                  <MapPin className="h-5 w-5 text-primary mt-1" />
-                  <div>
-                    <p>{business.address.street}</p>
-                    <p>
-                      {business.address.area}, {business.address.city}
-                    </p>
-                    <p>
-                      {business.address.state} - {business.address.pincode}
-                    </p>
-                    {business.address.landmark && (
-                      <p>Near {business.address.landmark}</p>
+                    {business.contactInfo.email && (
+                      <div className="flex items-center gap-3">
+                        <Mail className="h-5 w-5 text-primary" />
+                        <p>{business.contactInfo.email}</p>
+                      </div>
+                    )}
+                    {business.contactInfo.website && (
+                      <div className="flex items-center gap-3">
+                        <Globe className="h-5 w-5 text-primary" />
+                        <a
+                          href={business.contactInfo.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          Visit Website
+                        </a>
+                      </div>
+                    )}
+                    {business.whatsappNumber && (
+                      <div className="flex items-center gap-3">
+                        <Phone className="h-5 w-5 text-green-600" />
+                        <a
+                          href={`https://wa.me/${business.whatsappNumber.replace(
+                            /[^0-9]/g,
+                            ""
+                          )}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-green-600 hover:underline font-medium"
+                        >
+                          WhatsApp: {business.whatsappNumber}
+                        </a>
+                      </div>
                     )}
                   </div>
-                </div>
-
-                <Button variant="outline" className="w-full">
-                  <Navigation className="h-4 w-4 mr-2" />
-                  Get Directions
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Rating */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Rating & Reviews</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center mb-4">
-                  <div className="text-3xl font-bold mb-2">
-                    {business.ratings.average.toFixed(1)}
-                  </div>
-                  <div className="flex justify-center mb-2">
-                    {renderStars(business.ratings.average)}
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Based on {business.ratings.totalReviews} reviews
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 text-center text-sm">
-                  <div>
-                    <div className="font-semibold text-lg">
-                      {business.analytics.totalViews}
+                  {business.socialMedia && (
+                    <div className="mt-4 space-y-2">
+                      <h4 className="font-medium text-sm text-muted-foreground">
+                        Social Media
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {business.socialMedia.facebook && (
+                          <a
+                            href={business.socialMedia.facebook}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:underline text-sm"
+                          >
+                            Facebook
+                          </a>
+                        )}
+                        {business.socialMedia.instagram && (
+                          <a
+                            href={business.socialMedia.instagram}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-pink-600 hover:underline text-sm"
+                          >
+                            Instagram
+                          </a>
+                        )}
+                        {business.socialMedia.twitter && (
+                          <a
+                            href={business.socialMedia.twitter}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-400 hover:underline text-sm"
+                          >
+                            Twitter
+                          </a>
+                        )}
+                        {business.socialMedia.linkedin && (
+                          <a
+                            href={business.socialMedia.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-700 hover:underline text-sm"
+                          >
+                            LinkedIn
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-muted-foreground">Total Views</div>
+                  )}
+                  <div className="space-y-3 mt-4">
+                    <Button
+                      className="w-full"
+                      onClick={() =>
+                        handleCall(business.contactInfo.primaryPhone)
+                      }
+                    >
+                      <Phone className="h-4 w-4 mr-2" />
+                      Call Now
+                    </Button>
+                    <BusinessInquiryModal business={business} />
+                    <BusinessReviewModal business={business} />
                   </div>
-                  <div>
-                    <div className="font-semibold text-lg">
-                      {business.analytics.totalCalls}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Address</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-start gap-3 mb-4">
+                    <MapPin className="h-5 w-5 text-primary mt-1" />
+                    <div>
+                      <p>{business.address.street}</p>
+                      <p>
+                        {business.address.area}, {business.address.city}
+                      </p>
+                      <p>
+                        {business.address.state} - {business.address.pincode}
+                      </p>
+                      {business.address.landmark && (
+                        <p>Near {business.address.landmark}</p>
+                      )}
                     </div>
-                    <div className="text-muted-foreground">Total Calls</div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Business Hours */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Business Hours</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {formatBusinessHours(business.businessHours)}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Business Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Business Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {business.businessType && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Business Type</span>
-                    <span className="font-medium">{business.businessType}</span>
+                  {/* Embedded Map Section */}
+                  <div className="mt-4 overflow-hidden rounded-lg">
+                    <iframe
+                      src={`https://maps.google.com/maps?q=${encodeURIComponent(
+                        formattedAddress
+                      )}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                      width="100%"
+                      height="300"
+                      style={{ border: 0 }}
+                      allowFullScreen=""
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    ></iframe>
                   </div>
-                )}
 
-                {business.establishedYear && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Established</span>
-                    <span className="font-medium">
-                      {business.establishedYear}
-                    </span>
-                  </div>
-                )}
+                  <Button variant="outline" className="w-full mt-4">
+                    <Navigation className="h-4 w-4 mr-2" />
+                    Get Directions
+                  </Button>
+                </CardContent>
+              </Card>
 
-                {business.employeeCount && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Team Size</span>
-                    <span className="font-medium">
-                      {business.employeeCount} employees
-                    </span>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Business Hours</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {formatBusinessHours(business.businessHours)}
                   </div>
-                )}
-
-                {business.verification && business.verification.trustScore && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Trust Score</span>
-                    <span className="font-medium">
-                      {business.verification.trustScore}/100
-                    </span>
-                  </div>
-                )}
-
-                {business.subCategory && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Specialty</span>
-                    <span className="font-medium">{business.subCategory}</span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 };
 
