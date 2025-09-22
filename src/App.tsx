@@ -52,7 +52,6 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/blogs" element={<Blogs />} />
             <Route path="/properties" element={<Index />} />
