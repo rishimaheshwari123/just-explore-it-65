@@ -19,7 +19,7 @@ router.get("/profile/:userId", getUserProfile);
 router.put("/profile/:userId", updateUserProfile);
 
 // Admin routes
-router.get("/admin/all", getAllUsers);
-router.put("/admin/status/:userId", updateUserStatus);
+router.get("/getAll", getAllUsers);
+router.put("/status/update/:userId", updateUserStatus);
 
 module.exports = router;

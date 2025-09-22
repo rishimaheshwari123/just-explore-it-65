@@ -8,7 +8,7 @@ function PrivateRoute({ children }) {
     return <Navigate to="/" />;
   }
 
-  if (user?.role === "admin") {
+  if (user?.role === "admin" || user?.role === "super_admin") {
     return children;
   } else if (user?.role === "vendor" || user?.role === "user") {
     return children;

@@ -13,10 +13,10 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(
     localStorage.getItem("sidebarCollapsed") === "true"
   );
-  const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
   const sidebarRef = useRef(null);
   const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth.user);
 
   // Function to handle logout
   const handleLogout = async () => {
@@ -51,15 +51,36 @@ const Sidebar = () => {
     };
   }, []);
 
-  const menuItems = [
-    { to: "/", icon: Home, label: "Back To Home", color: "text-blue-600" },
-    { to: "/admin/dashboard", icon: BarChart3, label: "Dashboard", color: "text-green-600" },
-    { to: "/admin/vendors", icon: Users, label: "Manage Vendors", color: "text-purple-600" },
-    { to: "/admin/businesses", icon: Building2, label: "Manage Businesses", color: "text-cyan-600" },
-    { to: "/admin/support", icon: MessageSquare, label: "Support Center", color: "text-red-600" },
-    { to: "/admin/add-blog", icon: Plus, label: "Add Blog", color: "text-orange-600" },
-    { to: "/admin/get-blog", icon: FileText, label: "Get Blog", color: "text-indigo-600" },
+  // Define all menu items with their required permissions
+  const allMenuItems = [
+    { to: "/", icon: Home, label: "Back To Home", color: "text-blue-600", permission: null },
+    { to: "/admin/dashboard", icon: BarChart3, label: "Dashboard", color: "text-green-600", permission: null },
+    { to: "/admin/users", icon: Users, label: "Users Management", color: "text-blue-600", permission: "manageUsers" },
+    { to: "/admin/vendors", icon: Users, label: "Manage Vendors", color: "text-purple-600", permission: "manageVendors" },
+    { to: "/admin/businesses", icon: Building2, label: "Manage Businesses", color: "text-cyan-600", permission: "editBusiness" },
+    { to: "/admin/add-business", icon: Plus, label: "Add Business", color: "text-emerald-600", permission: "addBusiness" },
+    { to: "/admin/support", icon: MessageSquare, label: "Support Center", color: "text-red-600", permission: "supportCenter" },
+    { to: "/admin/add-blog", icon: Plus, label: "Add Blog", color: "text-orange-600", permission: "blogs" },
+    { to: "/admin/get-blog", icon: FileText, label: "Get Blog", color: "text-indigo-600", permission: "blogs" },
+    { to: "/admin/subscription-logs", icon: FileText, label: "Subscription Logs", color: "text-pink-600", permission: "subscriptionLogs" },
   ];
+
+  // Filter menu items based on user permissions
+  const menuItems = allMenuItems.filter(item => {
+    // Always show items without permission requirements
+    if (!item.permission) return true;
+    
+    // For super_admin, show all items
+    if (user?.role === 'super_admin') return true;
+    
+    // For admin, check specific permissions
+    if (user?.role === 'admin') {
+      return user?.permissions?.[item.permission] === true;
+    }
+    
+    // Hide for other roles
+    return false;
+  });
 
   return (
     <div

@@ -35,6 +35,8 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { format } from 'date-fns';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 interface Business {
   _id: string;
@@ -171,6 +173,57 @@ const BusinessManagement: React.FC = () => {
     }
   };
 
+  // Export businesses to PDF
+  const exportBusinessesToPDF = () => {
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(20);
+    doc.text('Business Management Report', 14, 20);
+    
+    // Date
+    doc.setFontSize(12);
+    doc.text(`Generated on: ${format(new Date(), 'PPP')}`, 14, 30);
+    
+    // Summary
+    doc.text(`Total Businesses: ${filteredBusinesses.length}`, 14, 40);
+    doc.text(`Active: ${filteredBusinesses.filter(b => b.status === 'active').length}`, 14, 50);
+    doc.text(`Pending: ${filteredBusinesses.filter(b => b.status === 'pending').length}`, 14, 60);
+    
+    // Table data
+    const tableColumn = [
+      'Business Name', 
+      'Vendor', 
+      'Category', 
+      'Location', 
+      'Status', 
+      'Views', 
+      'Rating'
+    ];
+    
+    const tableRows = filteredBusinesses.map((business) => [
+      business.businessName,
+      business.vendor.name,
+      business.category,
+      `${business.address.city}, ${business.address.state}`,
+      business.status,
+      business.analytics.totalViews.toString(),
+      `${business.ratings.average.toFixed(1)} (${business.ratings.totalReviews})`
+    ]);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 70,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [59, 130, 246] },
+      alternateRowStyles: { fillColor: [245, 247, 250] },
+    });
+
+    doc.save(`business-report-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+    toast.success('Business report exported successfully!');
+  };
+
   // Get status badge
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -260,10 +313,11 @@ const BusinessManagement: React.FC = () => {
           </Button>
           <Button
             variant="outline"
+            onClick={exportBusinessesToPDF}
             className="flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
-            Export
+            Export PDF
           </Button>
         </div>
       </div>

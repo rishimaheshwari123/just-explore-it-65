@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from 'lucide-react';
-import { setToken, setUser } from '@/redux/authSlice';
+import { userLogin } from '../service/operations/userAuth';
 
 const UserLogin: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -38,33 +38,10 @@ const UserLogin: React.FC = () => {
     setLoading(true);
     
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://just-explore-it-65.onrender.com/api/v1";
-      const response = await fetch(`${BASE_URL}/auth/user/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Store user data and token
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        dispatch(setToken(data.token));
-        dispatch(setUser(data.user));
-        
-        toast.success('Login successful!');
-        navigate('/user/profile');
-      } else {
-        toast.error(data.message || 'Login failed');
-      }
+      await userLogin(formData.email, formData.password, dispatch);
+      navigate('/user/profile');
     } catch (error) {
-      console.error('Login error:', error);
-      toast.error('Something went wrong. Please try again.');
+      // Error handling is done in userLogin function
     } finally {
       setLoading(false);
     }

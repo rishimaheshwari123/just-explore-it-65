@@ -250,7 +250,7 @@ const Header = () => {
                       </DropdownMenuItem>
                     )}
                     
-                    {user.role === 'admin' && (
+                    {(user.role === 'admin' || user.role === 'super_admin') && (
                       <DropdownMenuItem asChild>
                         <Link to="/admin/dashboard" className="flex items-center space-x-2">
                           <Shield className="h-4 w-4" />
@@ -400,7 +400,7 @@ const Header = () => {
                   </Link>
                 )}
                 
-                {user.role === 'admin' && (
+                {(user.role === 'admin' || user.role === 'super_admin') && (
                   <Link
                     to={"/admin/dashboard"}
                     className="flex items-center justify-center space-x-2 w-full px-4 py-3 rounded-full bg-gradient-to-r from-red-600 to-rose-600 text-white hover:from-red-700 hover:to-rose-700 transition-all font-semibold"

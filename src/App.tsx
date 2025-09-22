@@ -9,6 +9,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminSignup from "./pages/AdminSignup";
 import OpenRoute from "@/components/auth/OpenRoute";
 import PrivateRoute from "@/components/auth/PrivateRoute";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Dashboard from "./pages/admin/Dashboard";
 import Layout from "./pages/admin/Layout";
 import { RootState } from "./redux/store";
@@ -39,6 +40,8 @@ import UserRegister from "./pages/UserRegister";
 import UserProfile from "./pages/user/UserProfile";
 import VendorSupport from "./pages/vendor/VendorSupport";
 import AdminSupport from "./pages/admin/AdminSupport";
+import UsersManagement from "./pages/admin/UsersManagement";
+import SubscriptionLogs from "./pages/admin/SubscriptionLogs";
 
 const queryClient = new QueryClient();
 
@@ -96,8 +99,8 @@ const App = () => {
               }
             />
 
-            {/* ✅ Admin Routes (only if role = admin) */}
-            {user?.role === "admin" && (
+            {/* ✅ Admin Routes (only if role = admin or super_admin) */}
+            {(user?.role === "admin" || user?.role === "super_admin") && (
               <Route
                 path="/admin"
                 element={
@@ -118,7 +121,9 @@ const App = () => {
                   path="vendors"
                   element={
                     <PrivateRoute>
-                      <VendorManagement />
+                      <ProtectedRoute requiredPermission="manageVendors">
+                        <VendorManagement />
+                      </ProtectedRoute>
                     </PrivateRoute>
                   }
                 />
@@ -126,7 +131,9 @@ const App = () => {
                   path="add-blog"
                   element={
                     <PrivateRoute>
-                      <AddBlog />
+                      <ProtectedRoute requiredPermission="blogs">
+                        <AddBlog />
+                      </ProtectedRoute>
                     </PrivateRoute>
                   }
                 />
@@ -134,7 +141,9 @@ const App = () => {
                   path="get-blog"
                   element={
                     <PrivateRoute>
-                      <GetBlog />
+                      <ProtectedRoute requiredPermission="blogs">
+                        <GetBlog />
+                      </ProtectedRoute>
                     </PrivateRoute>
                   }
                 />
@@ -142,7 +151,9 @@ const App = () => {
                   path="businesses"
                   element={
                     <PrivateRoute>
-                      <BusinessManagement />
+                      <ProtectedRoute requiredPermission="editBusiness">
+                        <BusinessManagement />
+                      </ProtectedRoute>
                     </PrivateRoute>
                   }
                 />
@@ -150,7 +161,39 @@ const App = () => {
                   path="support"
                   element={
                     <PrivateRoute>
-                      <AdminSupport />
+                      <ProtectedRoute requiredPermission="supportCenter">
+                        <AdminSupport />
+                      </ProtectedRoute>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="users"
+                  element={
+                    <PrivateRoute>
+                      <ProtectedRoute requiredPermission="manageUsers">
+                        <UsersManagement />
+                      </ProtectedRoute>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="subscription-logs"
+                  element={
+                    <PrivateRoute>
+                      <ProtectedRoute requiredPermission="subscriptionLogs">
+                        <SubscriptionLogs />
+                      </ProtectedRoute>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="add-business"
+                  element={
+                    <PrivateRoute>
+                      <ProtectedRoute requiredPermission="addBusiness">
+                        <AddBusiness />
+                      </ProtectedRoute>
                     </PrivateRoute>
                   }
                 />

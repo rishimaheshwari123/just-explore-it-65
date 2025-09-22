@@ -39,6 +39,7 @@ import { imageUpload } from "@/service/operations/image";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import GooglePlacesAutocomplete from "./GooglePlacesAutocomplete";
+import { getAllVendorAPI } from "@/service/operations/vendor";
 
 interface BusinessFormData {
   businessName: string;
@@ -48,6 +49,7 @@ interface BusinessFormData {
   businessType: string;
   establishedYear: string;
   employeeCount: string;
+  selectedVendor?: string; // Add vendor selection field for admin
   address: {
     street: string;
     area: string;
@@ -447,8 +449,24 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
   const [newTag, setNewTag] = useState("");
   const [newKeyword, setNewKeyword] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [vendors, setVendors] = useState<any[]>([]);
 
   // Removed unused state variables for hardcoded city suggestions
+
+  // Fetch vendors for admin dropdown
+  useEffect(() => {
+    if (user?.role === "admin" || user?.role === "super_admin") {
+      const fetchVendors = async () => {
+        try {
+          const vendorList = await getAllVendorAPI();
+          setVendors(vendorList);
+        } catch (error) {
+          console.error("Error fetching vendors:", error);
+        }
+      };
+      fetchVendors();
+    }
+  }, [user?.role]);
 
   // Load business data for edit mode
   useEffect(() => {
@@ -977,8 +995,32 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
                 />
               </div>
 
+              {/* Vendor Selection for Admin */}
+              {(user?.role === "admin" || user?.role === "super_admin") && (
+                <div>
+                  <Label htmlFor="selectedVendor">Select Vendor *</Label>
+                  <Select
+                    value={formData.selectedVendor || ""}
+                    onValueChange={(value) =>
+                      handleInputChange("root", "selectedVendor", value)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select vendor for this business" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {vendors.map((vendor) => (
+                        <SelectItem key={vendor._id} value={vendor._id}>
+                          {vendor.name} - {vendor.email}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               <div>
-                <Label htmlFor="category">Category *</Label>
+                <Label htmlFor="category">Business Category *</Label>
                 <Select
                   value={formData.category}
                   onValueChange={(value) => {

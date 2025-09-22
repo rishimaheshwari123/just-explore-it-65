@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowLeft } from 'lucide-react';
+import { userRegister } from '../service/operations/userAuth';
 
 const UserRegister: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -49,31 +50,15 @@ const UserRegister: React.FC = () => {
     setLoading(true);
     
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://just-explore-it-65.onrender.com/api/v1";
-      const response = await fetch(`${BASE_URL}/auth/user/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          password: formData.password
-        }),
+      await userRegister({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password
       });
-
-      const data = await response.json();
-
-      if (data.success) {
-        toast.success('Registration successful! Please login to continue.');
-        navigate('/user/login');
-      } else {
-        toast.error(data.message || 'Registration failed');
-      }
+      navigate('/user/login');
     } catch (error) {
-      console.error('Registration error:', error);
-      toast.error('Something went wrong. Please try again.');
+      // Error handling is done in userRegister function
     } finally {
       setLoading(false);
     }

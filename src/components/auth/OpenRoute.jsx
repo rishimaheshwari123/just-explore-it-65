@@ -8,7 +8,7 @@ function OpenRoute({ children }) {
     return children;
   }
 
-  if (user?.role === "admin") {
+  if (user?.role === "admin" || user?.role === "super_admin") {
     return <Navigate to="/admin/dashboard" />;
   }
   if (user?.role === "vendor") {

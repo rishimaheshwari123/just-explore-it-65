@@ -14,9 +14,13 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // Routes
 const propertyRoutes = require('./routes/propertyRoutes');
 const vendorRoutes = require('./routes/vendorRoutes');
+const authRoutes = require('./routes/authRoute');
+const userRoutes = require('./routes/userRoute');
 
 app.use('/api/v1/property', propertyRoutes);
 app.use('/api/vendor', vendorRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/auth/user', userRoutes);
 
 // Health check route
 app.get('/api/health', (req, res) => {
