@@ -84,7 +84,7 @@ const BusinessDetail = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:8000/api/v1/property/business/${id}`
+        `https://just-explore-it-65.onrender.com/api/v1/property/business/${id}`
       );
       const data = await response.json();
 
@@ -109,7 +109,7 @@ const BusinessDetail = () => {
   const trackInteraction = async (type: string) => {
     try {
       await fetch(
-        `http://localhost:8000/api/v1/property/business/${id}/track-interaction`,
+        `https://just-explore-it-65.onrender.com/api/v1/property/business/${id}/track-interaction`,
         {
           method: "POST",
           headers: {

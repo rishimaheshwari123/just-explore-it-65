@@ -212,11 +212,11 @@ const BusinessListing = () => {
 
       console.log(
         "API URL:",
-        `http://localhost:8000/api/v1/property/businesses?${params.toString()}`
+        `https://just-explore-it-65.onrender.com/api/v1/property/businesses?${params.toString()}`
       );
 
       const response = await fetch(
-        `http://localhost:8000/api/v1/property/businesses?${params.toString()}`
+        `https://just-explore-it-65.onrender.com/api/v1/property/businesses?${params.toString()}`
       );
       const data = await response.json();
 
@@ -254,7 +254,7 @@ const BusinessListing = () => {
   const handleCall = (phone: string, businessId: string) => {
     // Track call interaction
     fetch(
-      `http://localhost:8000/api/v1/property/business/${businessId}/interaction`,
+      `https://just-explore-it-65.onrender.com/api/v1/property/business/${businessId}/interaction`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -289,12 +289,13 @@ const BusinessListing = () => {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`h-4 w-4 ${i < Math.floor(rating)
-          ? "text-yellow-400 fill-yellow-400"
-          : i < rating
+        className={`h-4 w-4 ${
+          i < Math.floor(rating)
+            ? "text-yellow-400 fill-yellow-400"
+            : i < rating
             ? "text-yellow-400 fill-yellow-400/50"
             : "text-gray-300"
-          }`}
+        }`}
       />
     ));
   };
@@ -336,8 +337,9 @@ const BusinessListing = () => {
 
           <div className="absolute top-2 right-2">
             <Badge
-              className={`text-xs ${isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                }`}
+              className={`text-xs ${
+                isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
+              }`}
             >
               <Clock className="h-3 w-3 mr-1" />
               {isOpen ? "Open" : "Closed"}
@@ -456,8 +458,9 @@ const BusinessListing = () => {
                 </div>
 
                 <Badge
-                  className={`text-xs ${isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
-                    }`}
+                  className={`text-xs ${
+                    isOpen ? "bg-green-500 text-white" : "bg-red-500 text-white"
+                  }`}
                 >
                   <Clock className="h-3 w-3 mr-1" />
                   {isOpen ? "Open" : "Closed"}

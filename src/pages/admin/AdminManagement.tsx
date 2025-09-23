@@ -1,44 +1,82 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
-import { 
-  Shield, 
-  Search, 
-  Filter, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  MoreHorizontal, 
-  Calendar, 
-  Mail, 
-  User, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import {
+  Shield,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  Trash2,
+  MoreHorizontal,
+  Calendar,
+  Mail,
+  User,
   UserPlus,
   Download,
   RefreshCw,
   CheckCircle,
   XCircle,
   Clock,
-  Settings
-} from 'lucide-react';
-import { format } from 'date-fns';
-import { getAllUsersAPI, deleteUserAPI, editPermissionAPI } from '../../service/operations/auth';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+  Settings,
+} from "lucide-react";
+import { format } from "date-fns";
+import {
+  getAllUsersAPI,
+  deleteUserAPI,
+  editPermissionAPI,
+} from "../../service/operations/auth";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface AdminData {
   _id: string;
   name: string;
   email: string;
-  role: 'super_admin' | 'admin';
+  role: "super_admin" | "admin";
   createdAt: string;
   permissions: {
     manageVendors: boolean;
@@ -56,8 +94,8 @@ interface AdminData {
 const AdminManagement = () => {
   const [admins, setAdmins] = useState<AdminData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
   const [isAddAdminOpen, setIsAddAdminOpen] = useState(false);
   const [isEditAdminOpen, setIsEditAdminOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState<AdminData | null>(null);
@@ -65,10 +103,10 @@ const AdminManagement = () => {
 
   // Add Admin Form State
   const [newAdmin, setNewAdmin] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'admin',
+    name: "",
+    email: "",
+    password: "",
+    role: "admin",
     permissions: {
       manageVendors: false,
       addBusiness: false,
@@ -78,7 +116,7 @@ const AdminManagement = () => {
       manageUsers: false,
       subscriptionLogs: false,
       exportData: false,
-    }
+    },
   });
 
   // Fetch admins
@@ -87,12 +125,13 @@ const AdminManagement = () => {
       setLoading(true);
       const response = await getAllUsersAPI();
       // Filter only admin and super_admin roles
-      const adminUsers = response.filter((user: AdminData) => 
-        user.role === 'admin' || user.role === 'super_admin'
+      const adminUsers = response.filter(
+        (user: AdminData) =>
+          user.role === "admin" || user.role === "super_admin"
       );
       setAdmins(adminUsers);
     } catch (error) {
-      toast.error('Failed to fetch admins');
+      toast.error("Failed to fetch admins");
     } finally {
       setLoading(false);
     }
@@ -103,10 +142,11 @@ const AdminManagement = () => {
   }, []);
 
   // Filter admins
-  const filteredAdmins = admins.filter(admin => {
-    const matchesSearch = admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         admin.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = roleFilter === 'all' || admin.role === roleFilter;
+  const filteredAdmins = admins.filter((admin) => {
+    const matchesSearch =
+      admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      admin.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = roleFilter === "all" || admin.role === roleFilter;
     return matchesSearch && matchesRole;
   });
 
@@ -115,29 +155,32 @@ const AdminManagement = () => {
     e.preventDefault();
     try {
       // Call register API to create admin
-      const response = await fetch('http://localhost:8000/api/v1/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          name: newAdmin.name,
-          email: newAdmin.email,
-          password: newAdmin.password,
-          role: newAdmin.role,
-          permissions: newAdmin.permissions
-        })
-      });
+      const response = await fetch(
+        "https://just-explore-it-65.onrender.com/api/v1/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            name: newAdmin.name,
+            email: newAdmin.email,
+            password: newAdmin.password,
+            role: newAdmin.role,
+            permissions: newAdmin.permissions,
+          }),
+        }
+      );
 
       if (response.ok) {
-        toast.success('Admin added successfully');
+        toast.success("Admin added successfully");
         setIsAddAdminOpen(false);
         setNewAdmin({
-          name: '',
-          email: '',
-          password: '',
-          role: 'admin',
+          name: "",
+          email: "",
+          password: "",
+          role: "admin",
           permissions: {
             manageVendors: false,
             addBusiness: false,
@@ -147,14 +190,14 @@ const AdminManagement = () => {
             manageUsers: false,
             subscriptionLogs: false,
             exportData: false,
-          }
+          },
         });
         fetchAdmins();
       } else {
-        throw new Error('Failed to create admin');
+        throw new Error("Failed to create admin");
       }
     } catch (error) {
-      toast.error('Failed to add admin');
+      toast.error("Failed to add admin");
     }
   };
 
@@ -168,14 +211,14 @@ const AdminManagement = () => {
         name: selectedAdmin.name,
         email: selectedAdmin.email,
         role: selectedAdmin.role,
-        permissions: selectedAdmin.permissions
+        permissions: selectedAdmin.permissions,
       });
-      toast.success('Admin updated successfully');
+      toast.success("Admin updated successfully");
       setIsEditAdminOpen(false);
       setSelectedAdmin(null);
       fetchAdmins();
     } catch (error) {
-      toast.error('Failed to update admin');
+      toast.error("Failed to update admin");
     }
   };
 
@@ -185,49 +228,49 @@ const AdminManagement = () => {
 
     try {
       await deleteUserAPI(deleteAdminId);
-      toast.success('Admin deleted successfully');
+      toast.success("Admin deleted successfully");
       setDeleteAdminId(null);
       fetchAdmins();
     } catch (error) {
-      toast.error('Failed to delete admin');
+      toast.error("Failed to delete admin");
     }
   };
 
   // Export to PDF
   const exportToPDF = () => {
     const doc = new jsPDF();
-    doc.text('Admin Management Report', 20, 20);
-    
-    const tableData = filteredAdmins.map(admin => [
+    doc.text("Admin Management Report", 20, 20);
+
+    const tableData = filteredAdmins.map((admin) => [
       admin.name,
       admin.email,
       admin.role,
-      format(new Date(admin.createdAt), 'dd/MM/yyyy'),
-      Object.values(admin.permissions).filter(Boolean).length.toString()
+      format(new Date(admin.createdAt), "dd/MM/yyyy"),
+      Object.values(admin.permissions).filter(Boolean).length.toString(),
     ]);
 
     autoTable(doc, {
-      head: [['Name', 'Email', 'Role', 'Created', 'Permissions']],
+      head: [["Name", "Email", "Role", "Created", "Permissions"]],
       body: tableData,
       startY: 30,
     });
 
-    doc.save('admin-management-report.pdf');
-    toast.success('Report exported successfully');
+    doc.save("admin-management-report.pdf");
+    toast.success("Report exported successfully");
   };
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
-      case 'super_admin':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'admin':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case "super_admin":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "admin":
+        return "bg-blue-100 text-blue-800 border-blue-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
-  const getPermissionCount = (permissions: AdminData['permissions']) => {
+  const getPermissionCount = (permissions: AdminData["permissions"]) => {
     return Object.values(permissions).filter(Boolean).length;
   };
 
@@ -240,9 +283,11 @@ const AdminManagement = () => {
             <Shield className="h-8 w-8 text-blue-600" />
             Admin Management
           </h1>
-          <p className="text-gray-600 mt-1">Manage admin and super admin accounts</p>
+          <p className="text-gray-600 mt-1">
+            Manage admin and super admin accounts
+          </p>
         </div>
-        
+
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={exportToPDF}
@@ -252,7 +297,7 @@ const AdminManagement = () => {
             <Download className="h-4 w-4" />
             Export PDF
           </Button>
-          
+
           <Button
             onClick={fetchAdmins}
             variant="outline"
@@ -276,7 +321,7 @@ const AdminManagement = () => {
                   Create a new admin account with specific permissions
                 </DialogDescription>
               </DialogHeader>
-              
+
               <form onSubmit={handleAddAdmin} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -284,7 +329,9 @@ const AdminManagement = () => {
                     <Input
                       id="name"
                       value={newAdmin.name}
-                      onChange={(e) => setNewAdmin({...newAdmin, name: e.target.value})}
+                      onChange={(e) =>
+                        setNewAdmin({ ...newAdmin, name: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -294,7 +341,9 @@ const AdminManagement = () => {
                       id="email"
                       type="email"
                       value={newAdmin.email}
-                      onChange={(e) => setNewAdmin({...newAdmin, email: e.target.value})}
+                      onChange={(e) =>
+                        setNewAdmin({ ...newAdmin, email: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -307,7 +356,9 @@ const AdminManagement = () => {
                       id="password"
                       type="password"
                       value={newAdmin.password}
-                      onChange={(e) => setNewAdmin({...newAdmin, password: e.target.value})}
+                      onChange={(e) =>
+                        setNewAdmin({ ...newAdmin, password: e.target.value })
+                      }
                       required
                     />
                   </div>
@@ -315,7 +366,9 @@ const AdminManagement = () => {
                     <Label htmlFor="role">Role</Label>
                     <Select
                       value={newAdmin.role}
-                      onValueChange={(value) => setNewAdmin({...newAdmin, role: value})}
+                      onValueChange={(value) =>
+                        setNewAdmin({ ...newAdmin, role: value })
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -332,26 +385,30 @@ const AdminManagement = () => {
                 <div>
                   <Label className="text-base font-medium">Permissions</Label>
                   <div className="grid grid-cols-2 gap-3 mt-2">
-                    {Object.entries(newAdmin.permissions).map(([key, value]) => (
-                      <div key={key} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id={key}
-                          checked={value}
-                          onChange={(e) => setNewAdmin({
-                            ...newAdmin,
-                            permissions: {
-                              ...newAdmin.permissions,
-                              [key]: e.target.checked
+                    {Object.entries(newAdmin.permissions).map(
+                      ([key, value]) => (
+                        <div key={key} className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={key}
+                            checked={value}
+                            onChange={(e) =>
+                              setNewAdmin({
+                                ...newAdmin,
+                                permissions: {
+                                  ...newAdmin.permissions,
+                                  [key]: e.target.checked,
+                                },
+                              })
                             }
-                          })}
-                          className="rounded border-gray-300"
-                        />
-                        <Label htmlFor={key} className="text-sm capitalize">
-                          {key.replace(/([A-Z])/g, ' $1').trim()}
-                        </Label>
-                      </div>
-                    ))}
+                            className="rounded border-gray-300"
+                          />
+                          <Label htmlFor={key} className="text-sm capitalize">
+                            {key.replace(/([A-Z])/g, " $1").trim()}
+                          </Label>
+                        </div>
+                      )
+                    )}
                   </div>
                 </div>
 
@@ -377,8 +434,12 @@ const AdminManagement = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Admins</p>
-                <p className="text-2xl font-bold text-gray-900">{admins.length}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Admins
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {admins.length}
+                </p>
               </div>
               <Shield className="h-8 w-8 text-blue-600" />
             </div>
@@ -389,9 +450,14 @@ const AdminManagement = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Super Admins</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Super Admins
+                </p>
                 <p className="text-2xl font-bold text-red-600">
-                  {admins.filter(admin => admin.role === 'super_admin').length}
+                  {
+                    admins.filter((admin) => admin.role === "super_admin")
+                      .length
+                  }
                 </p>
               </div>
               <Settings className="h-8 w-8 text-red-600" />
@@ -403,9 +469,11 @@ const AdminManagement = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Regular Admins</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Regular Admins
+                </p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {admins.filter(admin => admin.role === 'admin').length}
+                  {admins.filter((admin) => admin.role === "admin").length}
                 </p>
               </div>
               <User className="h-8 w-8 text-blue-600" />
@@ -417,11 +485,17 @@ const AdminManagement = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Active Today</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Active Today
+                </p>
                 <p className="text-2xl font-bold text-green-600">
-                  {admins.filter(admin => 
-                    new Date(admin.createdAt).toDateString() === new Date().toDateString()
-                  ).length}
+                  {
+                    admins.filter(
+                      (admin) =>
+                        new Date(admin.createdAt).toDateString() ===
+                        new Date().toDateString()
+                    ).length
+                  }
                 </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-600" />
@@ -445,7 +519,7 @@ const AdminManagement = () => {
                 />
               </div>
             </div>
-            
+
             <div className="flex gap-2">
               <Select value={roleFilter} onValueChange={setRoleFilter}>
                 <SelectTrigger className="w-40">
@@ -497,7 +571,9 @@ const AdminManagement = () => {
                             {admin.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900">{admin.name}</p>
+                            <p className="font-medium text-gray-900">
+                              {admin.name}
+                            </p>
                             <p className="text-sm text-gray-500 flex items-center gap-1">
                               <Mail className="h-3 w-3" />
                               {admin.email}
@@ -507,7 +583,9 @@ const AdminManagement = () => {
                       </TableCell>
                       <TableCell>
                         <Badge className={getRoleBadgeColor(admin.role)}>
-                          {admin.role === 'super_admin' ? 'Super Admin' : 'Admin'}
+                          {admin.role === "super_admin"
+                            ? "Super Admin"
+                            : "Admin"}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -516,10 +594,13 @@ const AdminManagement = () => {
                             {getPermissionCount(admin.permissions)}/8
                           </span>
                           <div className="w-16 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className="bg-blue-600 h-2 rounded-full" 
-                              style={{ 
-                                width: `${(getPermissionCount(admin.permissions) / 8) * 100}%` 
+                            <div
+                              className="bg-blue-600 h-2 rounded-full"
+                              style={{
+                                width: `${
+                                  (getPermissionCount(admin.permissions) / 8) *
+                                  100
+                                }%`,
                               }}
                             ></div>
                           </div>
@@ -528,7 +609,7 @@ const AdminManagement = () => {
                       <TableCell>
                         <div className="flex items-center gap-1 text-sm text-gray-500">
                           <Calendar className="h-3 w-3" />
-                          {format(new Date(admin.createdAt), 'dd/MM/yyyy')}
+                          {format(new Date(admin.createdAt), "dd/MM/yyyy")}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -576,7 +657,7 @@ const AdminManagement = () => {
               Update admin details and permissions for {selectedAdmin?.name}
             </DialogDescription>
           </DialogHeader>
-          
+
           {selectedAdmin && (
             <form onSubmit={handleEditAdmin} className="space-y-4">
               {/* Basic Info */}
@@ -586,10 +667,12 @@ const AdminManagement = () => {
                   <Input
                     id="edit-name"
                     value={selectedAdmin.name}
-                    onChange={(e) => setSelectedAdmin({
-                      ...selectedAdmin,
-                      name: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setSelectedAdmin({
+                        ...selectedAdmin,
+                        name: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
@@ -599,10 +682,12 @@ const AdminManagement = () => {
                     id="edit-email"
                     type="email"
                     value={selectedAdmin.email}
-                    onChange={(e) => setSelectedAdmin({
-                      ...selectedAdmin,
-                      email: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setSelectedAdmin({
+                        ...selectedAdmin,
+                        email: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
@@ -612,10 +697,12 @@ const AdminManagement = () => {
                 <Label htmlFor="edit-role">Role</Label>
                 <Select
                   value={selectedAdmin.role}
-                  onValueChange={(value) => setSelectedAdmin({
-                    ...selectedAdmin,
-                    role: value as 'admin' | 'super_admin'
-                  })}
+                  onValueChange={(value) =>
+                    setSelectedAdmin({
+                      ...selectedAdmin,
+                      role: value as "admin" | "super_admin",
+                    })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -631,26 +718,33 @@ const AdminManagement = () => {
               <div>
                 <Label className="text-base font-medium">Permissions</Label>
                 <div className="grid grid-cols-2 gap-3 mt-2">
-                  {Object.entries(selectedAdmin.permissions).map(([key, value]) => (
-                    <div key={key} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id={`edit-${key}`}
-                        checked={value}
-                        onChange={(e) => setSelectedAdmin({
-                          ...selectedAdmin,
-                          permissions: {
-                            ...selectedAdmin.permissions,
-                            [key]: e.target.checked
+                  {Object.entries(selectedAdmin.permissions).map(
+                    ([key, value]) => (
+                      <div key={key} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`edit-${key}`}
+                          checked={value}
+                          onChange={(e) =>
+                            setSelectedAdmin({
+                              ...selectedAdmin,
+                              permissions: {
+                                ...selectedAdmin.permissions,
+                                [key]: e.target.checked,
+                              },
+                            })
                           }
-                        })}
-                        className="rounded border-gray-300"
-                      />
-                      <Label htmlFor={`edit-${key}`} className="text-sm capitalize">
-                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                      </Label>
-                    </div>
-                  ))}
+                          className="rounded border-gray-300"
+                        />
+                        <Label
+                          htmlFor={`edit-${key}`}
+                          className="text-sm capitalize"
+                        >
+                          {key.replace(/([A-Z])/g, " $1").trim()}
+                        </Label>
+                      </div>
+                    )
+                  )}
                 </div>
               </div>
 
@@ -673,12 +767,16 @@ const AdminManagement = () => {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteAdminId} onOpenChange={() => setDeleteAdminId(null)}>
+      <AlertDialog
+        open={!!deleteAdminId}
+        onOpenChange={() => setDeleteAdminId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Admin</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this admin? This action cannot be undone.
+              Are you sure you want to delete this admin? This action cannot be
+              undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
