@@ -1,8 +1,25 @@
-import React, { useState } from 'react';
-import { Star, Phone, MessageCircle, Navigation, Globe, Clock, MapPin, Shield, Camera, Users, Calendar, Award, Heart, Share2, Eye, MessageSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import BusinessInquiryModal from '@/components/BusinessInquiryModal';
+import React, { useState } from "react";
+import {
+  Star,
+  Phone,
+  MessageCircle,
+  Navigation,
+  Globe,
+  Clock,
+  MapPin,
+  Shield,
+  Camera,
+  Users,
+  Calendar,
+  Award,
+  Heart,
+  Share2,
+  Eye,
+  MessageSquare,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import BusinessInquiryModal from "@/components/BusinessInquiryModal";
 
 interface Business {
   _id: string;
@@ -101,23 +118,24 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
     analytics,
     priceRange,
     features,
-    isPremium
+    isPremium,
   } = business;
 
-  // Helper functions
   const getCurrentStatus = () => {
     const now = new Date();
-    const currentDay = now.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+    const currentDay = now
+      .toLocaleDateString("en-US", { weekday: "long" })
+      .toLowerCase();
     const currentTime = now.toTimeString().slice(0, 5);
-    
+
     const todayHours = businessHours[currentDay];
     if (!todayHours || todayHours.isClosed) {
-      return { isOpen: false, message: 'Closed today' };
+      return { isOpen: false, message: "Closed today" };
     }
-    
+
     const openTime = todayHours.open;
     const closeTime = todayHours.close;
-    
+
     if (currentTime >= openTime && currentTime <= closeTime) {
       return { isOpen: true, message: `Open until ${closeTime}` };
     } else {
@@ -126,27 +144,47 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
   };
 
   const status = getCurrentStatus();
-  const primaryImage = images.find(img => img.isPrimary)?.url || images[0]?.url || '/placeholder.svg';
+  const primaryImage =
+    images.find((img) => img.isPrimary)?.url ||
+    images[0]?.url ||
+    "/placeholder.svg";
   const fullAddress = `${address.area}, ${address.city}, ${address.state}`;
   const [isLiked, setIsLiked] = useState(false);
   const [showFullHours, setShowFullHours] = useState(false);
+
   const handleCall = () => {
-    window.open(`tel:${contactInfo.primaryPhone}`, '_self');
+    window.open(`tel:${contactInfo.primaryPhone}`, "_self");
   };
 
   const handleWhatsApp = () => {
-    const message = encodeURIComponent(`Hi, I found your business ${businessName} on our platform. I'm interested in your services.`);
-    window.open(`https://wa.me/${contactInfo.primaryPhone.replace(/[^0-9]/g, '')}?text=${message}`, '_blank');
+    const message = encodeURIComponent(
+      `Hi, I found your business ${businessName} on our platform. I'm interested in your services.`
+    );
+    window.open(
+      `https://wa.me/${contactInfo.primaryPhone.replace(
+        /[^0-9]/g,
+        ""
+      )}?text=${message}`,
+      "_blank"
+    );
   };
 
   const handleDirections = () => {
     const encodedAddress = encodeURIComponent(fullAddress);
-    window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+    window.open(
+      `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`,
+      "_blank"
+    );
   };
 
   const handleWebsite = () => {
     if (contactInfo.website) {
-      window.open(contactInfo.website.startsWith('http') ? contactInfo.website : `https://${contactInfo.website}`, '_blank');
+      window.open(
+        contactInfo.website.startsWith("http")
+          ? contactInfo.website
+          : `https://${contactInfo.website}`,
+        "_blank"
+      );
     }
   };
 
@@ -159,7 +197,7 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
       navigator.share({
         title: businessName,
         text: `Check out ${businessName} - ${description}`,
-        url: window.location.href
+        url: window.location.href,
       });
     } else {
       navigator.clipboard.writeText(window.location.href);
@@ -172,17 +210,17 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
         key={index}
         className={`h-4 w-4 ${
           index < Math.floor(rating)
-            ? 'text-yellow-400 fill-yellow-400'
+            ? "text-yellow-400 fill-yellow-400"
             : index < rating
-            ? 'text-yellow-400 fill-yellow-400/50'
-            : 'text-gray-300'
+            ? "text-yellow-400 fill-yellow-400/50"
+            : "text-gray-300"
         }`}
       />
     ));
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group">
+    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group relative">
       {/* Premium Badge */}
       {isPremium && (
         <div className="absolute top-2 left-2 z-10">
@@ -205,8 +243,7 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
               />
               {images.length > 1 && (
                 <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded-lg text-xs flex items-center">
-                  <Camera className="h-3 w-3 mr-1" />
-                  +{images.length - 1}
+                  <Camera className="h-3 w-3 mr-1" />+{images.length - 1}
                 </div>
               )}
             </div>
@@ -216,7 +253,7 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
             <Camera className="h-12 w-12" />
           </div>
         )}
-        
+
         {/* Verification Badge */}
         {verification.isVerified && (
           <div className="absolute top-2 right-2">
@@ -229,7 +266,11 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
 
         {/* Open/Closed Status */}
         <div className="absolute bottom-2 left-2">
-          <Badge className={`${status.isOpen ? 'bg-green-600' : 'bg-red-600'} text-white`}>
+          <Badge
+            className={`${
+              status.isOpen ? "bg-green-600" : "bg-red-600"
+            } text-white`}
+          >
             <Clock className="h-3 w-3 mr-1" />
             {status.message}
           </Badge>
@@ -237,7 +278,9 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
       </div>
 
       {/* Content */}
-      <div className="p-4">
+      <div className="p-4 pb-[110px]">
+        {" "}
+        {/* Adjusted padding to make space for the buttons */}
         {/* Header */}
         <div className="flex justify-between items-start mb-2">
           <div className="flex-1">
@@ -253,9 +296,13 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
           <div className="text-right">
             <div className="flex items-center mb-1">
               {renderStars(ratings.average)}
-              <span className="ml-1 text-sm font-semibold text-gray-700">{ratings.average.toFixed(1)}</span>
+              <span className="ml-1 text-sm font-semibold text-gray-700">
+                {ratings.average.toFixed(1)}
+              </span>
             </div>
-            <p className="text-xs text-gray-500">({ratings.totalReviews} reviews)</p>
+            <p className="text-xs text-gray-500">
+              ({ratings.totalReviews} reviews)
+            </p>
             {analytics.totalViews > 0 && (
               <div className="flex items-center text-xs text-gray-500 mt-1">
                 <Eye className="h-3 w-3 mr-1" />
@@ -264,7 +311,6 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
             )}
           </div>
         </div>
-
         {/* Business Info Bar */}
         <div className="flex items-center justify-between mb-3 p-2 bg-gray-50 rounded-lg">
           <div className="flex items-center space-x-4 text-xs text-gray-600">
@@ -279,23 +325,33 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
             )}
           </div>
           <div className="flex items-center space-x-2">
-            <button onClick={handleLike} className="flex items-center text-xs text-gray-600 hover:text-red-500">
-              <Heart className={`h-3 w-3 mr-1 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+            <button
+              onClick={handleLike}
+              className="flex items-center text-xs text-gray-600 hover:text-red-500"
+            >
+              <Heart
+                className={`h-3 w-3 mr-1 ${
+                  isLiked ? "fill-red-500 text-red-500" : ""
+                }`}
+              />
               {analytics.totalCalls + (isLiked ? 1 : 0)}
             </button>
-            <button onClick={handleShare} className="flex items-center text-xs text-gray-600 hover:text-blue-500">
+            <button
+              onClick={handleShare}
+              className="flex items-center text-xs text-gray-600 hover:text-blue-500"
+            >
               <Share2 className="h-3 w-3" />
             </button>
           </div>
         </div>
-
         {/* Description */}
         <p className="text-sm text-gray-600 mb-3 line-clamp-2">{description}</p>
-
         {/* Services */}
         {services.length > 0 && (
           <div className="mb-3">
-            <h4 className="text-xs font-semibold text-gray-700 mb-1">Services:</h4>
+            <h4 className="text-xs font-semibold text-gray-700 mb-1">
+              Services:
+            </h4>
             <div className="flex flex-wrap gap-1">
               {services.slice(0, 3).map((service, index) => (
                 <Badge key={index} variant="secondary" className="text-xs">
@@ -310,11 +366,12 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
             </div>
           </div>
         )}
-
         {/* Features */}
         {features.length > 0 && (
           <div className="mb-3">
-            <h4 className="text-xs font-semibold text-gray-700 mb-1">Features:</h4>
+            <h4 className="text-xs font-semibold text-gray-700 mb-1">
+              Features:
+            </h4>
             <div className="flex flex-wrap gap-1">
               {features.slice(0, 4).map((feature, index) => (
                 <Badge key={index} variant="outline" className="text-xs">
@@ -329,14 +386,13 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
             </div>
           </div>
         )}
-
         {/* Location & Info */}
         <div className="space-y-2 mb-4">
           <div className="flex items-center text-sm text-gray-600">
             <MapPin className="h-4 w-4 mr-2 text-blue-600" />
             <span className="flex-1 truncate">{fullAddress}</span>
           </div>
-          
+
           {/* Business Hours */}
           <div className="bg-gray-50 p-2 rounded-lg">
             <div className="flex items-center justify-between text-sm">
@@ -346,22 +402,28 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
               </div>
               <span className="text-green-600 font-semibold">{priceRange}</span>
             </div>
-            
+
             <div className="mt-2">
-              <button 
+              <button
                 onClick={() => setShowFullHours(!showFullHours)}
                 className="text-xs text-blue-600 hover:text-blue-800"
               >
-                {showFullHours ? 'Hide' : 'Show'} all hours
+                {showFullHours ? "Hide" : "Show"} all hours
               </button>
-              
+
               {showFullHours && (
                 <div className="mt-2 space-y-1">
                   {Object.entries(businessHours).map(([day, hours]) => (
                     <div key={day} className="flex justify-between text-xs">
                       <span className="capitalize font-medium">{day}:</span>
-                      <span className={!hours.isClosed ? 'text-green-600' : 'text-red-600'}>
-                        {!hours.isClosed ? `${hours.open} - ${hours.close}` : 'Closed'}
+                      <span
+                        className={
+                          !hours.isClosed ? "text-green-600" : "text-red-600"
+                        }
+                      >
+                        {!hours.isClosed
+                          ? `${hours.open} - ${hours.close}`
+                          : "Closed"}
                       </span>
                     </div>
                   ))}
@@ -369,7 +431,7 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
               )}
             </div>
           </div>
-          
+
           {/* Contact Info */}
           <div className="text-xs text-gray-600">
             <span className="font-medium">Phone: </span>
@@ -382,56 +444,56 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
             )}
           </div>
         </div>
+      </div>
 
-        {/* Action Buttons */}
-        <div className="space-y-2">
-          <div className="grid grid-cols-4 gap-2">
+      {/* Action Buttons fixed at the bottom of the card */}
+      <div className="absolute bottom-0 left-0 w-full p-4 bg-white border-t border-gray-200 z-10">
+        <div className="grid grid-cols-4 gap-2 mb-2">
+          <Button
+            onClick={handleCall}
+            size="sm"
+            className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center"
+          >
+            <Phone className="h-4 w-4" />
+          </Button>
+          <Button
+            onClick={handleWhatsApp}
+            size="sm"
+            className="bg-green-500 hover:bg-green-600 text-white flex items-center justify-center"
+          >
+            <MessageCircle className="h-4 w-4" />
+          </Button>
+          <Button
+            onClick={handleDirections}
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center"
+          >
+            <Navigation className="h-4 w-4" />
+          </Button>
+          {contactInfo.website && (
             <Button
-              onClick={handleCall}
+              onClick={handleWebsite}
               size="sm"
-              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center"
+              className="bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center"
             >
-              <Phone className="h-4 w-4" />
+              <Globe className="h-4 w-4" />
             </Button>
-            <Button
-              onClick={handleWhatsApp}
-              size="sm"
-              className="bg-green-500 hover:bg-green-600 text-white flex items-center justify-center"
-            >
-              <MessageCircle className="h-4 w-4" />
-            </Button>
-            <Button
-              onClick={handleDirections}
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center"
-            >
-              <Navigation className="h-4 w-4" />
-            </Button>
-            {contactInfo.website && (
-              <Button
-                onClick={handleWebsite}
-                size="sm"
-                className="bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center"
-              >
-                <Globe className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-          
-          {/* Send Inquiry Button */}
-          <BusinessInquiryModal 
-            business={business}
-            trigger={
-              <Button
-                size="sm"
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Send Inquiry
-              </Button>
-            }
-          />
+          )}
         </div>
+
+        {/* Send Inquiry Button */}
+        <BusinessInquiryModal
+          business={business}
+          trigger={
+            <Button
+              size="sm"
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Send Inquiry
+            </Button>
+          }
+        />
       </div>
     </div>
   );

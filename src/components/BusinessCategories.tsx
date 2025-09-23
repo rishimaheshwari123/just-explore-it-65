@@ -60,7 +60,7 @@ import {
   School,
   ShieldCheck,
   Plane,
-  Flower2 as Lotus
+  Flower2 as Lotus,
 } from "lucide-react";
 
 const BusinessCategories = () => {
@@ -76,7 +76,7 @@ const BusinessCategories = () => {
     "Advertising Agencies": { icon: Megaphone, color: "text-red-500" },
     "Agriculture Equipment & Seeds": { icon: Tractor, color: "text-green-600" },
     "Apparels / Garments": { icon: Shirt, color: "text-blue-500" },
-    "Automobiles": { icon: Car, color: "text-gray-600" },
+    Automobiles: { icon: Car, color: "text-gray-600" },
     "Automobile Spare Parts": { icon: Settings, color: "text-orange-500" },
     "Baby Care & Kids Stores": { icon: Baby, color: "text-pink-400" },
     "Banks & ATMs": { icon: CreditCard, color: "text-blue-600" },
@@ -93,23 +93,32 @@ const BusinessCategories = () => {
     "Courier & Cargo Services": { icon: Package, color: "text-brown-500" },
     "Dairy Products & Milk Suppliers": { icon: Milk, color: "text-white" },
     "Dance & Music Classes": { icon: Music, color: "text-purple-400" },
-    "Diagnostic Centres & Pathology Labs": { icon: Microscope, color: "text-teal-500" },
-    "Doctors (All Specializations)": { icon: Stethoscope, color: "text-red-600" },
-    "Dry Cleaners & Laundry Services": { icon: Laundry, color: "text-blue-300" },
+    "Diagnostic Centres & Pathology Labs": {
+      icon: Microscope,
+      color: "text-teal-500",
+    },
+    "Doctors (All Specializations)": {
+      icon: Stethoscope,
+      color: "text-red-600",
+    },
+    "Dry Cleaners & Laundry Services": {
+      icon: Laundry,
+      color: "text-blue-300",
+    },
     "Education Institutes": { icon: GraduationCap, color: "text-purple-500" },
-    "Electricians": { icon: Zap, color: "text-yellow-500" },
+    Electricians: { icon: Zap, color: "text-yellow-500" },
     "Electronics & Home Appliances": { icon: Tv, color: "text-gray-700" },
     "Event Organisers": { icon: Calendar, color: "text-orange-400" },
     "Eye Clinics & Opticians": { icon: Eye, color: "text-blue-700" },
     "Fast Food & Restaurants": { icon: Utensils, color: "text-red-500" },
     "Fitness Centres & Gyms": { icon: Dumbbell, color: "text-yellow-600" },
-    "Florists": { icon: Flower, color: "text-pink-600" },
+    Florists: { icon: Flower, color: "text-pink-600" },
     "Furniture Dealers & Home Decor": { icon: Sofa, color: "text-brown-600" },
     "Financial Services": { icon: DollarSign, color: "text-green-600" },
     "Gas Agencies": { icon: Fuel, color: "text-orange-600" },
     "Gift Shops": { icon: Gift, color: "text-red-400" },
     "Grocery Stores & Kirana": { icon: Store, color: "text-green-500" },
-    "Gynecologists": { icon: Heart, color: "text-pink-500" },
+    Gynecologists: { icon: Heart, color: "text-pink-500" },
     "Hardware & Sanitary Shops": { icon: Wrench, color: "text-gray-600" },
     "Hospitals & Nursing Homes": { icon: Hospital, color: "text-red-600" },
     "Hostels / PG Accommodation": { icon: Bed, color: "text-blue-500" },
@@ -121,28 +130,38 @@ const BusinessCategories = () => {
     "Insurance Agents": { icon: Shield, color: "text-green-700" },
     "Jewellery Shops": { icon: Gem, color: "text-yellow-400" },
     "Job Placement Agencies": { icon: Job, color: "text-gray-500" },
-    "Mobile Phone Dealers & Repair": { icon: Smartphone, color: "text-gray-800" },
+    "Mobile Phone Dealers & Repair": {
+      icon: Smartphone,
+      color: "text-gray-800",
+    },
     "Photographers & Videographers": { icon: Camera, color: "text-cyan-500" },
     "Property Dealers": { icon: MapPin, color: "text-red-700" },
-    "Pet Shops & Veterinary Clinics": { icon: PawPrint, color: "text-orange-500" },
+    "Pet Shops & Veterinary Clinics": {
+      icon: PawPrint,
+      color: "text-orange-500",
+    },
     "Real Estate Agents": { icon: Building, color: "text-blue-800" },
     "Schools & Colleges": { icon: School, color: "text-purple-600" },
     "Security Services & Guards": { icon: ShieldCheck, color: "text-red-800" },
     "Tour & Travel Agents": { icon: Plane, color: "text-sky-500" },
     "Wedding Planners": { icon: Heart, color: "text-pink-600" },
-    "Yoga Centres": { icon: Lotus, color: "text-green-400" }
+    "Yoga Centres": { icon: Lotus, color: "text-green-400" },
   };
 
   const categories = BUSINESS_CATEGORIES.map((categoryName) => ({
     name: categoryName,
-    icon: categoryIcons[categoryName as keyof typeof categoryIcons]?.icon || Briefcase,
-    color: categoryIcons[categoryName as keyof typeof categoryIcons]?.color || "text-gray-500",
+    icon:
+      categoryIcons[categoryName as keyof typeof categoryIcons]?.icon ||
+      Briefcase,
+    color:
+      categoryIcons[categoryName as keyof typeof categoryIcons]?.color ||
+      "text-gray-500",
   }));
 
   const visibleCategories = showAll ? categories : categories.slice(0, 10);
 
   return (
-    <section className="py-16 bg-gradient-to-br from-muted/30 via-background to-muted/20">
+    <section className=" bg-gradient-to-br from-muted/30 via-background to-muted/20">
       <div className="container mx-auto px-4">
         {/* Enhanced Header */}
         <div className="text-center mb-12">
@@ -150,7 +169,8 @@ const BusinessCategories = () => {
             Browse by Categories
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-            Explore our comprehensive range of business categories and find exactly what you're looking for
+            Explore our comprehensive range of business categories and find
+            exactly what you're looking for
           </p>
         </div>
 
@@ -173,16 +193,15 @@ const BusinessCategories = () => {
                 onClick={() => handleCategoryClick(category.name)}
               >
                 <div className="p-3 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md group-hover:shadow-lg transition-all duration-300">
-                  <IconComponent className={`${category.color} group-hover:scale-110 transition-transform duration-300`} />
+                  <IconComponent
+                    className={`${category.color} group-hover:scale-110 transition-transform duration-300`}
+                  />
                 </div>
-               <span
-  className="text-xs md:text-sm lg:text-base font-medium text-center w-full overflow-hidden relative"
->
-  <span className="inline-block whitespace-nowrap animate-marquee">
-    {category.name}
-  </span>
-</span>
-
+                <span className="text-xs md:text-sm lg:text-base font-medium text-center w-full overflow-hidden relative">
+                  <span className="inline-block whitespace-nowrap animate-marquee">
+                    {category.name}
+                  </span>
+                </span>
               </Button>
             );
           })}
@@ -191,8 +210,8 @@ const BusinessCategories = () => {
         {/* Enhanced More Button */}
         {!showAll && categories.length > 10 && (
           <div className="flex justify-center mt-10">
-            <Button 
-              onClick={() => setShowAll(true)} 
+            <Button
+              onClick={() => setShowAll(true)}
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             >
               View All Categories

@@ -22,7 +22,9 @@ const SearchSection = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [locationInput, setLocationInput] = useState("");
-  const [locationSuggestions, setLocationSuggestions] = useState<LocationSuggestion[]>([]);
+  const [locationSuggestions, setLocationSuggestions] = useState<
+    LocationSuggestion[]
+  >([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isGoogleMapsLoaded, setIsGoogleMapsLoaded] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -40,7 +42,7 @@ const SearchSection = () => {
         return;
       }
 
-      const script = document.createElement('script');
+      const script = document.createElement("script");
       script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyASz6Gqa5Oa3WialPx7Z6ebZTj02Liw-Gk&libraries=places`;
       script.async = true;
       script.onload = () => {
@@ -54,7 +56,7 @@ const SearchSection = () => {
 
   const handleLocationSearch = (query: string) => {
     setLocationInput(query);
-    
+
     if (!query.trim() || !isGoogleMapsLoaded) {
       setLocationSuggestions([]);
       setShowSuggestions(false);
@@ -65,16 +67,19 @@ const SearchSection = () => {
     service.getPlacePredictions(
       {
         input: query,
-        types: ['(cities)'],
-        componentRestrictions: { country: 'in' }
+        types: ["(cities)"],
+        componentRestrictions: { country: "in" },
       },
       (predictions, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-          const suggestions = predictions.map(prediction => ({
+        if (
+          status === window.google.maps.places.PlacesServiceStatus.OK &&
+          predictions
+        ) {
+          const suggestions = predictions.map((prediction) => ({
             name: prediction.description,
             lat: 0,
             lng: 0,
-            placeId: prediction.place_id
+            placeId: prediction.place_id,
           }));
           setLocationSuggestions(suggestions);
           setShowSuggestions(true);
@@ -94,25 +99,27 @@ const SearchSection = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (searchTerm) params.set('search', searchTerm);
-    if (selectedCategory && selectedCategory !== 'all') params.set('category', selectedCategory);
-    if (locationInput) params.set('location', locationInput);
-    if (priceRange && priceRange !== 'all') params.set('priceRange', priceRange);
-    if (rating && rating !== 'all') params.set('rating', rating);
-    if (distance && distance !== 'all') params.set('distance', distance);
-    if (openNow) params.set('openNow', 'true');
-    
+    if (searchTerm) params.set("search", searchTerm);
+    if (selectedCategory && selectedCategory !== "all")
+      params.set("category", selectedCategory);
+    if (locationInput) params.set("location", locationInput);
+    if (priceRange && priceRange !== "all")
+      params.set("priceRange", priceRange);
+    if (rating && rating !== "all") params.set("rating", rating);
+    if (distance && distance !== "all") params.set("distance", distance);
+    if (openNow) params.set("openNow", "true");
+
     window.location.href = `/business-listing?${params.toString()}`;
   };
 
   return (
-    <section className="relative bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 py-16 overflow-hidden">
+    <section className="relative bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 py-8 overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] opacity-50"></div>
       <div className="absolute top-0 left-1/4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
       <div className="absolute top-0 right-1/4 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
       <div className="absolute -bottom-8 left-1/3 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
-      
+
       <div className="relative max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent leading-tight">
@@ -120,11 +127,15 @@ const SearchSection = () => {
             <span className="block">Businesses Near You</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Search across thousands of verified businesses and find exactly what you're looking for
+            Search across thousands of verified businesses and find exactly what
+            you're looking for
           </p>
         </div>
 
-        <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4 bg-white/80 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/20 hover:shadow-3xl transition-all duration-300">
+        <form
+          onSubmit={handleSearch}
+          className="flex flex-col md:flex-row gap-4 bg-white/80 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/20 hover:shadow-3xl transition-all duration-300"
+        >
           {/* Search Input */}
           <div className="flex-[2] relative group">
             <Input
@@ -142,7 +153,7 @@ const SearchSection = () => {
               <Search className="h-5 w-5" />
             </Button>
           </div>
-          
+
           {/* Location Input with Autocomplete */}
           <div className="flex-1 relative group">
             <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
@@ -163,16 +174,18 @@ const SearchSection = () => {
                 if (navigator.geolocation) {
                   navigator.geolocation.getCurrentPosition(
                     (position) => {
-                      setLocationInput('Near Me');
+                      setLocationInput("Near Me");
                       setShowSuggestions(false);
                     },
                     (error) => {
-                      console.error('Error getting location:', error);
-                      alert('Unable to get your location. Please enter manually.');
+                      console.error("Error getting location:", error);
+                      alert(
+                        "Unable to get your location. Please enter manually."
+                      );
                     }
                   );
                 } else {
-                  alert('Geolocation is not supported by this browser.');
+                  alert("Geolocation is not supported by this browser.");
                 }
               }}
               className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 px-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all duration-300"
@@ -188,7 +201,9 @@ const SearchSection = () => {
                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
                     onClick={() => handleLocationSelect(suggestion)}
                   >
-                    <div className="font-medium text-gray-900">{suggestion.name}</div>
+                    <div className="font-medium text-gray-900">
+                      {suggestion.name}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -197,7 +212,10 @@ const SearchSection = () => {
 
           {/* Category Select */}
           <div className="flex-1 group">
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
               <SelectTrigger className="h-14 text-base bg-white/50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 group-hover:border-purple-300">
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
@@ -211,7 +229,7 @@ const SearchSection = () => {
               </SelectContent>
             </Select>
           </div>
-          
+
           {/* Desktop Search Button */}
           <div className="hidden md:block">
             <Button
@@ -223,7 +241,7 @@ const SearchSection = () => {
               Search Now
             </Button>
           </div>
-          
+
           {/* Search Button for Mobile */}
           <div className="md:hidden">
             <Button
@@ -246,7 +264,7 @@ const SearchSection = () => {
             className="bg-white/70 backdrop-blur-sm border-2 border-purple-200 hover:border-purple-400 text-purple-700 hover:bg-purple-50 rounded-xl px-6 py-2 transition-all duration-300"
           >
             <Filter className="h-4 w-4 mr-2" />
-            {showFilters ? 'Hide Filters' : 'Advanced Filters'}
+            {showFilters ? "Hide Filters" : "Advanced Filters"}
           </Button>
         </div>
 
@@ -323,9 +341,9 @@ const SearchSection = () => {
                   variant={openNow ? "default" : "outline"}
                   onClick={() => setOpenNow(!openNow)}
                   className={`w-full h-10 rounded-lg transition-all duration-300 ${
-                    openNow 
-                      ? 'bg-green-600 hover:bg-green-700 text-white' 
-                      : 'bg-white/80 border border-gray-300 text-gray-700 hover:bg-green-50'
+                    openNow
+                      ? "bg-green-600 hover:bg-green-700 text-white"
+                      : "bg-white/80 border border-gray-300 text-gray-700 hover:bg-green-50"
                   }`}
                 >
                   <Clock className="h-4 w-4 mr-2" />
@@ -340,9 +358,9 @@ const SearchSection = () => {
                 type="button"
                 variant="ghost"
                 onClick={() => {
-                  setPriceRange('all');
-                  setRating('all');
-                  setDistance('all');
+                  setPriceRange("all");
+                  setRating("all");
+                  setDistance("all");
                   setOpenNow(false);
                 }}
                 className="text-gray-600 hover:text-purple-700 hover:bg-purple-50 rounded-lg px-4 py-2"

@@ -216,7 +216,7 @@ const LocationServices: React.FC = () => {
   };
 
   return (
-    <section className="py-16 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <section className="py-2 bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
@@ -407,7 +407,7 @@ const LocationServices: React.FC = () => {
 
         {/* Map Integration Note */}
         <div className="text-center mt-12">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-2xl mx-auto">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-7xl mx-auto">
             <MapPin className="h-8 w-8 text-blue-600 mx-auto mb-3" />
             <h3 className="font-semibold text-blue-900 mb-2">
               Interactive Map View

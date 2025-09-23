@@ -143,7 +143,7 @@ const Index = () => {
       </div>
 
       {/* Filter Section */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 ">
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center space-x-4">
             <Button

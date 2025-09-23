@@ -219,7 +219,7 @@ const BusinessListing: React.FC = () => {
   const priceRanges = ["₹", "₹₹", "₹₹₹", "₹₹₹₹"];
 
   return (
-    <section className="py-16 bg-gradient-to-br from-gray-50 via-white to-purple-50">
+    <section className="py-5 bg-gradient-to-br from-gray-50 via-white to-purple-50">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
