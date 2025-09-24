@@ -41,6 +41,11 @@ All colors MUST be HSL.
     --search-shadow: 0 10px 30px -10px hsl(var(--primary) / 0.3);
     --card-hover: 0 10px 25px -5px hsl(var(--primary) / 0.15);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Animation definitions */
+    --animation-fade-in: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    --animation-scale-in: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    --animation-slide-up: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 
     --radius: 0.5rem;
 
@@ -107,5 +112,74 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Animation keyframes and utilities */
+@layer utilities {
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes slideUp {
+    0% {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .hover-scale {
+    transition: transform var(--transition-smooth);
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  /* Staggered animation delays */
+  .\[animation-delay\:100ms\] {
+    animation-delay: 100ms;
+  }
+
+  .\[animation-delay\:200ms\] {
+    animation-delay: 200ms;
+  }
+
+  .\[animation-delay\:300ms\] {
+    animation-delay: 300ms;
   }
 }

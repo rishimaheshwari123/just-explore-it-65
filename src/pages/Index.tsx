@@ -15,19 +15,16 @@ import Footer from "@/components/Footer";
 import ConnectSection from "@/components/ConnectSection";
 import TopBar from "@/components/TopBar";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Building2,
-  Plus,
   List,
   TrendingUp,
   Users,
   Star,
-  Eye,
+  Sparkles,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import AdSlider from "@/components/AdSlider";
 import FloatingAd from "@/components/FloatingAd";
 
@@ -86,120 +83,199 @@ const Index = () => {
       <Header />
       <HeroBanner />
       <SearchSection />
+      
+      {/* Enhanced Stats Section with Animations */}
+      <section className="relative py-16 lg:py-24 bg-gradient-to-br from-background via-muted/20 to-background overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--primary)/0.1),transparent_50%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,hsl(var(--accent)/0.08),transparent_50%)]" />
+        
+        <div className="container mx-auto px-4 relative">
+          {/* Section Header */}
+          <div className="text-center mb-12 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-4">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium text-primary">Platform Statistics</span>
+            </div>
+            <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent mb-4">
+              Growing Together
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Join thousands of businesses and customers who trust our platform every day
+            </p>
+          </div>
+
+          {/* Animated Stats Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            {/* Total Businesses */}
+            <Card className="group relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm hover:bg-card/80 transition-all duration-500 hover:scale-105 animate-fade-in">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary-glow/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <CardContent className="p-6 text-center relative z-10">
+                <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform duration-300">
+                  <Building2 className="h-6 w-6" />
+                </div>
+                <div className="text-2xl lg:text-3xl font-bold text-primary mb-1">
+                  {loading ? (
+                    <div className="animate-pulse bg-primary/20 rounded h-8 w-16 mx-auto" />
+                  ) : (
+                    <span className="tabular-nums">{stats.totalBusinesses}</span>
+                  )}
+                </div>
+                <div className="text-sm text-muted-foreground font-medium">Total Businesses</div>
+              </CardContent>
+            </Card>
+
+            {/* Customer Reviews */}
+            <Card className="group relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm hover:bg-card/80 transition-all duration-500 hover:scale-105 animate-fade-in [animation-delay:100ms]">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <CardContent className="p-6 text-center relative z-10">
+                <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-accent/10 text-accent-foreground group-hover:scale-110 transition-transform duration-300">
+                  <Star className="h-6 w-6 text-accent" />
+                </div>
+                <div className="text-2xl lg:text-3xl font-bold text-accent mb-1">
+                  {loading ? (
+                    <div className="animate-pulse bg-accent/20 rounded h-8 w-16 mx-auto" />
+                  ) : (
+                    <span className="tabular-nums">{stats.totalReviews}</span>
+                  )}
+                </div>
+                <div className="text-sm text-muted-foreground font-medium">Customer Reviews</div>
+              </CardContent>
+            </Card>
+
+            {/* Happy Users */}
+            <Card className="group relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm hover:bg-card/80 transition-all duration-500 hover:scale-105 animate-fade-in [animation-delay:200ms]">
+              <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <CardContent className="p-6 text-center relative z-10">
+                <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-secondary/10 text-secondary group-hover:scale-110 transition-transform duration-300">
+                  <Users className="h-6 w-6" />
+                </div>
+                <div className="text-2xl lg:text-3xl font-bold text-secondary mb-1">
+                  {loading ? (
+                    <div className="animate-pulse bg-secondary/20 rounded h-8 w-16 mx-auto" />
+                  ) : (
+                    <span className="tabular-nums">{stats.totalUsers}+</span>
+                  )}
+                </div>
+                <div className="text-sm text-muted-foreground font-medium">Happy Users</div>
+              </CardContent>
+            </Card>
+
+            {/* Featured Listings */}
+            <Card className="group relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm hover:bg-card/80 transition-all duration-500 hover:scale-105 animate-fade-in [animation-delay:300ms]">
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-glow/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <CardContent className="p-6 text-center relative z-10">
+                <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-primary-glow/10 text-primary-glow group-hover:scale-110 transition-transform duration-300">
+                  <TrendingUp className="h-6 w-6" />
+                </div>
+                <div className="text-2xl lg:text-3xl font-bold text-primary-glow mb-1">
+                  {loading ? (
+                    <div className="animate-pulse bg-primary-glow/20 rounded h-8 w-16 mx-auto" />
+                  ) : (
+                    <span className="tabular-nums">{stats.featuredBusinesses}</span>
+                  )}
+                </div>
+                <div className="text-sm text-muted-foreground font-medium">Featured Listings</div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       <AdSlider />
       <FloatingAd />
 
-      {/* Dynamic Stats Section */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-center mb-2">
-                <Building2 className="h-8 w-8 text-blue-600" />
-              </div>
-              <div className="text-2xl font-bold text-blue-600">
-                {loading ? "..." : stats.totalBusinesses}
-              </div>
-              <div className="text-sm text-gray-600">Total Businesses</div>
-            </CardContent>
-          </Card>
+      {/* Enhanced Filter Section */}
+      <section className="py-12 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+            {/* Filter Tabs */}
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                variant={activeFilter === "all" ? "default" : "outline"}
+                onClick={() => setActiveFilter("all")}
+                className="relative overflow-hidden group"
+              >
+                <span className="relative z-10">All Businesses</span>
+                {activeFilter === "all" && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary-glow to-primary animate-pulse" />
+                )}
+              </Button>
+              <Button
+                variant={activeFilter === "businesses" ? "default" : "outline"}
+                onClick={() => setActiveFilter("businesses")}
+                className="relative overflow-hidden group flex items-center gap-2"
+              >
+                <Building2 className="w-4 h-4 relative z-10" />
+                <span className="relative z-10">Featured Businesses</span>
+                {activeFilter === "businesses" && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary-glow to-primary animate-pulse" />
+                )}
+              </Button>
+            </div>
 
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-center mb-2">
-                <Star className="h-8 w-8 text-yellow-600" />
-              </div>
-              <div className="text-2xl font-bold text-yellow-600">
-                {loading ? "..." : stats.totalReviews}
-              </div>
-              <div className="text-sm text-gray-600">Customer Reviews</div>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-center mb-2">
-                <Users className="h-8 w-8 text-green-600" />
-              </div>
-              <div className="text-2xl font-bold text-green-600">
-                {loading ? "..." : stats.totalUsers}
-              </div>
-              <div className="text-sm text-gray-600">Happy Users</div>
-            </CardContent>
-          </Card>
-
-          <Card className="text-center hover:shadow-lg transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-center mb-2">
-                <TrendingUp className="h-8 w-8 text-purple-600" />
-              </div>
-              <div className="text-2xl font-bold text-purple-600">
-                {loading ? "..." : stats.featuredBusinesses}
-              </div>
-              <div className="text-sm text-gray-600">Featured Listings</div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Filter Section */}
-      <div className="container mx-auto px-4 ">
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant={activeFilter === "all" ? "default" : "outline"}
-              onClick={() => setActiveFilter("all")}
-              className="flex items-center space-x-2"
-            >
-              <span>All Businesses</span>
-            </Button>
-            <Button
-              variant={activeFilter === "businesses" ? "default" : "outline"}
-              onClick={() => setActiveFilter("businesses")}
-              className="flex items-center space-x-2"
-            >
-              <Building2 className="w-4 h-4" />
-              <span>Featured Businesses</span>
-            </Button>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/business-listing")}
-              className="flex items-center space-x-2"
-            >
-              <List className="w-4 h-4" />
-              <span>View All</span>
-            </Button>
-            {/* <Button
-              onClick={() => navigate('/add-business')}
-              className="flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add Business</span>
-            </Button> */}
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                onClick={() => navigate("/business-listing")}
+                className="flex items-center gap-2 hover-scale"
+              >
+                <List className="w-4 h-4" />
+                <span>View All</span>
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <BusinessCategories />
+      {/* Enhanced Business Categories with Animation */}
+      <section className="py-16 bg-gradient-to-b from-muted/30 to-background">
+        <BusinessCategories />
+      </section>
 
-      {/* Conditional rendering based on filter */}
+      {/* Content Sections with Improved Spacing */}
       {(activeFilter === "all" || activeFilter === "businesses") && (
-        <FeaturedBusinesses />
+        <section className="py-16 animate-fade-in">
+          <FeaturedBusinesses />
+        </section>
       )}
+      
       {(activeFilter === "all" || activeFilter === "businesses") && (
-        <BusinessListing />
+        <section className="py-16 bg-muted/20 animate-fade-in">
+          <BusinessListing />
+        </section>
       )}
 
-      <TrendingSection />
-      <LocationServices />
-      <ReviewsSection />
-      <ConnectSection />
-      <CustomerReviews />
-      <PopularSearches />
-      <AppPromotion />
+      {/* Enhanced Sections with Better Spacing */}
+      <section className="py-20 bg-gradient-to-br from-background to-muted/30">
+        <TrendingSection />
+      </section>
+
+      <section className="py-20">
+        <LocationServices />
+      </section>
+
+      <section className="py-20 bg-muted/40">
+        <ReviewsSection />
+      </section>
+
+      <section className="py-16 bg-gradient-to-t from-card to-background">
+        <ConnectSection />
+      </section>
+
+      <section className="py-20 bg-gradient-to-br from-muted/20 to-background">
+        <CustomerReviews />
+      </section>
+
+      <section className="py-16">
+        <PopularSearches />
+      </section>
+
+      <section className="py-20 bg-gradient-to-t from-primary/5 to-background">
+        <AppPromotion />
+      </section>
+
       <Footer />
     </div>
   );
