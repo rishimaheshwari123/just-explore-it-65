@@ -137,7 +137,7 @@ const BusinessInquiryModal: React.FC<BusinessInquiryModalProps> = ({
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof InquiryFormData],
+          ...(typeof prev[parent as keyof InquiryFormData] === 'object' && prev[parent as keyof InquiryFormData] !== null ? prev[parent as keyof InquiryFormData] as Record<string, any> : {}),
           [child]: value
         }
       }));
