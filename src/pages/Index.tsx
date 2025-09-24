@@ -105,11 +105,10 @@ const Index = () => {
             </p>
           </div>
 
-          {/* Animated Stats Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
             {/* Total Businesses */}
             <Card className="group relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm hover:bg-card/80 transition-all duration-500 hover:scale-105 animate-fade-in">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary-glow/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardContent className="p-6 text-center relative z-10">
                 <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform duration-300">
                   <Building2 className="h-6 w-6" />
@@ -127,14 +126,14 @@ const Index = () => {
 
             {/* Customer Reviews */}
             <Card className="group relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm hover:bg-card/80 transition-all duration-500 hover:scale-105 animate-fade-in [animation-delay:100ms]">
-              <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardContent className="p-6 text-center relative z-10">
-                <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-accent/10 text-accent-foreground group-hover:scale-110 transition-transform duration-300">
-                  <Star className="h-6 w-6 text-accent" />
+                <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform duration-300">
+                  <Star className="h-6 w-6" />
                 </div>
-                <div className="text-2xl lg:text-3xl font-bold text-accent mb-1">
+                <div className="text-2xl lg:text-3xl font-bold text-primary mb-1">
                   {loading ? (
-                    <div className="animate-pulse bg-accent/20 rounded h-8 w-16 mx-auto" />
+                    <div className="animate-pulse bg-primary/20 rounded h-8 w-16 mx-auto" />
                   ) : (
                     <span className="tabular-nums">{stats.totalReviews}</span>
                   )}
@@ -145,14 +144,14 @@ const Index = () => {
 
             {/* Happy Users */}
             <Card className="group relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm hover:bg-card/80 transition-all duration-500 hover:scale-105 animate-fade-in [animation-delay:200ms]">
-              <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardContent className="p-6 text-center relative z-10">
-                <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-secondary/10 text-secondary group-hover:scale-110 transition-transform duration-300">
+                <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform duration-300">
                   <Users className="h-6 w-6" />
                 </div>
-                <div className="text-2xl lg:text-3xl font-bold text-secondary mb-1">
+                <div className="text-2xl lg:text-3xl font-bold text-primary mb-1">
                   {loading ? (
-                    <div className="animate-pulse bg-secondary/20 rounded h-8 w-16 mx-auto" />
+                    <div className="animate-pulse bg-primary/20 rounded h-8 w-16 mx-auto" />
                   ) : (
                     <span className="tabular-nums">{stats.totalUsers}+</span>
                   )}
@@ -163,14 +162,14 @@ const Index = () => {
 
             {/* Featured Listings */}
             <Card className="group relative overflow-hidden border-0 bg-card/60 backdrop-blur-sm hover:bg-card/80 transition-all duration-500 hover:scale-105 animate-fade-in [animation-delay:300ms]">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-glow/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <CardContent className="p-6 text-center relative z-10">
-                <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-primary-glow/10 text-primary-glow group-hover:scale-110 transition-transform duration-300">
+                <div className="inline-flex items-center justify-center w-12 h-12 mb-4 rounded-xl bg-primary/10 text-primary group-hover:scale-110 transition-transform duration-300">
                   <TrendingUp className="h-6 w-6" />
                 </div>
-                <div className="text-2xl lg:text-3xl font-bold text-primary-glow mb-1">
+                <div className="text-2xl lg:text-3xl font-bold text-primary mb-1">
                   {loading ? (
-                    <div className="animate-pulse bg-primary-glow/20 rounded h-8 w-16 mx-auto" />
+                    <div className="animate-pulse bg-primary/20 rounded h-8 w-16 mx-auto" />
                   ) : (
                     <span className="tabular-nums">{stats.featuredBusinesses}</span>
                   )}
