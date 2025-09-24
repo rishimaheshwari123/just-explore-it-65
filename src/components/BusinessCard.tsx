@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Star,
   Phone,
@@ -105,6 +106,7 @@ interface BusinessCardProps {
 }
 
 const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
+  const navigate = useNavigate();
   const {
     _id,
     businessName,
@@ -204,6 +206,10 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
     } else {
       navigator.clipboard.writeText(window.location.href);
     }
+  };
+
+  const handleViewBusiness = () => {
+    navigate(`/business/${_id}`);
   };
 
   const renderStars = (rating: number) => {
@@ -403,18 +409,29 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
         </div>
 
         {/* Send Inquiry Button */}
-        <BusinessInquiryModal
-          business={business}
-          trigger={
-            <Button
-              size="sm"
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-            >
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Send Inquiry
-            </Button>
-          }
-        />
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            onClick={handleViewBusiness}
+            size="sm"
+            variant="outline"
+            className="flex items-center justify-center border-purple-600 text-purple-600 hover:bg-purple-50"
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            View Business
+          </Button>
+          <BusinessInquiryModal
+            business={business}
+            trigger={
+              <Button
+                size="sm"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+              >
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Send Inquiry
+              </Button>
+            }
+          />
+        </div>
       </div>
     </div>
   );

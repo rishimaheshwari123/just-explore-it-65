@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroBanner from "@/assets/hero-banner.jpg";
+import heroBanner2 from "@/assets/1.png";
+import heroBanner3 from "@/assets/2.png";
 
 const HeroBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -19,7 +21,7 @@ const HeroBanner = () => {
       description:
         "Connect with verified businesses and discover amazing deals near you",
       image: heroBanner,
-      gradient: "from-purple-900/80 via-blue-900/70 to-black/60",
+      gradient: "from-purple-900/40 via-blue-900/30 to-black/20",
       stats: [
         { icon: Users, label: "Active Users", value: "50K+" },
         { icon: Star, label: "Verified Listings", value: "10K+" },
@@ -35,13 +37,29 @@ const HeroBanner = () => {
         class: "Trusted Platform",
         year: "Since 2024",
       },
-      image:
-        "https://www.vizion.com/wp-content/uploads/2017/11/google-local-business.png",
-      gradient: "from-indigo-900/80 via-purple-900/70 to-pink-900/60",
+      image: heroBanner2,
+      gradient: "from-indigo-900/40 via-purple-900/30 to-pink-900/20",
       stats: [
         { icon: Users, label: "Happy Customers", value: "25K+" },
         { icon: Star, label: "Average Rating", value: "4.8" },
         { icon: TrendingUp, label: "Growth Rate", value: "200%" },
+      ],
+    },
+    {
+      title: "Discover • Connect • Grow",
+      subtitle: "Your business journey starts here",
+      description:
+        "Join thousands of successful businesses and unlock new opportunities with our platform.",
+      specs: {
+        class: "Growth Platform",
+        year: "Trusted 2024",
+      },
+      image: heroBanner3,
+      gradient: "from-emerald-900/40 via-teal-900/30 to-cyan-900/20",
+      stats: [
+        { icon: Users, label: "Business Partners", value: "15K+" },
+        { icon: Star, label: "Success Stories", value: "8K+" },
+        { icon: TrendingUp, label: "Revenue Growth", value: "150%" },
       ],
     },
   ];
@@ -90,7 +108,7 @@ const HeroBanner = () => {
               />
 
               {/* Overlay Pattern */}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_0%,transparent_50%)] opacity-30"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05)_0%,transparent_50%)] opacity-15"></div>
 
               <div className="relative h-full flex items-center">
                 <div className="container mx-auto px-6">
@@ -103,14 +121,14 @@ const HeroBanner = () => {
                           : "translate-y-8 opacity-0"
                       }`}
                     >
-                      <span className="bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent">
+                      <span className="bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent drop-shadow-lg">
                         {slide.title}
                       </span>
                     </h2>
 
                     {/* Animated Subtitle */}
                     <p
-                      className={`text-xl md:text-3xl mb-4 font-medium transform transition-all duration-1000 delay-200 ${
+                      className={`text-xl md:text-3xl mb-4 font-medium transform transition-all duration-1000 delay-200 drop-shadow-md ${
                         index === currentSlide
                           ? "translate-y-0 opacity-100"
                           : "translate-y-8 opacity-0"
@@ -122,7 +140,7 @@ const HeroBanner = () => {
                     {/* Animated Description */}
                     {slide.description && (
                       <p
-                        className={`text-base md:text-lg mb-8 opacity-90 max-w-2xl transform transition-all duration-1000 delay-300 ${
+                        className={`text-base md:text-lg mb-8 opacity-90 max-w-2xl transform transition-all duration-1000 delay-300 drop-shadow-sm ${
                           index === currentSlide
                             ? "translate-y-0 opacity-90"
                             : "translate-y-8 opacity-0"

@@ -81,9 +81,9 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <TopBar />
       <Header />
-      <HeroBanner />
-      <br />
+    
       <AdSlider />
+      <HeroBanner />
       <SearchSection />
 
       {/* Enhanced Stats Section with Animations */}
@@ -272,9 +272,9 @@ const Index = () => {
         <LocationServices />
       </section>
 
-      <section className="py-5 bg-muted/40">
+      {/* <section className="py-5 bg-muted/40">
         <ReviewsSection />
-      </section>
+      </section> */}
 
       <section className=" bg-gradient-to-t from-card to-background">
         <ConnectSection />

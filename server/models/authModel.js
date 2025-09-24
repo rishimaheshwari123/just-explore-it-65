@@ -17,8 +17,8 @@ const authSchema = new mongoose.Schema(
 
         role: {
             type: String,
-            enum: ["super_admin", "admin"],
-            default: "admin",
+            enum: ["super_admin", "admin", "user"],
+            default: "user",
         },
         
         // Admin specific fields
