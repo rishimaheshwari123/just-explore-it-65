@@ -7,6 +7,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+
 import { MapPin, Search, Filter, Star, Clock, DollarSign } from "lucide-react";
 import { BUSINESS_CATEGORIES } from "@/constants/categories";
 import { useState, useEffect, useRef } from "react";
@@ -112,264 +119,261 @@ const SearchSection = () => {
     window.location.href = `/business-listing?${params.toString()}`;
   };
 
-  return (
-    <section className="relative bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 py-8 overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-grid-slate-100 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] opacity-50"></div>
-      <div className="absolute top-0 left-1/4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-      <div className="absolute top-0 right-1/4 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div className="absolute -bottom-8 left-1/3 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+  const clearFilters = () => {
+    setPriceRange("all");
+    setRating("all");
+    setDistance("all");
+    setOpenNow(false);
+  };
 
-      <div className="relative max-w-7xl mx-auto px-4">
+  return (
+    <section className="relative bg-gradient-to-br from-slate-50 via-gray-100 to-slate-200 py-16">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 z-0 opacity-10">
+        <svg
+          className="h-full w-full"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 100 100"
+        >
+          <defs>
+            <pattern
+              id="pattern-grid"
+              width="10"
+              height="10"
+              patternUnits="userSpaceOnUse"
+            >
+              <path
+                d="M 10 0 L 0 0 0 10"
+                fill="none"
+                stroke="#e2e8f0"
+                strokeWidth="0.2"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#pattern-grid)" />
+        </svg>
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 z-10">
         <div className="text-center mb-12">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent leading-tight">
-            Discover Amazing
-            <span className="block">Businesses Near You</span>
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-slate-900">
+            Discover a World of Local Businesses
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Search across thousands of verified businesses and find exactly what
-            you're looking for
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Find everything from professional services to your favorite local
+            shops with ease.
           </p>
         </div>
 
-        <form
-          onSubmit={handleSearch}
-          className="flex flex-col md:flex-row gap-4 bg-white/80 backdrop-blur-lg p-8 rounded-3xl shadow-2xl border border-white/20 hover:shadow-3xl transition-all duration-300"
-        >
-          {/* Search Input */}
-          <div className="flex-[2] relative group">
-            <Input
-              placeholder="Search businesses, services..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="h-14 text-base pr-14 bg-white/50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 group-hover:border-purple-300"
-            />
-            <Button
-              type="submit"
-              variant="hero"
-              size="sm"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 w-10 flex items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg transition-all duration-300 hover:scale-105"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-          </div>
-
-          {/* Location Input with Autocomplete */}
-          <div className="flex-1 relative group">
-            <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
-              <MapPin className="h-5 w-5 text-gray-400 group-hover:text-purple-500 transition-colors duration-300" />
-            </div>
-            <Input
-              ref={locationInputRef}
-              placeholder="Enter city name"
-              value={locationInput}
-              onChange={(e) => handleLocationSearch(e.target.value)}
-              onFocus={() => locationInput && setShowSuggestions(true)}
-              onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              className="pl-12 pr-20 h-14 text-base bg-white/50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 group-hover:border-purple-300"
-            />
-            <Button
-              type="button"
-              onClick={() => {
-                if (navigator.geolocation) {
-                  navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                      setLocationInput("Near Me");
-                      setShowSuggestions(false);
-                    },
-                    (error) => {
-                      console.error("Error getting location:", error);
-                      alert(
-                        "Unable to get your location. Please enter manually."
-                      );
-                    }
-                  );
-                } else {
-                  alert("Geolocation is not supported by this browser.");
-                }
-              }}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 px-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all duration-300"
-              title="Use current location"
-            >
-              <MapPin className="h-4 w-4" />
-            </Button>
-            {showSuggestions && locationSuggestions.length > 0 && (
-              <div className="absolute z-20 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto top-full mt-1">
-                {locationSuggestions.map((suggestion, index) => (
-                  <div
-                    key={index}
-                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
-                    onClick={() => handleLocationSelect(suggestion)}
-                  >
-                    <div className="font-medium text-gray-900">
-                      {suggestion.name}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Category Select */}
-          <div className="flex-1 group">
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger className="h-14 text-base bg-white/50 border-2 border-gray-200 rounded-2xl focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 transition-all duration-300 group-hover:border-purple-300">
-                <SelectValue placeholder="Select Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {BUSINESS_CATEGORIES.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Desktop Search Button */}
-          <div className="hidden md:block">
-            <Button
-              type="submit"
-              variant="hero"
-              className="h-14 px-10 text-base font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-700 hover:via-pink-700 hover:to-blue-700 text-white shadow-2xl rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-3xl"
-            >
-              <Search className="h-5 w-5 mr-3" />
-              Search Now
-            </Button>
-          </div>
-
-          {/* Search Button for Mobile */}
-          <div className="md:hidden">
-            <Button
-              type="submit"
-              variant="hero"
-              className="w-full h-14 text-base font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-700 hover:via-pink-700 hover:to-blue-700 text-white shadow-2xl rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-3xl"
-            >
-              <Search className="h-5 w-5 mr-3" />
-              Search Now
-            </Button>
-          </div>
-        </form>
-
-        {/* Advanced Filters Toggle */}
-        <div className="flex justify-center mt-6">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setShowFilters(!showFilters)}
-            className="bg-white/70 backdrop-blur-sm border-2 border-purple-200 hover:border-purple-400 text-purple-700 hover:bg-purple-50 rounded-xl px-6 py-2 transition-all duration-300"
+        <div className="bg-white rounded-3xl p-4 shadow-2xl border border-gray-200">
+          <form
+            onSubmit={handleSearch}
+            className="flex flex-col lg:flex-row gap-4 w-full"
           >
-            <Filter className="h-4 w-4 mr-2" />
-            {showFilters ? "Hide Filters" : "Advanced Filters"}
-          </Button>
-        </div>
+            {/* Search Input */}
+            <div className="flex-1 relative">
+              <Search
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <Input
+                placeholder="Search businesses, services, or products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-14 pl-12 bg-gray-50 border-gray-200 text-base rounded-2xl focus-visible:ring-indigo-500"
+              />
+            </div>
 
-        {/* Advanced Filters Panel */}
-        {showFilters && (
-          <div className="mt-6 bg-white/90 backdrop-blur-lg p-6 rounded-2xl shadow-xl border border-white/30 animate-in slide-in-from-top-2 duration-300">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Price Range Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 flex items-center">
-                  <DollarSign className="h-4 w-4 mr-1 text-green-600" />
-                  Price Range
-                </label>
-                <Select value={priceRange} onValueChange={setPriceRange}>
-                  <SelectTrigger className="h-10 bg-white/80 border border-gray-300 rounded-lg">
-                    <SelectValue placeholder="Any Price" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Any Price</SelectItem>
-                    <SelectItem value="budget">Budget (₹0-₹500)</SelectItem>
-                    <SelectItem value="mid">Mid Range (₹500-₹2000)</SelectItem>
-                    <SelectItem value="premium">Premium (₹2000+)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Location Input with Autocomplete */}
+            <div className="flex-1 relative">
+              <MapPin
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                size={20}
+              />
+              <Input
+                ref={locationInputRef}
+                placeholder="Enter your city or area"
+                value={locationInput}
+                onChange={(e) => handleLocationSearch(e.target.value)}
+                onFocus={() => locationInput && setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                className="h-14 pl-12 bg-gray-50 border-gray-200 text-base rounded-2xl focus-visible:ring-indigo-500"
+              />
+              {showSuggestions && locationSuggestions.length > 0 && (
+                <div className="absolute z-20 w-full bg-white border border-gray-200 rounded-lg shadow-xl max-h-60 overflow-y-auto top-full mt-2">
+                  {locationSuggestions.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0 border-gray-200"
+                      onClick={() => handleLocationSelect(suggestion)}
+                    >
+                      <div className="font-medium text-slate-800">
+                        {suggestion.name}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-              {/* Rating Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 flex items-center">
-                  <Star className="h-4 w-4 mr-1 text-yellow-500" />
-                  Minimum Rating
-                </label>
-                <Select value={rating} onValueChange={setRating}>
-                  <SelectTrigger className="h-10 bg-white/80 border border-gray-300 rounded-lg">
-                    <SelectValue placeholder="Any Rating" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Any Rating</SelectItem>
-                    <SelectItem value="4">4+ Stars</SelectItem>
-                    <SelectItem value="3">3+ Stars</SelectItem>
-                    <SelectItem value="2">2+ Stars</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            {/* Category Select */}
+            <div className="flex-1">
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
+                <SelectTrigger className="h-14 bg-gray-50 border-gray-200 text-base rounded-2xl focus-visible:ring-indigo-500">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {BUSINESS_CATEGORIES.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </form>
 
-              {/* Distance Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 flex items-center">
-                  <MapPin className="h-4 w-4 mr-1 text-blue-600" />
-                  Distance
-                </label>
-                <Select value={distance} onValueChange={setDistance}>
-                  <SelectTrigger className="h-10 bg-white/80 border border-gray-300 rounded-lg">
-                    <SelectValue placeholder="Any Distance" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Any Distance</SelectItem>
-                    <SelectItem value="1">Within 1 km</SelectItem>
-                    <SelectItem value="5">Within 5 km</SelectItem>
-                    <SelectItem value="10">Within 10 km</SelectItem>
-                    <SelectItem value="25">Within 25 km</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {/* Buttons & Filters */}
+          <div className="flex flex-col md:flex-row gap-4 mt-6">
+            <Button
+              type="submit"
+              onClick={handleSearch}
+              className="flex-1 h-14 font-bold text-base rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white transition-all duration-300 shadow-md hover:shadow-lg"
+            >
+              <Search className="h-5 w-5 mr-2" />
+              Search Now
+            </Button>
 
-              {/* Open Now Filter */}
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-700 flex items-center">
-                  <Clock className="h-4 w-4 mr-1 text-orange-600" />
-                  Availability
-                </label>
+            <Popover open={showFilters} onOpenChange={setShowFilters}>
+              <PopoverTrigger asChild>
                 <Button
                   type="button"
-                  variant={openNow ? "default" : "outline"}
-                  onClick={() => setOpenNow(!openNow)}
-                  className={`w-full h-10 rounded-lg transition-all duration-300 ${
-                    openNow
-                      ? "bg-green-600 hover:bg-green-700 text-white"
-                      : "bg-white/80 border border-gray-300 text-gray-700 hover:bg-green-50"
-                  }`}
+                  variant="outline"
+                  className="flex-1 h-14 bg-white border-gray-300 text-slate-700 hover:bg-gray-100 rounded-2xl transition-colors"
                 >
-                  <Clock className="h-4 w-4 mr-2" />
-                  Open Now
+                  <Filter className="h-4 w-4 mr-2" />
+                  Advanced Filters
                 </Button>
-              </div>
-            </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 bg-white p-4 rounded-xl shadow-lg border border-gray-200">
+                <div className="grid gap-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium leading-none text-slate-800">
+                      Filter Options
+                    </h4>
+                    <p className="text-sm text-slate-500">
+                      Refine your search.
+                    </p>
+                  </div>
+                  <div className="grid gap-2">
+                    {/* Price Range */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700 flex items-center">
+                        <DollarSign className="h-4 w-4 mr-1 text-green-600" />
+                        Price Range
+                      </label>
+                      <Select value={priceRange} onValueChange={setPriceRange}>
+                        <SelectTrigger className="h-10 bg-gray-50 rounded-lg">
+                          <SelectValue placeholder="Any Price" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Any Price</SelectItem>
+                          <SelectItem value="budget">
+                            Budget (₹0-₹500)
+                          </SelectItem>
+                          <SelectItem value="mid">
+                            Mid Range (₹500-₹2000)
+                          </SelectItem>
+                          <SelectItem value="premium">
+                            Premium (₹2000+)
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-            {/* Clear Filters Button */}
-            <div className="flex justify-center mt-4">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => {
-                  setPriceRange("all");
-                  setRating("all");
-                  setDistance("all");
-                  setOpenNow(false);
-                }}
-                className="text-gray-600 hover:text-purple-700 hover:bg-purple-50 rounded-lg px-4 py-2"
-              >
-                Clear All Filters
-              </Button>
-            </div>
+                    {/* Rating Filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700 flex items-center">
+                        <Star className="h-4 w-4 mr-1 text-yellow-500" />
+                        Minimum Rating
+                      </label>
+                      <Select value={rating} onValueChange={setRating}>
+                        <SelectTrigger className="h-10 bg-gray-50 rounded-lg">
+                          <SelectValue placeholder="Any Rating" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Any Rating</SelectItem>
+                          <SelectItem value="4">4+ Stars</SelectItem>
+                          <SelectItem value="3">3+ Stars</SelectItem>
+                          <SelectItem value="2">2+ Stars</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Distance Filter */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-700 flex items-center">
+                        <MapPin className="h-4 w-4 mr-1 text-blue-600" />
+                        Distance
+                      </label>
+                      <Select value={distance} onValueChange={setDistance}>
+                        <SelectTrigger className="h-10 bg-gray-50 rounded-lg">
+                          <SelectValue placeholder="Any Distance" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Any Distance</SelectItem>
+                          <SelectItem value="1">Within 1 km</SelectItem>
+                          <SelectItem value="5">Within 5 km</SelectItem>
+                          <SelectItem value="10">Within 10 km</SelectItem>
+                          <SelectItem value="25">Within 25 km</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Open Now Checkbox */}
+                    <div className="flex items-center space-x-2 mt-2">
+                      <Checkbox
+                        id="openNow"
+                        checked={openNow}
+                        onCheckedChange={(checked) => setOpenNow(checked)}
+                        className="w-5 h-5 border-gray-300 rounded focus-visible:ring-indigo-500"
+                      />
+                      <label
+                        htmlFor="openNow"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-700 flex items-center"
+                      >
+                        <Clock className="h-4 w-4 mr-1 text-orange-600" />
+                        Open Now
+                      </label>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between mt-2">
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      onClick={clearFilters}
+                      className="text-gray-500 hover:text-indigo-600"
+                    >
+                      Clear All
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => setShowFilters(false)}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                    >
+                      Done
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
-        )}
+        </div>
       </div>
     </section>
   );

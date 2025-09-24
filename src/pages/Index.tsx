@@ -244,7 +244,7 @@ const Index = () => {
       </section>
 
       {/* Enhanced Business Categories with Animation */}
-      <section className="py-16 bg-gradient-to-b from-muted/30 to-background">
+      <section className="py-2 bg-gradient-to-b from-muted/30 to-background">
         <BusinessCategories />
       </section>
 
@@ -282,11 +282,11 @@ const Index = () => {
         <CustomerReviews />
       </section>
 
-      <section className="py-16">
+      <section className="py-0">
         <PopularSearches />
       </section>
 
-      <section className="py-20 bg-gradient-to-t from-primary/5 to-background">
+      <section className="py-0 bg-gradient-to-t from-primary/5 to-background">
         <AppPromotion />
       </section>
 

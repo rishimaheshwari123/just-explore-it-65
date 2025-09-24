@@ -383,15 +383,6 @@ const ReviewsSection: React.FC = () => {
             </div>
 
             {/* Load More Button */}
-            <div className="text-center mt-8">
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full lg:w-1/2 border-purple-200 text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-colors duration-200"
-              >
-                Load More Reviews
-              </Button>
-            </div>
           </div>
         </div>
       </div>
