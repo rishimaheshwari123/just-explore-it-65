@@ -132,8 +132,9 @@ const BusinessListing: React.FC = () => {
         throw new Error("Failed to fetch businesses");
       }
       const data = await response.json();
-      setBusinesses(data.businesses || []);
-      setFilteredBusinesses(data.businesses || []);
+      const firstSix = (data.businesses || []).slice(0, 6); // 👈 only 6 businesses
+      setBusinesses(firstSix);
+      setFilteredBusinesses(firstSix);
     } catch (error) {
       console.error("Error fetching businesses:", error);
       toast({

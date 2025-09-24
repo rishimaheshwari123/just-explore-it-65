@@ -92,10 +92,12 @@ interface Business {
   };
   priceRange: string;
   features: string[];
-  status: {
-    isOpen: boolean;
-    message: string;
-  } | string;
+  status:
+    | {
+        isOpen: boolean;
+        message: string;
+      }
+    | string;
 }
 
 interface BusinessCardProps {
@@ -312,80 +314,9 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
           </div>
         </div>
         {/* Business Info Bar */}
-        <div className="flex items-center justify-between mb-3 p-2 bg-gray-50 rounded-lg">
-          <div className="flex items-center space-x-4 text-xs text-gray-600">
-            <div className="flex items-center">
-              <span className="font-medium">{priceRange}</span>
-            </div>
-            {verification.trustScore > 0 && (
-              <div className="flex items-center">
-                <Shield className="h-3 w-3 mr-1" />
-                Trust: {verification.trustScore}%
-              </div>
-            )}
-          </div>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={handleLike}
-              className="flex items-center text-xs text-gray-600 hover:text-red-500"
-            >
-              <Heart
-                className={`h-3 w-3 mr-1 ${
-                  isLiked ? "fill-red-500 text-red-500" : ""
-                }`}
-              />
-              {analytics.totalCalls + (isLiked ? 1 : 0)}
-            </button>
-            <button
-              onClick={handleShare}
-              className="flex items-center text-xs text-gray-600 hover:text-blue-500"
-            >
-              <Share2 className="h-3 w-3" />
-            </button>
-          </div>
-        </div>
         {/* Description */}
         <p className="text-sm text-gray-600 mb-3 line-clamp-2">{description}</p>
         {/* Services */}
-        {services.length > 0 && (
-          <div className="mb-3">
-            <h4 className="text-xs font-semibold text-gray-700 mb-1">
-              Services:
-            </h4>
-            <div className="flex flex-wrap gap-1">
-              {services.slice(0, 3).map((service, index) => (
-                <Badge key={index} variant="secondary" className="text-xs">
-                  {service.name}
-                </Badge>
-              ))}
-              {services.length > 3 && (
-                <Badge variant="secondary" className="text-xs">
-                  +{services.length - 3} more
-                </Badge>
-              )}
-            </div>
-          </div>
-        )}
-        {/* Features */}
-        {features.length > 0 && (
-          <div className="mb-3">
-            <h4 className="text-xs font-semibold text-gray-700 mb-1">
-              Features:
-            </h4>
-            <div className="flex flex-wrap gap-1">
-              {features.slice(0, 4).map((feature, index) => (
-                <Badge key={index} variant="outline" className="text-xs">
-                  {feature}
-                </Badge>
-              ))}
-              {features.length > 4 && (
-                <Badge variant="outline" className="text-xs">
-                  +{features.length - 4} more
-                </Badge>
-              )}
-            </div>
-          </div>
-        )}
         {/* Location & Info */}
         <div className="space-y-2 mb-4">
           <div className="flex items-center text-sm text-gray-600">
@@ -433,16 +364,6 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
           </div>
 
           {/* Contact Info */}
-          <div className="text-xs text-gray-600">
-            <span className="font-medium">Phone: </span>
-            {contactInfo.primaryPhone}
-            {contactInfo.email && (
-              <div>
-                <span className="font-medium">Email: </span>
-                {contactInfo.email}
-              </div>
-            )}
-          </div>
         </div>
       </div>
 

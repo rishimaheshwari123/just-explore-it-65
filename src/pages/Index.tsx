@@ -82,6 +82,8 @@ const Index = () => {
       <TopBar />
       <Header />
       <HeroBanner />
+      <br />
+      <AdSlider />
       <SearchSection />
 
       {/* Enhanced Stats Section with Animations */}
