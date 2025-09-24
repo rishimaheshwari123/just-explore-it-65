@@ -95,7 +95,7 @@ interface Business {
   status: {
     isOpen: boolean;
     message: string;
-  };
+  } | string;
 }
 
 interface BusinessCardProps {

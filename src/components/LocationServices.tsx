@@ -201,7 +201,7 @@ const LocationServices: React.FC = () => {
 
     // If user location is available, use it as starting point
     const origin = userLocation
-      ? `${userLocation.latitude},${userLocation.longitude}`
+      ? `${userLocation.lat},${userLocation.lng}`
       : "";
 
     const baseUrl = "https://www.google.com/maps/dir/";
@@ -307,12 +307,12 @@ const LocationServices: React.FC = () => {
                   <div className="absolute top-3 left-3">
                     <Badge
                       variant={
-                        isBusinessOpen(business) ? "default" : "secondary"
+                        isBusinessOpen(business.businessHours) ? "default" : "secondary"
                       }
                       className="bg-white/90 text-gray-800"
                     >
                       <Clock className="h-3 w-3 mr-1" />
-                      {isBusinessOpen(business) ? "Open" : "Closed"}
+                      {isBusinessOpen(business.businessHours) ? "Open" : "Closed"}
                     </Badge>
                   </div>
                   <div className="absolute top-3 right-3">

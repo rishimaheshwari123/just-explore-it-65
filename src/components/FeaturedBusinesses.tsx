@@ -545,7 +545,7 @@ const FeaturedBusinesses = () => {
                         variant="outline"
                         className="flex-1 text-xs"
                         onClick={() =>
-                          handleCall(business._id, business.contactInfo.phone)
+                          handleCall(business._id, business.contactInfo.primaryPhone)
                         }
                       >
                         <Phone className="h-3 w-3 mr-1" />
