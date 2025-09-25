@@ -10,7 +10,9 @@ const {
   UPDATE_VENDOR,
   GET_VENDOR,
   UPDATE_VENDOR_PROFILE,
-  UPDATE_VENDOR_PERSANTAGE
+  UPDATE_VENDOR_PERSANTAGE,
+  SEND_OTP_API,
+  VERIFY_OTP_API,
 } = vendor;
 
 export async function login(email, password, dispatch) {
@@ -124,6 +126,92 @@ export function logout(navigate) {
   };
 }
 
+
+export async function sendOtp(email, navigate) {
+  const toastId = toast.loading("Loading...")
+
+  let result = []
+
+  try {
+    const response = await apiConnector("POST", SEND_OTP_API, { email })
+
+    result = response.data.success
+    if (!response.data.success) {
+      throw new Error(response.data.message)
+    }
+
+    toast.success("OTP Sent Successfully")
+    navigate("/verify-email")
+  } catch (error) {
+    console.log("SENDOTP API ERROR............", error)
+    toast.error("Could Not Send OTP")
+    return result
+  } finally {
+    toast.dismiss(toastId)
+  }
+
+  return result
+}
+
+
+
+
+export function compareOtp(otp, email, navigate) {
+  return async (dispatch) => {
+    const toastId = toast.loading("Loading...")
+    let result = true
+    try {
+      const response = await apiConnector("POST", VERIFY_OTP_API, {
+        otp, email
+      })
+      console.log("Compare API RESPONSE............", response)
+
+
+      if (!response.data.success) {
+        throw new Error(response.data.message)
+      }
+
+      if (response?.data?.userFind) {
+        console.log(response.data.token)
+        dispatch(setToken(response.data.token))
+        dispatch(setUser(response.data.existingUser))
+        localStorage.setItem("user", JSON.stringify(response.data.existingUser))
+
+        localStorage.setItem("token", JSON.stringify(response.data.token))
+        navigate("/profile")
+
+
+        toast.success("Login Succesfully")
+        toast.dismiss(toastId)
+
+        return
+      }
+      result = response?.data?.userFind
+
+      Swal.fire({
+        title: "Login Failed",
+        text:
+          "Your Not Admin Please Contact To SuperAdmin",
+      });
+
+
+      // navigate("/verify-email")
+    } catch (error) {
+      console.log("COMPARE API ERROR............", error)
+      // toast.error(error?.response?.data?.message)
+
+      Swal.fire({
+        title: "Login Failed",
+        text:
+          error.response?.data?.message ||
+          "Something went wrong, please try again later",
+        icon: "error",
+      });
+    }
+    toast.dismiss(toastId)
+    return result
+  }
+}
 
 export const getAllVendorAPI = async () => {
 

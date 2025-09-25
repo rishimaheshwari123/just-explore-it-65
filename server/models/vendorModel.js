@@ -5,45 +5,39 @@ const vendorSchema = new mongoose.Schema(
         // Personal Information
         name: {
             type: String,
-            required: true,
             trim: true,
         },
-        
+
         email: {
             type: String,
-            required: true,
             unique: true,
             lowercase: true,
             trim: true,
         },
-        
+
         password: {
             type: String,
-            required: true,
             minlength: 6,
         },
-        
+
         phone: {
             type: String,
-            required: true,
             trim: true,
         },
-        
+
         alternatePhone: {
             type: String,
             trim: true,
         },
-        
+
         // Business Owner Information
         ownerDetails: {
             firstName: {
                 type: String,
-                required: true,
                 trim: true,
             },
             lastName: {
                 type: String,
-                required: true,
                 trim: true,
             },
             dateOfBirth: Date,
@@ -52,59 +46,53 @@ const vendorSchema = new mongoose.Schema(
                 enum: ['Male', 'Female', 'Other'],
             },
         },
-        
+
         // Company/Business Information
         company: {
             type: String,
-            required: true,
             trim: true,
         },
-        
+
         businessRegistrationNumber: {
             type: String,
             trim: true,
         },
-        
+
         gstNumber: {
             type: String,
             trim: true,
         },
-        
+
         // Address Information
         address: {
             street: {
                 type: String,
-                required: true,
                 trim: true,
             },
             area: {
                 type: String,
-                required: true,
                 trim: true,
             },
             city: {
                 type: String,
-                required: true,
                 trim: true,
             },
             state: {
                 type: String,
-                required: true,
                 trim: true,
             },
             pincode: {
                 type: String,
-                required: true,
                 trim: true,
             },
         },
-        
+
         description: {
             type: String,
             trim: true,
             maxlength: 500,
         },
-        
+
         // Verification Documents
         documents: {
             aadhar: {
@@ -145,26 +133,26 @@ const vendorSchema = new mongoose.Schema(
                 },
             },
         },
-        
+
         // Profile Information
         profileImage: {
             public_id: String,
             url: String,
         },
-        
+
         // Account Status
         role: {
             type: String,
             enum: ["vendor", "premium_vendor", "enterprise_vendor"],
             default: "vendor",
         },
-        
+
         status: {
             type: String,
             enum: ['active', 'inactive', 'pending', 'suspended', 'rejected'],
             default: 'pending',
         },
-        
+
         // Verification Status
         verification: {
             isEmailVerified: {
@@ -185,7 +173,7 @@ const vendorSchema = new mongoose.Schema(
                 default: 'basic',
             },
         },
-        
+
         // Subscription Information
         subscription: {
             plan: {
@@ -204,7 +192,7 @@ const vendorSchema = new mongoose.Schema(
                 isEnabled: Boolean,
             }],
         },
-        
+
         // Business Analytics
         analytics: {
             totalBusinesses: {
@@ -224,7 +212,7 @@ const vendorSchema = new mongoose.Schema(
                 default: 0,
             },
         },
-        
+
         // Payment Information
         paymentInfo: {
             totalEarnings: {
@@ -237,7 +225,7 @@ const vendorSchema = new mongoose.Schema(
             },
             lastPaymentDate: Date,
         },
-        
+
         // Settings
         settings: {
             notifications: {
@@ -265,22 +253,22 @@ const vendorSchema = new mongoose.Schema(
                 },
             },
         },
-        
+
         // Login Information
         lastLogin: Date,
         loginCount: {
             type: Number,
             default: 0,
         },
-        
+
         token: {
             type: String,
         },
-        
+
         resetPasswordToken: String,
         resetPasswordExpire: Date,
     },
-    { 
+    {
         timestamps: true,
         toJSON: { virtuals: true },
         toObject: { virtuals: true }

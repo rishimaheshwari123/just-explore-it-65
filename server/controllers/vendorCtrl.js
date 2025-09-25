@@ -1,62 +1,85 @@
 const bcrypt = require("bcryptjs");
 const vendorModel = require("../models/vendorModel");
 const jwt = require("jsonwebtoken");
-
+const OTPModel = require("../models/otpModel")
+const otpGenerator = require("otp-generator")
 
 
 
 const vendorRegisterCtrl = async (req, res) => {
   try {
     const {
-      name, email, password, phone, company, address, description, status = "pending"
-    } = req.body;
+      name,
+      email,
+      phone,
+      password,
+      otp,
+      company,
+      address,
+      description
+    } = req.body
 
-    if (!name || !email || !password) {
-      return res.status(403).send({
+    // Check required fields
+    if (!name || !email || !phone || !password || !otp || !company || !address) {
+      return res.status(403).json({
         success: false,
-        message: "All required fields must be filled",
-      });
+        message: "All required fields (name, email, phone, password, otp, company, address) must be provided",
+      })
     }
 
-
-    const existingUser = await vendorModel.findOne({ email });
+    // Check if user already exists
+    const existingUser = await vendorModel.findOne({ email })
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "Vendor already exists. Please sign in to continue.",
-      });
+        message: "User already exists. Please sign in to continue.",
+      })
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // Find the most recent OTP for the email
+    const response = await OTPModel.find({ email }).sort({ createdAt: -1 }).limit(1)
+    if (response.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "The OTP is not valid",
+      })
+    } else if (otp !== response[0].otp) {
+      return res.status(400).json({
+        success: false,
+        message: "The OTP is not valid",
+      })
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    // Create new user
     const user = await vendorModel.create({
-      name, email, password: hashedPassword, phone, company, address, description, status
-    });
-
-    const token = jwt.sign(
-      { email: user.email, id: user._id, role: user.role },
-      process.env.JWT_SECRET
-    );
-
-    const options = {
-      expires: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-      httpOnly: true,
-    };
-    res.cookie("token", token, options);
+      name,
+      email,
+      phone,
+      password: hashedPassword,
+      company,
+      address,
+      description,
+      status: "pending", // default
+    })
 
     return res.status(200).json({
       success: true,
-      token,
       user,
-      message: "Vendor registered successfully",
-    });
+      message: "User registered successfully",
+    })
   } catch (error) {
-    console.error(error);
+    console.error("Register error:", error)
     return res.status(500).json({
       success: false,
-      message: "Vendor cannot be registered. Please try again.",
-    });
+      message: "User cannot be registered. Please try again.",
+    })
   }
 };
+
+
 
 const vendorLoginCtrl = async (req, res) => {
   try {
@@ -269,6 +292,50 @@ const updateVendorProfileCtrl = async (req, res) => {
 };
 
 
+const sendotpCtrl = async (req, res) => {
+  try {
+    const { email } = req.body
+    const checkUserPresent = await vendorModel.findOne({ email })
+
+    if (checkUserPresent) {
+      return res.status(401).json({
+        success: false,
+        message: `User is Already Registered`,
+      })
+    }
+
+    var otp = otpGenerator.generate(6, {
+      upperCaseAlphabets: false,
+      lowerCaseAlphabets: false,
+      specialChars: false,
+    })
+    const result = await OTPModel.findOne({ otp: otp })
+    console.log("Result is Generate OTP Func")
+    console.log("OTP", otp)
+    console.log("Result", result)
+    while (result) {
+      otp = otpGenerator.generate(6, {
+        upperCaseAlphabets: false,
+      })
+    }
+    const otpPayload = { email, otp }
+    const otpBody = await OTPModel.create(otpPayload)
+    console.log("OTP Body", otpBody)
+    res.status(200).json({
+      success: true,
+      message: `OTP Sent Successfully`,
+      otp,
+    })
+  } catch (error) {
+    console.log(error.message)
+    return res.status(500).json({ success: false, error: error.message })
+  }
+}
+
+
+
+
+
 
 
 
@@ -279,5 +346,6 @@ module.exports = {
   updateVendorStatusCtrl,
   getVendorByIDCtrl,
   updateVendorProfileCtrl,
-  updateVendorPercentageCtrl
+  updateVendorPercentageCtrl,
+  sendotpCtrl
 };

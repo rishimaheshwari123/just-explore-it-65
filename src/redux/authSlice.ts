@@ -5,6 +5,7 @@ interface AuthState {
   loading: boolean;
   token: string | null;
   user: Record<string, any> | null;
+  signupData: Record<string, any> | null;
 }
 
 // Initial state with type
@@ -16,12 +17,17 @@ const initialState: AuthState = {
   user: localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user") as string)
     : null,
+  signupData: null,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
+    // ✅ setSignupData
+    setSignupData(state, action: PayloadAction<Record<string, any> | null>) {
+      state.signupData = action.payload;
+    },
     // ✅ Type for setLoading
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
@@ -41,6 +47,7 @@ const authSlice = createSlice({
       state.token = null;
       state.user = null;
       state.loading = false;
+      state.signupData = null;
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     },
@@ -48,7 +55,8 @@ const authSlice = createSlice({
 });
 
 // Export actions
-export const { setLoading, setToken, setUser, logout } = authSlice.actions;
+export const { setSignupData, setLoading, setToken, setUser, logout } =
+  authSlice.actions;
 
 // Export reducer
 export default authSlice.reducer;

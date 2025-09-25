@@ -44,6 +44,7 @@ import AdminSupport from "./pages/admin/AdminSupport";
 import UsersManagement from "./pages/admin/UsersManagement";
 import SubscriptionLogs from "./pages/admin/SubscriptionLogs";
 import CreateAdd from "./pages/admin/CreateAdd";
+import VerifyEmail from "./pages/VerifyEmail";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +89,14 @@ const App = () => {
               element={
                 <OpenRoute>
                   <VendorRegister />
+                </OpenRoute>
+              }
+            />
+            <Route
+              path="/vendor/verify-email"
+              element={
+                <OpenRoute>
+                  <VerifyEmail />
                 </OpenRoute>
               }
             />

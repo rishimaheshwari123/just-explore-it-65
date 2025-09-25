@@ -20,6 +20,8 @@ export const vendor = {
   UPDATE_VENDOR: BASE_URL + "/vendor/update",
   UPDATE_VENDOR_PROFILE: BASE_URL + "/vendor/update-profile",
   UPDATE_VENDOR_PERSANTAGE: BASE_URL + "/vendor/update-percentage",
+  SEND_OTP_API: BASE_URL + "/vendor/sentotp",
+  VERIFY_OTP_API: BASE_URL + "/vendor/verifyotp",
 }
 export const property = {
   CREATE_PROPERTY_API: BASE_URL + "/property/create",
@@ -54,13 +56,13 @@ export const inquiryEndpoints = {
   // Business Inquiry APIs
   CREATE_BUSINESS_INQUIRY_API: BASE_URL + "/inquiry/business/create",
   GET_BUSINESS_INQUIRIES_API: BASE_URL + "/inquiry/business/:businessId",
-  
+
   // Vendor Inquiry Management APIs
   GET_VENDOR_INQUIRIES_API: BASE_URL + "/inquiry/vendor/:vendorId",
   GET_INQUIRY_DETAILS_API: BASE_URL + "/inquiry/details/:inquiryId",
   REPLY_TO_INQUIRY_API: BASE_URL + "/inquiry/reply/:inquiryId",
   UPDATE_INQUIRY_STATUS_API: BASE_URL + "/inquiry/status/:inquiryId",
-  
+
   // Admin APIs
   GET_ALL_INQUIRIES_API: BASE_URL + "/inquiry/admin/all",
 }
