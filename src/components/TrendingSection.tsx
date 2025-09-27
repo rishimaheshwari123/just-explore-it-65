@@ -2,8 +2,10 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Search, Flame, Clock, ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const TrendingSection: React.FC = () => {
+  const navigate = useNavigate();
   const trendingSearches = [
     { term: "Restaurants near me", count: "2.5K searches", trend: "+15%" },
     { term: "Mobile repair shop", count: "1.8K searches", trend: "+22%" },
@@ -66,16 +68,16 @@ const TrendingSection: React.FC = () => {
     },
   ];
 
-  const handleSearchClick = (term: string) => {
+  const handleSearchClick = (searchTerm: string) => {
     const params = new URLSearchParams();
-    params.set("search", term);
-    window.location.href = `/businesses?${params.toString()}`;
+    params.set("search", searchTerm);
+    navigate(`/business-listing?${params.toString()}`);
   };
 
   const handleCategoryClick = (category: string) => {
     const params = new URLSearchParams();
-    params.set("category", category.toLowerCase().replace(/[^a-z0-9]/g, "-"));
-    window.location.href = `/properties?${params.toString()}`;
+    params.set("search", category);
+    navigate(`/business-listing?${params.toString()}`);
   };
 
   return (

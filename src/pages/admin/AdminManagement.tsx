@@ -156,7 +156,7 @@ const AdminManagement = () => {
     try {
       // Call register API to create admin
       const response = await fetch(
-        "https://just-explore-it-65.onrender.com/api/v1/auth/register",
+        "http://localhost:8000/api/v1/auth/register",
         {
           method: "POST",
           headers: {

@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const PopularSearches = () => {
+  const navigate = useNavigate();
   const trendingSearches = [
     {
       term: "Restaurants near me",
@@ -61,6 +63,12 @@ const PopularSearches = () => {
     },
   ];
 
+  const handleSearchClick = (searchTerm: string) => {
+    const params = new URLSearchParams();
+    params.set("search", searchTerm);
+    navigate(`/business-listing?${params.toString()}`);
+  };
+
   const cityStats = [
     { label: "Total Businesses", value: "25,000+", icon: "🏢" },
     { label: "Cities Covered", value: "50+", icon: "🌍" },
@@ -106,6 +114,7 @@ const PopularSearches = () => {
                 {trendingSearches.map((search, index) => (
                   <div
                     key={index}
+                    onClick={() => handleSearchClick(search.term)}
                     className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
                   >
                     <div className="flex items-center">
@@ -148,6 +157,7 @@ const PopularSearches = () => {
                 {recentSearches.map((search, index) => (
                   <div
                     key={index}
+                    onClick={() => handleSearchClick(search.term)}
                     className="flex items-center p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
                   >
                     <img
@@ -178,6 +188,7 @@ const PopularSearches = () => {
                       variant="outline"
                       size="sm"
                       className="text-xs"
+                      onClick={() => handleSearchClick(category)}
                     >
                       {category}
                     </Button>

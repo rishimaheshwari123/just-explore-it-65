@@ -444,12 +444,34 @@ const getBusinessesCtrl = async (req, res) => {
 
 
         if (search) {
-            filter.$or = [
-                { businessName: new RegExp(search, 'i') },
-                { description: new RegExp(search, 'i') },
-                { tags: new RegExp(search, 'i') },
-                { keywords: new RegExp(search, 'i') },
-            ];
+            // Split search term into individual keywords for partial matching
+            const searchKeywords = search.toLowerCase().split(/\s+/).filter(keyword => keyword.length > 0);
+            
+            // Create search conditions for each keyword
+            const searchConditions = [];
+            
+            searchKeywords.forEach(keyword => {
+                const keywordRegex = new RegExp(keyword, 'i');
+                searchConditions.push({
+                    $or: [
+                        { businessName: keywordRegex },
+                        { description: keywordRegex },
+                        { tags: keywordRegex },
+                        { keywords: keywordRegex },
+                        { category: keywordRegex },
+                        { 'address.street': keywordRegex },
+                        { 'address.area': keywordRegex },
+                        { 'address.city': keywordRegex },
+                        { 'address.state': keywordRegex },
+                        { 'address.pincode': keywordRegex }
+                    ]
+                });
+            });
+            
+            // If multiple keywords, match any of them (OR logic)
+            if (searchConditions.length > 0) {
+                filter.$or = filter.$or ? filter.$or.concat(searchConditions) : searchConditions;
+            }
         }
 
 
