@@ -17,6 +17,7 @@ import {
   Share2,
   Eye,
   MessageSquare,
+  Crown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -432,6 +433,33 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
             }
           />
         </div>
+        
+        {/* Premium Button - Only show if business is not premium */}
+        {!isPremium && (
+          <div className="mt-2">
+            <Button
+              onClick={() => {
+                // Navigate to subscription page or open modal
+                navigate(`/vendor/subscription/${_id}`);
+              }}
+              size="sm"
+              className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold"
+            >
+              <Crown className="h-4 w-4 mr-2" />
+              Upgrade to Premium
+            </Button>
+          </div>
+        )}
+        
+        {/* Premium Badge - Show if business is premium */}
+        {isPremium && (
+          <div className="mt-2">
+            <Badge className="w-full justify-center bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-semibold">
+              <Crown className="h-4 w-4 mr-2" />
+              Premium Business
+            </Badge>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -332,6 +332,64 @@ const businessSchema = new mongoose.Schema(
             },
         },
 
+        // Subscription Details
+        subscriptions: [{
+            subscriptionId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'BusinessSubscription',
+                required: true,
+            },
+            planName: {
+                type: String,
+                required: true,
+            },
+            startDate: {
+                type: Date,
+                required: true,
+            },
+            endDate: {
+                type: Date,
+                required: true,
+            },
+            price: {
+                type: Number,
+                required: true,
+            },
+            status: {
+                type: String,
+                enum: ['active', 'expired', 'cancelled', 'pending'],
+                default: 'active',
+            },
+            features: [{
+                type: String,
+            }],
+            priority: {
+                type: Number,
+                default: 0,
+            },
+        }],
+
+        // Current Active Subscription (for quick access)
+        currentSubscription: {
+            subscriptionId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'BusinessSubscription',
+            },
+            planName: String,
+            startDate: Date,
+            endDate: Date,
+            price: Number,
+            status: {
+                type: String,
+                enum: ['active', 'expired', 'cancelled', 'pending'],
+            },
+            features: [String],
+            priority: {
+                type: Number,
+                default: 0,
+            },
+        },
+
         // Owner/Vendor Information
         vendor: {
             type: mongoose.Schema.Types.ObjectId,
@@ -391,6 +449,27 @@ businessSchema.index({ keywords: 1 });
 // businessSchema.index({ tags: 1 }); // Commented to avoid parallel array indexing issue
 businessSchema.index({ "ratings.average": -1 });
 businessSchema.index({ status: 1, isPremium: -1 });
+
+// Subscription-related indexes
+businessSchema.index({ "currentSubscription.status": 1, "currentSubscription.priority": -1 });
+businessSchema.index({ "currentSubscription.endDate": 1 });
+businessSchema.index({ "subscriptions.status": 1, "subscriptions.endDate": 1 });
+
+// Virtual for checking if business has active subscription
+businessSchema.virtual('hasActiveSubscription').get(function () {
+    if (!this.currentSubscription) return false;
+    const now = new Date();
+    return this.currentSubscription.status === 'active' && 
+           this.currentSubscription.endDate > now;
+});
+
+// Method to get subscription priority for search ranking
+businessSchema.methods.getSubscriptionPriority = function() {
+    if (this.hasActiveSubscription) {
+        return this.currentSubscription.priority || 0;
+    }
+    return 0;
+};
 
 // Pre-save middleware to sync coordinates with location
 businessSchema.pre('save', function (next) {

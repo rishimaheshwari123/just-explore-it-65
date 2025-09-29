@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Home, BarChart3, Plus, Building2, MessageSquare, LogOut, Store, ShoppingBag, Mail } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, BarChart3, Plus, Building2, MessageSquare, LogOut, Store, ShoppingBag, Mail, Crown } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setToken, setUser } from "@/redux/authSlice";
 import { toast } from "react-toastify";
@@ -61,6 +61,7 @@ const Sidebar = () => {
   const businessMenuItems = [
     { to: "/vendor/add-business", icon: Store, label: "Add Business", color: "text-emerald-600" },
     { to: "/vendor/businesses", icon: ShoppingBag, label: "All Businesses", color: "text-teal-600" },
+    { to: "/vendor/subscriptions", icon: Crown, label: "Subscriptions", color: "text-purple-600" },
     { to: "/vendor/business-inquiry", icon: Mail, label: "Business Inquiry", color: "text-cyan-600" },
     { to: "/vendor/support", icon: MessageSquare, label: "Support Center", color: "text-red-600" },
   ];

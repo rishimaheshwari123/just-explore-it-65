@@ -26,21 +26,38 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 interface SubscriptionLog {
-  id: string;
-  userId: string;
-  userName: string;
-  userEmail: string;
-  planName: string;
-  planType: 'monthly' | 'yearly' | 'lifetime';
+  _id: string;
+  business: {
+    _id: string;
+    businessName: string;
+    category: string;
+  };
+  vendor: {
+    _id: string;
+    name: string;
+    email: string;
+  };
+  plan: {
+    _id: string;
+    name: string;
+    price: number;
+  };
+  action: 'purchased' | 'renewed' | 'cancelled' | 'expired' | 'upgraded' | 'downgraded';
   amount: number;
-  currency: string;
-  status: 'active' | 'expired' | 'cancelled' | 'pending';
-  paymentMethod: string;
-  transactionId: string;
-  startDate: string;
-  endDate: string;
+  paymentDetails: {
+    transactionId: string;
+    paymentMethod: string;
+    paymentDate: string;
+    paymentStatus: 'completed' | 'pending' | 'failed';
+  };
+  metadata: {
+    userAgent: string;
+    ipAddress: string;
+    source: string;
+  };
+  notes: string;
   createdAt: string;
-  features: string[];
+  updatedAt: string;
 }
 
 const SubscriptionLogs = () => {
@@ -49,158 +66,82 @@ const SubscriptionLogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [planFilter, setPlanFilter] = useState('all');
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pages: 1,
+    total: 0
+  });
 
-  // Dummy subscription data
-  const dummySubscriptions: SubscriptionLog[] = [
-    {
-      id: 'sub_001',
-      userId: 'user_001',
-      userName: 'Rajesh Kumar',
-      userEmail: 'rajesh@example.com',
-      planName: 'Premium Business',
-      planType: 'monthly',
-      amount: 2999,
-      currency: 'INR',
-      status: 'active',
-      paymentMethod: 'Credit Card',
-      transactionId: 'txn_abc123',
-      startDate: '2024-01-15T00:00:00Z',
-      endDate: '2024-02-15T00:00:00Z',
-      createdAt: '2024-01-15T10:30:00Z',
-      features: ['Unlimited Listings', 'Priority Support', 'Analytics Dashboard', 'Custom Branding']
-    },
-    {
-      id: 'sub_002',
-      userId: 'user_002',
-      userName: 'Priya Sharma',
-      userEmail: 'priya@example.com',
-      planName: 'Standard',
-      planType: 'yearly',
-      amount: 19999,
-      currency: 'INR',
-      status: 'active',
-      paymentMethod: 'UPI',
-      transactionId: 'txn_def456',
-      startDate: '2024-01-10T00:00:00Z',
-      endDate: '2025-01-10T00:00:00Z',
-      createdAt: '2024-01-10T14:20:00Z',
-      features: ['50 Listings', 'Email Support', 'Basic Analytics']
-    },
-    {
-      id: 'sub_003',
-      userId: 'user_003',
-      userName: 'Amit Patel',
-      userEmail: 'amit@example.com',
-      planName: 'Enterprise',
-      planType: 'yearly',
-      amount: 49999,
-      currency: 'INR',
-      status: 'expired',
-      paymentMethod: 'Net Banking',
-      transactionId: 'txn_ghi789',
-      startDate: '2023-01-05T00:00:00Z',
-      endDate: '2024-01-05T00:00:00Z',
-      createdAt: '2023-01-05T09:15:00Z',
-      features: ['Unlimited Listings', '24/7 Support', 'Advanced Analytics', 'API Access', 'White Label']
-    },
-    {
-      id: 'sub_004',
-      userId: 'user_004',
-      userName: 'Sunita Gupta',
-      userEmail: 'sunita@example.com',
-      planName: 'Basic',
-      planType: 'monthly',
-      amount: 999,
-      currency: 'INR',
-      status: 'cancelled',
-      paymentMethod: 'Debit Card',
-      transactionId: 'txn_jkl012',
-      startDate: '2024-01-01T00:00:00Z',
-      endDate: '2024-02-01T00:00:00Z',
-      createdAt: '2024-01-01T16:45:00Z',
-      features: ['10 Listings', 'Basic Support']
-    },
-    {
-      id: 'sub_005',
-      userId: 'user_005',
-      userName: 'Vikash Singh',
-      userEmail: 'vikash@example.com',
-      planName: 'Premium Business',
-      planType: 'monthly',
-      amount: 2999,
-      currency: 'INR',
-      status: 'pending',
-      paymentMethod: 'Wallet',
-      transactionId: 'txn_mno345',
-      startDate: '2024-01-20T00:00:00Z',
-      endDate: '2024-02-20T00:00:00Z',
-      createdAt: '2024-01-20T11:30:00Z',
-      features: ['Unlimited Listings', 'Priority Support', 'Analytics Dashboard', 'Custom Branding']
-    },
-    {
-      id: 'sub_006',
-      userId: 'user_006',
-      userName: 'Neha Agarwal',
-      userEmail: 'neha@example.com',
-      planName: 'Lifetime Pro',
-      planType: 'lifetime',
-      amount: 99999,
-      currency: 'INR',
-      status: 'active',
-      paymentMethod: 'Credit Card',
-      transactionId: 'txn_pqr678',
-      startDate: '2024-01-12T00:00:00Z',
-      endDate: '2099-12-31T00:00:00Z',
-      createdAt: '2024-01-12T13:20:00Z',
-      features: ['Unlimited Everything', 'Lifetime Updates', 'Premium Support', 'All Features']
+  const fetchSubscriptionLogs = async (page = 1) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:8000/api/v1/subscription/logs?page=${page}&limit=50`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setSubscriptions(data.data.logs);
+        setPagination(data.data.pagination);
+      } else {
+        toast.error('Failed to fetch subscription logs');
+      }
+    } catch (error) {
+      console.error('Error fetching subscription logs:', error);
+      toast.error('Error fetching subscription logs');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
   useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setSubscriptions(dummySubscriptions);
-      setLoading(false);
-    }, 1000);
+    fetchSubscriptionLogs();
   }, []);
 
   // Filter subscriptions
   const filteredSubscriptions = subscriptions.filter(sub => {
-    const matchesSearch = sub.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         sub.userEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         sub.planName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         sub.transactionId.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || sub.status === statusFilter;
-    const matchesPlan = planFilter === 'all' || sub.planType === planFilter;
+    const matchesSearch = sub.business?.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         sub.vendor?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         sub.vendor?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         sub.plan?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         sub.paymentDetails?.transactionId?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || sub.action === statusFilter;
+    const matchesPlan = planFilter === 'all' || sub.plan?.name?.toLowerCase().includes(planFilter.toLowerCase());
     return matchesSearch && matchesStatus && matchesPlan;
   });
 
   // Get status badge color
-  const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case 'active':
+  const getStatusBadgeColor = (action: string) => {
+    switch (action) {
+      case 'purchased':
         return 'bg-green-100 text-green-800';
-      case 'expired':
-        return 'bg-red-100 text-red-800';
+      case 'renewed':
+        return 'bg-blue-100 text-blue-800';
       case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      case 'expired':
         return 'bg-gray-100 text-gray-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+      case 'upgraded':
+        return 'bg-purple-100 text-purple-800';
+      case 'downgraded':
+        return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
   // Get status icon
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'active':
+  const getStatusIcon = (action: string) => {
+    switch (action) {
+      case 'purchased':
         return <CheckCircle className="h-3 w-3" />;
-      case 'expired':
-        return <XCircle className="h-3 w-3" />;
+      case 'renewed':
+        return <RefreshCw className="h-3 w-3" />;
       case 'cancelled':
+        return <XCircle className="h-3 w-3" />;
+      case 'expired':
         return <AlertCircle className="h-3 w-3" />;
-      case 'pending':
+      case 'upgraded':
+        return <TrendingUp className="h-3 w-3" />;
+      case 'downgraded':
         return <Clock className="h-3 w-3" />;
       default:
         return <Clock className="h-3 w-3" />;
@@ -219,16 +160,16 @@ const SubscriptionLogs = () => {
     doc.text(`Total Subscriptions: ${filteredSubscriptions.length}`, 14, 40);
 
     const tableData = filteredSubscriptions.map(sub => [
-      sub.userName,
-      sub.planName,
-      sub.planType,
+      sub.business?.businessName || 'N/A',
+      sub.plan?.name || 'N/A',
+      sub.action,
       `₹${sub.amount}`,
-      sub.status.toUpperCase(),
+      sub.paymentDetails?.paymentStatus?.toUpperCase() || 'N/A',
       format(new Date(sub.createdAt), 'PP'),
     ]);
 
     autoTable(doc, {
-      head: [['User', 'Plan', 'Type', 'Amount', 'Status', 'Date']],
+      head: [['Business', 'Plan', 'Action', 'Amount', 'Payment Status', 'Date']],
       body: tableData,
       startY: 50,
     });
@@ -239,7 +180,7 @@ const SubscriptionLogs = () => {
 
   // Calculate stats
   const totalRevenue = subscriptions.reduce((sum, sub) => sum + sub.amount, 0);
-  const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active').length;
+  const activeSubscriptions = subscriptions.filter(sub => sub.action === 'purchased').length;
   const monthlyRevenue = subscriptions
     .filter(sub => {
       const subDate = new Date(sub.createdAt);
@@ -336,25 +277,27 @@ const SubscriptionLogs = () => {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder="Filter by action" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
+                <SelectItem value="all">All Actions</SelectItem>
+                <SelectItem value="purchased">Purchased</SelectItem>
+                <SelectItem value="renewed">Renewed</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="expired">Expired</SelectItem>
+                <SelectItem value="upgraded">Upgraded</SelectItem>
+                <SelectItem value="downgraded">Downgraded</SelectItem>
               </SelectContent>
             </Select>
             <Select value={planFilter} onValueChange={setPlanFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by plan type" />
+                <SelectValue placeholder="Filter by plan" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Plans</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="yearly">Yearly</SelectItem>
-                <SelectItem value="lifetime">Lifetime</SelectItem>
+                <SelectItem value="basic">Basic</SelectItem>
+                <SelectItem value="premium">Premium</SelectItem>
+                <SelectItem value="enterprise">Enterprise</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -378,71 +321,69 @@ const SubscriptionLogs = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>User</TableHead>
+                  <TableHead>Business & Vendor</TableHead>
                   <TableHead>Plan Details</TableHead>
                   <TableHead>Amount</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Action</TableHead>
                   <TableHead>Payment Method</TableHead>
                   <TableHead>Transaction ID</TableHead>
-                  <TableHead>Duration</TableHead>
+                  <TableHead>Payment Status</TableHead>
                   <TableHead>Created Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredSubscriptions.map((subscription) => (
-                  <TableRow key={subscription.id}>
+                  <TableRow key={subscription._id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
                           <span className="text-white font-semibold text-sm">
-                            {subscription.userName.charAt(0).toUpperCase()}
+                            {subscription.business?.businessName?.charAt(0)?.toUpperCase() || 'B'}
                           </span>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">{subscription.userName}</p>
-                          <p className="text-sm text-gray-500">{subscription.userEmail}</p>
+                          <p className="font-medium text-gray-900">{subscription.business?.businessName || 'N/A'}</p>
+                          <p className="text-sm text-gray-500">{subscription.vendor?.name || 'N/A'} ({subscription.vendor?.email || 'N/A'})</p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{subscription.planName}</p>
+                        <p className="font-medium text-gray-900">{subscription.plan?.name || 'N/A'}</p>
                         <Badge variant="outline" className="mt-1">
-                          {subscription.planType.toUpperCase()}
+                          {subscription.business?.category || 'General'}
                         </Badge>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
                         <span className="font-semibold text-gray-900">
-                          ₹{subscription.amount.toLocaleString()}
+                          ₹{subscription.amount?.toLocaleString() || 0}
                         </span>
-                        <span className="text-sm text-gray-500">{subscription.currency}</span>
+                        <span className="text-sm text-gray-500">INR</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusBadgeColor(subscription.status)}>
-                        {getStatusIcon(subscription.status)}
-                        <span className="ml-1">{subscription.status.toUpperCase()}</span>
+                      <Badge className={getStatusBadgeColor(subscription.action)}>
+                        {getStatusIcon(subscription.action)}
+                        <span className="ml-1">{subscription.action?.toUpperCase() || 'N/A'}</span>
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <CreditCard className="h-4 w-4 text-gray-400" />
-                        {subscription.paymentMethod}
+                        {subscription.paymentDetails?.paymentMethod || 'N/A'}
                       </div>
                     </TableCell>
                     <TableCell>
                       <code className="text-sm bg-gray-100 px-2 py-1 rounded">
-                        {subscription.transactionId}
+                        {subscription.paymentDetails?.transactionId || 'N/A'}
                       </code>
                     </TableCell>
                     <TableCell>
-                      <div className="text-sm">
-                        <p>{format(new Date(subscription.startDate), 'PP')}</p>
-                        <p className="text-gray-500">to</p>
-                        <p>{format(new Date(subscription.endDate), 'PP')}</p>
-                      </div>
+                      <Badge variant={subscription.paymentDetails?.paymentStatus === 'completed' ? 'default' : 'secondary'}>
+                        {subscription.paymentDetails?.paymentStatus?.toUpperCase() || 'N/A'}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

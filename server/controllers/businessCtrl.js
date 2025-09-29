@@ -489,8 +489,14 @@ const getBusinessesCtrl = async (req, res) => {
             filter['premiumFeatures.featuredListing'] = true;
         }
 
-        // Build sort object
+        // Build sort object with premium business priority
         const sort = {};
+        
+        // Always prioritize premium businesses first
+        sort['isPremium'] = -1; // Premium businesses first
+        sort['currentSubscription.priority'] = -1; // Higher priority first
+        sort['currentSubscription.status'] = -1; // Active subscriptions first
+        
         if (sortBy === 'rating') {
             sort['ratings.average'] = sortOrder === 'asc' ? 1 : -1;
         } else if (sortBy === 'views') {
@@ -548,7 +554,9 @@ const getBusinessesCtrl = async (req, res) => {
                     }
                 },
                 {
-                    $sort: sortBy === 'distance' ? { distance: 1 } : sort
+                    $sort: sortBy === 'distance' ? 
+                        { isPremium: -1, 'currentSubscription.priority': -1, distance: 1 } : 
+                        { isPremium: -1, 'currentSubscription.priority': -1, ...sort }
                 },
                 {
                     $skip: skip

@@ -45,6 +45,12 @@ interface Business {
   };
   status: 'active' | 'inactive' | 'pending' | 'suspended';
   isPremium: boolean;
+  currentSubscription?: {
+    planName: string;
+    status: string;
+    endDate: string;
+    priority: number;
+  };
   createdAt: string;
   images?: Array<{
     url: string;
@@ -120,6 +126,45 @@ const VendorBusinessStats: React.FC<VendorBusinessStatsProps> = ({ vendorId }) =
         );
       default:
         return <Badge>Unknown</Badge>;
+    }
+  };
+
+  const getSubscriptionBadge = (subscription: any) => {
+    if (!subscription) {
+      return <Badge className="bg-gray-100 text-gray-800">No Plan</Badge>;
+    }
+
+    const isExpiringSoon = () => {
+      const endDate = new Date(subscription.endDate);
+      const now = new Date();
+      const diffTime = endDate.getTime() - now.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays <= 30 && diffDays > 0;
+    };
+
+    const isExpired = () => {
+      const endDate = new Date(subscription.endDate);
+      const now = new Date();
+      return endDate < now;
+    };
+
+    if (isExpired()) {
+      return <Badge className="bg-red-100 text-red-800">Expired</Badge>;
+    }
+
+    if (isExpiringSoon()) {
+      return <Badge className="bg-orange-100 text-orange-800">Expiring Soon</Badge>;
+    }
+
+    switch (subscription.priority) {
+      case 3:
+        return <Badge className="bg-purple-100 text-purple-800">Enterprise Elite</Badge>;
+      case 2:
+        return <Badge className="bg-blue-100 text-blue-800">Business Pro</Badge>;
+      case 1:
+        return <Badge className="bg-orange-100 text-orange-800">Basic Premium</Badge>;
+      default:
+        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
     }
   };
 
@@ -237,6 +282,7 @@ const VendorBusinessStats: React.FC<VendorBusinessStatsProps> = ({ vendorId }) =
                             {business.isPremium && (
                               <Badge className="bg-purple-100 text-purple-800">Premium</Badge>
                             )}
+                            {getSubscriptionBadge(business.currentSubscription)}
                           </div>
                           
                           <p className="text-sm text-gray-600 mb-2 line-clamp-2">
@@ -322,6 +368,7 @@ const VendorBusinessStats: React.FC<VendorBusinessStatsProps> = ({ vendorId }) =
                                       {selectedBusiness.isPremium && (
                                         <Badge className="bg-purple-100 text-purple-800">Premium</Badge>
                                       )}
+                                      {getSubscriptionBadge(selectedBusiness.currentSubscription)}
                                     </div>
                                     <p className="text-gray-600">{selectedBusiness.description}</p>
                                   </div>

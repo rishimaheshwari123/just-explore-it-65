@@ -79,6 +79,12 @@ interface Business {
   };
   status: 'active' | 'inactive' | 'pending' | 'suspended';
   isPremium: boolean;
+  currentSubscription?: {
+    planName: string;
+    status: string;
+    endDate: string;
+    priority: number;
+  };
   createdAt: string;
   updatedAt: string;
   images?: Array<{
@@ -450,6 +456,7 @@ const BusinessManagement: React.FC = () => {
                     <TableHead>Category</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Subscription</TableHead>
                     <TableHead>Analytics</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead>Actions</TableHead>
@@ -512,6 +519,8 @@ const BusinessManagement: React.FC = () => {
                       </TableCell>
                       
                       <TableCell>{getStatusBadge(business.status)}</TableCell>
+                      
+                      <TableCell>{getSubscriptionBadge(business)}</TableCell>
                       
                       <TableCell>
                         <div className="text-sm">
@@ -865,6 +874,44 @@ const BusinessManagement: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+};
+
+// Helper function to get subscription badge
+const getSubscriptionBadge = (business: Business) => {
+  if (!business.currentSubscription || business.currentSubscription.status !== 'active') {
+    return (
+      <Badge variant="outline" className="text-gray-600 border-gray-300">
+        Free Plan
+      </Badge>
+    );
+  }
+
+  const { planName, priority, endDate } = business.currentSubscription;
+  const isExpiringSoon = new Date(endDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  
+  let badgeClass = "bg-blue-100 text-blue-800";
+  let icon = "💼";
+  
+  if (priority >= 3) {
+    badgeClass = "bg-purple-100 text-purple-800";
+    icon = "👑";
+  } else if (priority >= 2) {
+    badgeClass = "bg-yellow-100 text-yellow-800";
+    icon = "⭐";
+  }
+
+  return (
+    <div className="flex flex-col gap-1">
+      <Badge className={badgeClass}>
+        {icon} {planName}
+      </Badge>
+      {isExpiringSoon && (
+        <Badge variant="outline" className="text-orange-600 border-orange-300 text-xs">
+          Expires Soon
+        </Badge>
+      )}
     </div>
   );
 };

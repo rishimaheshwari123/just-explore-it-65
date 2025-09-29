@@ -46,6 +46,7 @@ app.use("/api/v1/career", require("./routes/careerRoute"))
 app.use("/api/v1/job", require("./routes/jobRoute"))
 app.use("/api/v1/customer-support", require("./routes/customerSupportRoute"))
 app.use("/api/v1/ads", require("./routes/adsRoute"));
+app.use("/api/v1/subscription", require("./routes/subscriptionRoutes"));
 
 
 

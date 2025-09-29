@@ -45,6 +45,8 @@ import UsersManagement from "./pages/admin/UsersManagement";
 import SubscriptionLogs from "./pages/admin/SubscriptionLogs";
 import CreateAdd from "./pages/admin/CreateAdd";
 import VerifyEmail from "./pages/VerifyEmail";
+import SubscriptionPage from "./pages/SubscriptionPage";
+import VendorSubscriptions from "./pages/vendor/VendorSubscriptions";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +69,7 @@ const App = () => {
             <Route path="/business/:id" element={<BusinessDetail />} />
             <Route path="/add-business" element={<AddBusiness />} />
             <Route path="/edit-business/:id" element={<EditBusiness />} />
+            <Route path="/subscription/:businessId" element={<SubscriptionPage />} />
             <Route path="/blog/:id" element={<SingleBlog />} />
             <Route
               path="/login"
@@ -292,6 +295,14 @@ const App = () => {
                   element={
                     <PrivateRoute>
                       <VendorSupport />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="subscriptions"
+                  element={
+                    <PrivateRoute>
+                      <VendorSubscriptions />
                     </PrivateRoute>
                   }
                 />

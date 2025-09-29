@@ -448,6 +448,12 @@ const FeaturedBusinesses = () => {
                           Verified
                         </Badge>
                       )}
+                      {business.isPremium && (
+                        <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs font-semibold">
+                          <Star className="h-3 w-3 mr-1" />
+                          Premium
+                        </Badge>
+                      )}
                     </div>
 
                     {/* Status Badge */}

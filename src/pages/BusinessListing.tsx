@@ -328,6 +328,12 @@ const BusinessListing = () => {
                 Verified
               </Badge>
             )}
+            {business.isPremium && (
+              <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs font-semibold">
+                <Star className="h-3 w-3 mr-1" />
+                Premium
+              </Badge>
+            )}
             {business.premiumFeatures.featuredListing && (
               <Badge className="bg-yellow-500 text-white text-xs">
                 Featured
@@ -452,6 +458,12 @@ const BusinessListing = () => {
                       <Badge className="bg-green-500 text-white text-xs flex items-center gap-1">
                         <Verified className="h-3 w-3" />
                         Verified
+                      </Badge>
+                    )}
+                    {business.isPremium && (
+                      <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white text-xs font-semibold">
+                        <Star className="h-3 w-3 mr-1" />
+                        Premium
                       </Badge>
                     )}
                   </div>

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ShoppingBag, Plus, Search, Filter, Eye, Edit, Trash2, Star, MapPin, Phone, Clock, Users } from 'lucide-react';
+import { ShoppingBag, Plus, Search, Filter, Eye, Edit, Trash2, Star, MapPin, Phone, Clock, Users, Crown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useSelector } from 'react-redux';
@@ -358,6 +358,18 @@ const VendorBusinesses = () => {
                         View
                       </Button>
                     </Link>
+                    <Link to={`/subscription/${business._id}`} className="flex-1">
+                      <Button 
+                        size="sm" 
+                        className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                      >
+                        <Crown className="h-4 w-4 mr-1" />
+                        Upgrade
+                      </Button>
+                    </Link>
+                  </div>
+                  
+                  <div className="flex gap-2 mt-2">
                     <Button 
                       variant="outline" 
                       size="sm" 
