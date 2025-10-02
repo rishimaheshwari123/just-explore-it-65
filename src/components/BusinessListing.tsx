@@ -126,7 +126,7 @@ const BusinessListing: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "http://localhost:8000/api/v1/property/businesses?limit=50"
+        "https://server.businessgurujee.com/api/v1/property/businesses?limit=50"
       );
       if (!response.ok) {
         throw new Error("Failed to fetch businesses");

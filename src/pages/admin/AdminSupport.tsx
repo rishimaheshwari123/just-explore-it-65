@@ -111,7 +111,7 @@ const AdminSupport: React.FC = () => {
   // Fetch tickets and stats
   const fetchData = async () => {
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       
       // Fetch tickets
       const ticketsResponse = await fetch(`${BASE_URL}/tickets/admin/all`);
@@ -143,7 +143,7 @@ const AdminSupport: React.FC = () => {
   // Update ticket status
   const handleUpdateStatus = async (ticketId: string, status: string) => {
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/tickets/admin/status/${ticketId}`, {
         method: 'PUT',
         headers: {
@@ -179,7 +179,7 @@ const AdminSupport: React.FC = () => {
     if (!newMessage.trim()) return;
 
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/tickets/message/${ticketId}`, {
         method: 'POST',
         headers: {

@@ -97,7 +97,7 @@ const VendorInquiryManagement: React.FC<VendorInquiryManagementProps> = ({ vendo
       if (filters.status !== "all") queryParams.append("status", filters.status);
       if (filters.priority !== "all") queryParams.append("priority", filters.priority);
       
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(
         `${BASE_URL}/inquiry/vendor/${vendorId}?${queryParams}`
       );
@@ -134,7 +134,7 @@ const VendorInquiryManagement: React.FC<VendorInquiryManagementProps> = ({ vendo
 
     setReplyLoading(true);
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(
         `${BASE_URL}/inquiry/reply/${inquiryId}`,
         {
@@ -169,7 +169,7 @@ const VendorInquiryManagement: React.FC<VendorInquiryManagementProps> = ({ vendo
 
   const updateInquiryStatus = async (inquiryId: string, status: string) => {
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(
         `${BASE_URL}/inquiry/status/${inquiryId}`,
         {

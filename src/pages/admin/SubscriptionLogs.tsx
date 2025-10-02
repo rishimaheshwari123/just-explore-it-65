@@ -75,7 +75,7 @@ const SubscriptionLogs = () => {
   const fetchSubscriptionLogs = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8000/api/v1/subscription/logs?page=${page}&limit=50`);
+      const response = await fetch(`https://server.businessgurujee.com/api/v1/subscription/logs?page=${page}&limit=50`);
       const data = await response.json();
       
       if (data.success) {

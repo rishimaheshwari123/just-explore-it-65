@@ -78,12 +78,12 @@ const SubscriptionPage: React.FC = () => {
       setLoading(true);
       
       // Fetch subscription plans
-      const plansResponse = await axios.get('http://localhost:8000/api/v1/subscriptions/plans');
+      const plansResponse = await axios.get('https://server.businessgurujee.com/api/v1/subscriptions/plans');
       setPlans(plansResponse.data.data || []);
 console.log(plansResponse)
       // Fetch business details if businessId is provided
       if (businessId) {
-        const businessResponse = await axios.get(`http://localhost:8000/api/v1/property/business/${businessId}`);
+        const businessResponse = await axios.get(`https://server.businessgurujee.com/api/v1/property/business/${businessId}`);
         setBusiness(businessResponse.data.business);
         console.log(businessResponse.data.business)
       }
@@ -104,7 +104,7 @@ console.log(plansResponse)
     try {
       setPurchasing(planId);
       
-      const response = await axios.post('http://localhost:8000/api/v1/subscriptions/purchase', {
+      const response = await axios.post('https://server.businessgurujee.com/api/v1/subscriptions/purchase', {
         businessId,
         planId,
         vendorId:user._id

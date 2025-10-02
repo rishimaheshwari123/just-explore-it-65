@@ -45,7 +45,7 @@ const Index = () => {
     const fetchHomeData = async () => {
       try {
         const BASE_URL =
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+          import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
 
         // Fetch businesses for stats
         const businessResponse = await fetch(`${BASE_URL}/property/get-all`);

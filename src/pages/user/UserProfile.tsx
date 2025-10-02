@@ -84,7 +84,7 @@ const UserProfile: React.FC = () => {
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       
       // Fetch user inquiries
       const inquiriesResponse = await fetch(`${BASE_URL}/inquiry/user/${user._id}`);
@@ -164,7 +164,7 @@ const UserProfile: React.FC = () => {
     }
 
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/inquiry/user-reply/${selectedInquiry._id}`, {
         method: 'POST',
         headers: {

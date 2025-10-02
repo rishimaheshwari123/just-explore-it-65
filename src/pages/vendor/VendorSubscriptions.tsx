@@ -45,7 +45,7 @@ const VendorSubscriptions = () => {
   const fetchVendorBusinesses = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:8000/api/v1/property/businesses/vendor/${user?._id}`, {
+      const response = await axios.get(`https://server.businessgurujee.com/api/v1/property/businesses/vendor/${user?._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBusinesses(response.data.businesses || []);
