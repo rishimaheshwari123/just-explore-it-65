@@ -385,20 +385,7 @@ const LocationServices: React.FC = () => {
                   </div>
 
                   {/* Travel Options */}
-                  <div className="flex items-center justify-center gap-4 mt-4 pt-4 border-t border-gray-100">
-                    <div className="flex items-center gap-1 text-xs text-gray-500">
-                      <Car className="h-3 w-3" />
-                      <span>5 min</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-gray-500">
-                      <Bike className="h-3 w-3" />
-                      <span>12 min</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-gray-500">
-                      <User className="h-3 w-3" />
-                      <span>18 min</span>
-                    </div>
-                  </div>
+                
                 </div>
               </div>
             ))
@@ -406,27 +393,7 @@ const LocationServices: React.FC = () => {
         </div>
 
         {/* Map Integration Note */}
-        <div className="text-center mt-12">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-7xl mx-auto">
-            <MapPin className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-            <h3 className="font-semibold text-blue-900 mb-2">
-              Interactive Map View
-            </h3>
-            <p className="text-blue-700 text-sm mb-4">
-              Click on "Directions" to open Google Maps with turn-by-turn
-              navigation to your selected business.
-            </p>
-            <Button
-              variant="outline"
-              className="border-blue-300 text-blue-700 hover:bg-blue-100"
-              onClick={viewAllOnMap}
-              disabled={nearbyBusinesses.length === 0}
-            >
-              <Navigation className="h-4 w-4 mr-2" />
-              View All on Map
-            </Button>
-          </div>
-        </div>
+      
       </div>
     </section>
   );

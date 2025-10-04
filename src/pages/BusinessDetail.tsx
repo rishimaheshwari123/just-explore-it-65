@@ -144,6 +144,39 @@ const BusinessDetail: React.FC = () => {
       setLoading(false);
     }
   };
+   const trackInteraction = async (type: string) => {
+    try {
+      await fetch(
+        `https://server.businessgurujee.com/api/v1/property/business/${id}/track-interaction`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ type }),
+        }
+      );
+    } catch (error) {
+      console.error("Error tracking interaction:", error);
+    }
+  };
+const handleGetDirections = () => {
+  if (business) {
+    trackInteraction("direction"); // keep tracking if needed
+
+    const { street, area, city, state, pincode } = business.address;
+
+    // Construct full address
+    const address = `${street}, ${area}, ${city}, ${state} ${pincode}`;
+    const encodedAddress = encodeURIComponent(address);
+
+    // Open Google Maps in a new tab
+    window.open(
+      `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`,
+      "_blank"
+    );
+  }
+};
 
   const trackView = async () => {
     try {
@@ -772,10 +805,14 @@ const BusinessDetail: React.FC = () => {
                     ></iframe>
                   </div>
 
-                  <Button variant="outline" className="w-full mt-4">
-                    <Navigation className="h-4 w-4 mr-2" />
-                    Get Directions
-                  </Button>
+                  <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGetDirections}
+                >
+                  <Navigation className="h-4 w-4 mr-2" />
+                  Get Directions
+                </Button>
                 </CardContent>
               </Card>
 

@@ -86,7 +86,56 @@ const Index = () => {
       <HeroBanner />
       <SearchSection />
 
-      {/* Enhanced Stats Section with Animations */}
+   
+
+      <FloatingAd />
+
+   
+
+      {/* Enhanced Business Categories with Animation */}
+      <section className="py-2 bg-gradient-to-b from-muted/30 to-background ">
+        <BusinessCategories />
+      </section>
+      <AdSlider />
+
+      {/* Content Sections with Improved Spacing */}
+      {/* {(activeFilter === "all" || activeFilter === "businesses") && (
+        <section className="py-3 animate-fade-in">
+          <FeaturedBusinesses />
+        </section>
+      )} */}
+
+      {(activeFilter === "all" || activeFilter === "businesses") && (
+        <section className="py-2 bg-muted/20 animate-fade-in">
+          <BusinessListing />
+        </section>
+      )}
+
+      {/* Enhanced Sections with Better Spacing */}
+      <section className="py- bg-gradient-to-br from-background to-muted/30">
+        <TrendingSection />
+      </section>
+
+      <section className="py-">
+        <LocationServices />
+      </section>
+
+      {/* <section className="py-5 bg-muted/40">
+        <ReviewsSection />
+      </section> */}
+
+      <section className=" bg-gradient-to-t from-card to-background">
+        <ConnectSection />
+      </section>
+
+      <section className=" bg-gradient-to-br from-muted/20 to-background">
+        <CustomerReviews />
+      </section>
+
+      <section className="py-0">
+        <PopularSearches />
+      </section>
+   {/* Enhanced Stats Section with Animations */}
       <section className="relative py-16 lg:py-24 bg-gradient-to-br from-background via-muted/20 to-background overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--primary)/0.1),transparent_50%)]" />
@@ -197,97 +246,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      <AdSlider />
-      <FloatingAd />
-
-      {/* Enhanced Filter Section */}
-      <section className="py-12 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
-            {/* Filter Tabs */}
-            <div className="flex flex-wrap items-center gap-3">
-              <Button
-                variant={activeFilter === "all" ? "default" : "outline"}
-                onClick={() => setActiveFilter("all")}
-                className="relative overflow-hidden group"
-              >
-                <span className="relative z-10">All Businesses</span>
-                {activeFilter === "all" && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary-glow to-primary animate-pulse" />
-                )}
-              </Button>
-              <Button
-                variant={activeFilter === "businesses" ? "default" : "outline"}
-                onClick={() => setActiveFilter("businesses")}
-                className="relative overflow-hidden group flex items-center gap-2"
-              >
-                <Building2 className="w-4 h-4 relative z-10" />
-                <span className="relative z-10">Featured Businesses</span>
-                {activeFilter === "businesses" && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary-glow to-primary animate-pulse" />
-                )}
-              </Button>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                onClick={() => navigate("/business-listing")}
-                className="flex items-center gap-2 hover-scale"
-              >
-                <List className="w-4 h-4" />
-                <span>View All</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Enhanced Business Categories with Animation */}
-      <section className="py-2 bg-gradient-to-b from-muted/30 to-background">
-        <BusinessCategories />
-      </section>
-
-      {/* Content Sections with Improved Spacing */}
-      {(activeFilter === "all" || activeFilter === "businesses") && (
-        <section className="py-3 animate-fade-in">
-          <FeaturedBusinesses />
-        </section>
-      )}
-
-      {(activeFilter === "all" || activeFilter === "businesses") && (
-        <section className="py-2 bg-muted/20 animate-fade-in">
-          <BusinessListing />
-        </section>
-      )}
-
-      {/* Enhanced Sections with Better Spacing */}
-      <section className="py- bg-gradient-to-br from-background to-muted/30">
-        <TrendingSection />
-      </section>
-
-      <section className="py-">
-        <LocationServices />
-      </section>
-
-      {/* <section className="py-5 bg-muted/40">
-        <ReviewsSection />
-      </section> */}
-
-      <section className=" bg-gradient-to-t from-card to-background">
-        <ConnectSection />
-      </section>
-
-      <section className=" bg-gradient-to-br from-muted/20 to-background">
-        <CustomerReviews />
-      </section>
-
-      <section className="py-0">
-        <PopularSearches />
-      </section>
-
       <section className="py-0 bg-gradient-to-t from-primary/5 to-background">
         <AppPromotion />
       </section>

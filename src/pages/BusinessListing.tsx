@@ -29,6 +29,7 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TopBar from "@/components/TopBar";
+import { BUSINESS_CATEGORIES } from "@/constants/categories";
 
 interface Business {
   _id: string;
@@ -121,18 +122,7 @@ const BusinessListing = () => {
   const [selectedDistance, setSelectedDistance] = useState("10"); // km
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
 
-  const categories = [
-    "Restaurants",
-    "Hotels",
-    "Healthcare",
-    "Education",
-    "Automotive",
-    "Beauty & Spa",
-    "Shopping",
-    "Services",
-    "Entertainment",
-    "Real Estate",
-  ];
+  const categories = BUSINESS_CATEGORIES
 
   const locations = [
     "Mumbai",

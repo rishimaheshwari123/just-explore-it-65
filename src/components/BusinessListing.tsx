@@ -19,6 +19,7 @@ import {
   Clock,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { BUSINESS_CATEGORIES } from "@/constants/categories";
 
 interface Business {
   _id: string;
@@ -104,24 +105,7 @@ const BusinessListing: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>("rating");
   const [priceFilter, setPriceFilter] = useState<string>("all");
 
-  const categories = [
-    "Restaurants & Food",
-    "Healthcare & Medical",
-    "Education",
-    "Beauty & Wellness",
-    "Automotive",
-    "Home Services",
-    "Professional Services",
-    "Retail & Shopping",
-    "Entertainment",
-    "Travel & Tourism",
-    "Real Estate",
-    "Technology",
-    "Finance & Banking",
-    "Sports & Fitness",
-    "Pet Services",
-  ];
-
+  const categories = BUSINESS_CATEGORIES
   const fetchBusinesses = async () => {
     setLoading(true);
     try {
@@ -234,7 +218,7 @@ const BusinessListing: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+        {false && <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Search */}
             <div className="relative">
@@ -314,7 +298,7 @@ const BusinessListing: React.FC = () => {
               </SelectContent>
             </Select>
           </div>
-        </div>
+        </div>}
 
         {/* Results Count */}
         <div className="mb-6">

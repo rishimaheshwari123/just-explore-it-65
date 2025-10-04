@@ -341,7 +341,7 @@ const FeaturedBusinesses = () => {
         </div>
 
         {/* Filter Controls */}
-        <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">
+        {/* <div className="mb-8 bg-white p-6 rounded-lg shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <Filter className="h-5 w-5 text-muted-foreground" />
             <h3 className="font-semibold">Filter Businesses</h3>
@@ -400,7 +400,7 @@ const FeaturedBusinesses = () => {
             Showing {filteredBusinesses.length} of {businesses.length}{" "}
             businesses
           </div>
-        </div>
+        </div> */}
 
         {businesses.length === 0 ? (
           <div className="text-center py-12">

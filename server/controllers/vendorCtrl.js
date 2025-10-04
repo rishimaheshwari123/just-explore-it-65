@@ -100,12 +100,12 @@ const vendorLoginCtrl = async (req, res) => {
         message: `Vendor is not Registered with Us Please SignUp to Continue`,
       });
     }
-    if (user.status !== "approved") {
-      return res.status(403).json({
-        success: false,
-        message: `Your account is not active till now`,
-      });
-    }
+    // if (user.status !== "approved") {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: `Your account is not active till now`,
+    //   });
+    // }
 
     if (await bcrypt.compare(password, user.password)) {
       const token = jwt.sign(
