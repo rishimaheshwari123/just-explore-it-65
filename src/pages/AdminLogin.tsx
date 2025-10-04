@@ -63,17 +63,7 @@ const AdminLogin = () => {
                 </span>
               </div>
             </div>
-            <div className="flex items-center justify-between mt-4">
-              <p className="text-sm text-gray-600">
-                If not have account please register
-              </p>
-              <Link
-                to="/register"
-                className="text-sm font-semibold text-blue-600 hover:underline"
-              >
-                Register
-              </Link>
-            </div>
+          
 
             <Button
               type="submit"

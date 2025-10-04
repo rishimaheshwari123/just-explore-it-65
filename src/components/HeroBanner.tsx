@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import heroBanner from "@/assets/hero-banner.jpg";
-import heroBanner2 from "@/assets/1.png";
+import heroBanner2 from "@/assets/5.png";
 import heroBanner3 from "@/assets/2.png";
 
 const HeroBanner = () => {

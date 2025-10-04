@@ -79,14 +79,14 @@ const App = () => {
                 </OpenRoute>
               }
             />
-            <Route
+            {/* <Route
               path="/register"
               element={
                 <OpenRoute>
                   <AdminSignup />
                 </OpenRoute>
               }
-            />
+            /> */}
             <Route
               path="/vendor/register"
               element={
