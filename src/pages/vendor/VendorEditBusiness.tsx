@@ -1341,7 +1341,7 @@ const VendorEditBusiness = () => {
               {/* Step 5: Features, Images & Additional Info */}
               {currentStep === 5 && (
                 <div className="space-y-6">
-                  <div>
+                  {/* <div>
                     <h3 className="text-lg font-semibold mb-4">
                       Business Features
                     </h3>
@@ -1376,7 +1376,7 @@ const VendorEditBusiness = () => {
                         </Badge>
                       ))}
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="space-y-4">
                     <h4 className="font-medium flex items-center gap-2">
@@ -1439,7 +1439,7 @@ const VendorEditBusiness = () => {
                   <div>
                     <Label htmlFor="priceRange">Price Range</Label>
                     <Select
-                      value={formData.priceRange}
+                      value={formData.priceRange || ""} // controlled value
                       onValueChange={(value) =>
                         handleInputChange("root", "priceRange", value)
                       }
@@ -1449,11 +1449,15 @@ const VendorEditBusiness = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="budget">
-                          Budget Friendly (₹)
+                          Budget Friendly (₹0 - ₹500)
                         </SelectItem>
-                        <SelectItem value="moderate">Moderate (₹₹)</SelectItem>
-                        <SelectItem value="premium">Premium (₹₹₹)</SelectItem>
-                        <SelectItem value="luxury">Luxury (₹₹₹₹)</SelectItem>
+                        <SelectItem value="moderate">
+                          Moderate (₹500 - ₹2000)
+                        </SelectItem>
+                        <SelectItem value="premium">
+                          Premium (₹2000 - ₹5000)
+                        </SelectItem>
+                        <SelectItem value="luxury">Luxury (₹5000+)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

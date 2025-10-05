@@ -53,7 +53,6 @@ const createBusinessCtrl = async (req, res) => {
             priceRange,
             vendor,
         } = businessData;
-        console.log(req.body)
         // ========== HANDLE FILE UPLOAD ==========
         const uploadedImages = [];
         if (req.files && req.files.images) {
@@ -276,6 +275,7 @@ const updateBusinessCtrl = async (req, res) => {
             paymentMethods,
             amenities,
             images,
+            priceRange,
             vendor,
         } = req.body;
 
@@ -337,6 +337,7 @@ const updateBusinessCtrl = async (req, res) => {
             ...(employeeCount && { employeeCount }),
             ...(address && { address }),
             ...(contactInfo && { contactInfo }),
+            ...(priceRange && { priceRange }),
             ...(area && { area }),
             ...(coordinates && {
                 location: {

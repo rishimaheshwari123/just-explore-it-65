@@ -293,6 +293,12 @@ const businessSchema = new mongoose.Schema(
             type: String,
             trim: true,
         }],
+        paymentMethods: [{
+            type: String,
+        }],
+        amenities: [{
+            type: String,
+        }],
 
         // Business Status
         status: {
