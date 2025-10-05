@@ -19,10 +19,7 @@ const Footer = () => {
           {/* Company Info */}
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="text-2xl font-bold bg-gradient-to-r from-secondary to-accent bg-clip-text text-transparent">
-                BG
-              </div>
-              <span className="text-xl font-semibold">Business Gurujee</span>
+              <img src="/logo2.png" alt="" className="h-20" />
             </div>
             <p className="text-white mb-4">
               Your trusted local business directory. Find the best businesses

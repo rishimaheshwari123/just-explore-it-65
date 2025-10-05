@@ -6,7 +6,7 @@ function VendorLayout() {
     <div className="">
       <Sidebar />
 
-      <div className="lg:ml-24 mx-5 mt-3 ml-[100px] min-h-screen  ">
+      <div className="lg:ml-24 mx-2 mt-3 ml-[82px] min-h-screen  ">
         <Outlet />
       </div>
     </div>
