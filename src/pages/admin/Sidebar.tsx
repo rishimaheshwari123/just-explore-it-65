@@ -107,13 +107,13 @@ const Sidebar = () => {
       color: "text-cyan-600",
       permission: "editBusiness",
     },
-    {
-      to: "/admin/add-business",
-      icon: Plus,
-      label: "Add Business",
-      color: "text-emerald-600",
-      permission: "addBusiness",
-    },
+    // {
+    //   to: "/admin/add-business",
+    //   icon: Plus,
+    //   label: "Add Business",
+    //   color: "text-emerald-600",
+    //   permission: "addBusiness",
+    // },
     {
       to: "/admin/support",
       icon: MessageSquare,

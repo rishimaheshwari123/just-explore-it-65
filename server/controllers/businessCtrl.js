@@ -53,7 +53,7 @@ const createBusinessCtrl = async (req, res) => {
             priceRange,
             vendor,
         } = businessData;
-
+        console.log(req.body)
         // ========== HANDLE FILE UPLOAD ==========
         const uploadedImages = [];
         if (req.files && req.files.images) {
@@ -446,10 +446,10 @@ const getBusinessesCtrl = async (req, res) => {
         if (search) {
             // Split search term into individual keywords for partial matching
             const searchKeywords = search.toLowerCase().split(/\s+/).filter(keyword => keyword.length > 0);
-            
+
             // Create search conditions for each keyword
             const searchConditions = [];
-            
+
             searchKeywords.forEach(keyword => {
                 const keywordRegex = new RegExp(keyword, 'i');
                 searchConditions.push({
@@ -467,7 +467,7 @@ const getBusinessesCtrl = async (req, res) => {
                     ]
                 });
             });
-            
+
             // If multiple keywords, match any of them (OR logic)
             if (searchConditions.length > 0) {
                 filter.$or = filter.$or ? filter.$or.concat(searchConditions) : searchConditions;
@@ -491,12 +491,12 @@ const getBusinessesCtrl = async (req, res) => {
 
         // Build sort object with premium business priority
         const sort = {};
-        
+
         // Always prioritize premium businesses first
         sort['isPremium'] = -1; // Premium businesses first
         sort['currentSubscription.priority'] = -1; // Higher priority first
         sort['currentSubscription.status'] = -1; // Active subscriptions first
-        
+
         if (sortBy === 'rating') {
             sort['ratings.average'] = sortOrder === 'asc' ? 1 : -1;
         } else if (sortBy === 'views') {
@@ -554,8 +554,8 @@ const getBusinessesCtrl = async (req, res) => {
                     }
                 },
                 {
-                    $sort: sortBy === 'distance' ? 
-                        { isPremium: -1, 'currentSubscription.priority': -1, distance: 1 } : 
+                    $sort: sortBy === 'distance' ?
+                        { isPremium: -1, 'currentSubscription.priority': -1, distance: 1 } :
                         { isPremium: -1, 'currentSubscription.priority': -1, ...sort }
                 },
                 {

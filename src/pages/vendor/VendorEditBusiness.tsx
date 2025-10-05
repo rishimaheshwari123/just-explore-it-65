@@ -235,7 +235,7 @@ const VendorEditBusiness = () => {
         )}/${businessId}`
       );
       const data = await response.json();
-      console.log(data, "bus");
+      console.log(data, "single bussiness data");
       if (data.success) {
         const businessData = data.business;
         setFormData({

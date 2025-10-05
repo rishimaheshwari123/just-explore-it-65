@@ -1,15 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ShoppingBag, Plus, Search, Filter, Eye, Edit, Trash2, Star, MapPin, Phone, Clock, Users, Crown } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { toast } from 'sonner';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
-import { business } from '../../service/apis';
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  ShoppingBag,
+  Plus,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  Trash2,
+  Star,
+  MapPin,
+  Phone,
+  Clock,
+  Users,
+  Crown,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { business } from "../../service/apis";
 
 interface Business {
   _id: string;
@@ -59,10 +85,10 @@ interface Business {
 const VendorBusinesses = () => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+
   // Get vendor ID from Redux store
   const { user } = useSelector((state: RootState) => state.auth);
   const vendorId = user?._id;
@@ -70,25 +96,27 @@ const VendorBusinesses = () => {
   // Fetch vendor businesses from API
   const fetchVendorBusinesses = async () => {
     if (!vendorId) {
-      toast.error('Vendor ID not found');
+      toast.error("Vendor ID not found");
       return;
     }
 
     try {
       setLoading(true);
-      const response = await fetch(`${business.GET_VENDOR_BUSINESS_API}/${vendorId}`);
+      const response = await fetch(
+        `${business.GET_VENDOR_BUSINESS_API}/${vendorId}`
+      );
       const data = await response.json();
 
       if (data.success) {
         setBusinesses(data.businesses || []);
       } else {
-        console.error('Failed to fetch businesses:', data.message);
-        toast.error('Failed to load businesses');
+        console.error("Failed to fetch businesses:", data.message);
+        toast.error("Failed to load businesses");
         setBusinesses([]);
       }
     } catch (error) {
-      console.error('Error fetching businesses:', error);
-      toast.error('Failed to load businesses');
+      console.error("Error fetching businesses:", error);
+      toast.error("Failed to load businesses");
       setBusinesses([]);
     } finally {
       setLoading(false);
@@ -102,39 +130,51 @@ const VendorBusinesses = () => {
     }
   }, [vendorId]);
 
-  const filteredBusinesses = businesses.filter(business => {
-    const matchesSearch = business.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         business.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'all' || business.category === filterCategory;
-    const matchesStatus = filterStatus === 'all' || (filterStatus === 'active' && business.status.isOpen) || (filterStatus === 'pending' && !business.status.isOpen);
-    
+  const filteredBusinesses = businesses.filter((business) => {
+    const matchesSearch =
+      business.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      business.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      filterCategory === "all" || business.category === filterCategory;
+    const matchesStatus =
+      filterStatus === "all" ||
+      (filterStatus === "active" && business.status.isOpen) ||
+      (filterStatus === "pending" && !business.status.isOpen);
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
   const handleDeleteBusiness = async (businessId: string) => {
-    if (!confirm('Are you sure you want to delete this business? This action cannot be undone.')) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this business? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
     try {
-      const response = await fetch(`${business.DELETE_BUSINESS_API}/${businessId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
+      const response = await fetch(
+        `${business.DELETE_BUSINESS_API}/${businessId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       const data = await response.json();
-      
+
       if (data.success) {
-        setBusinesses(prev => prev.filter(b => b._id !== businessId));
-        toast.success('Business deleted successfully!');
+        setBusinesses((prev) => prev.filter((b) => b._id !== businessId));
+        toast.success("Business deleted successfully!");
       } else {
-        toast.error(data.message || 'Failed to delete business');
+        toast.error(data.message || "Failed to delete business");
       }
     } catch (error) {
-      console.error('Error deleting business:', error);
-      toast.error('Failed to delete business');
+      console.error("Error deleting business:", error);
+      toast.error("Failed to delete business");
     }
   };
 
@@ -145,9 +185,9 @@ const VendorBusinesses = () => {
 
   const getStatusColor = (status: { isOpen: boolean; message: string }) => {
     if (status.isOpen) {
-      return 'bg-green-100 text-green-800';
+      return "bg-green-100 text-green-800";
     } else {
-      return 'bg-yellow-100 text-yellow-800';
+      return "bg-yellow-100 text-yellow-800";
     }
   };
 
@@ -158,7 +198,7 @@ const VendorBusinesses = () => {
           <div className="animate-pulse">
             <div className="h-8 bg-gray-300 rounded w-1/4 mb-4"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map(i => (
+              {[1, 2, 3].map((i) => (
                 <div key={i} className="h-64 bg-gray-300 rounded-lg"></div>
               ))}
             </div>
@@ -179,8 +219,12 @@ const VendorBusinesses = () => {
                 <ShoppingBag className="h-6 w-6 text-emerald-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">My Businesses</h1>
-                <p className="text-gray-600 mt-1">Manage all your registered businesses</p>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  My Businesses
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Manage all your registered businesses
+                </p>
               </div>
             </div>
             <Link to="/vendor/add-business">
@@ -198,7 +242,9 @@ const VendorBusinesses = () => {
                 <div className="flex items-center gap-3">
                   <ShoppingBag className="h-8 w-8 text-emerald-600" />
                   <div>
-                    <p className="text-2xl font-bold text-gray-900">{businesses.length}</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {businesses.length}
+                    </p>
                     <p className="text-sm text-gray-600">Total Businesses</p>
                   </div>
                 </div>
@@ -212,7 +258,7 @@ const VendorBusinesses = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-gray-900">
-                      {businesses.filter(b => b.status.isOpen).length}
+                      {businesses.filter((b) => b.status.isOpen).length}
                     </p>
                     <p className="text-sm text-gray-600">Active</p>
                   </div>
@@ -225,7 +271,7 @@ const VendorBusinesses = () => {
                   <Clock className="h-8 w-8 text-yellow-600" />
                   <div>
                     <p className="text-2xl font-bold text-gray-900">
-                      {businesses.filter(b => !b.status.isOpen).length}
+                      {businesses.filter((b) => !b.status.isOpen).length}
                     </p>
                     <p className="text-sm text-gray-600">Pending</p>
                   </div>
@@ -238,7 +284,10 @@ const VendorBusinesses = () => {
                   <Users className="h-8 w-8 text-blue-600" />
                   <div>
                     <p className="text-2xl font-bold text-gray-900">
-                      {businesses.reduce((sum, b) => sum + (b.ratings?.totalReviews || 0), 0)}
+                      {businesses.reduce(
+                        (sum, b) => sum + (b.ratings?.totalReviews || 0),
+                        0
+                      )}
                     </p>
                     <p className="text-sm text-gray-600">Total Reviews</p>
                   </div>
@@ -290,8 +339,12 @@ const VendorBusinesses = () => {
           <Card className="text-center py-12">
             <CardContent>
               <ShoppingBag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No businesses found</h3>
-              <p className="text-gray-600 mb-4">Start by adding your first business to the platform.</p>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No businesses found
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Start by adding your first business to the platform.
+              </p>
               <Link to="/vendor/add-business">
                 <Button className="bg-emerald-600 hover:bg-emerald-700">
                   <Plus className="h-4 w-4 mr-2" />
@@ -303,8 +356,20 @@ const VendorBusinesses = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredBusinesses.map((business) => (
-              <Card key={business._id} className="hover:shadow-lg transition-shadow">
+              <Card
+                key={business._id}
+                className="hover:shadow-lg transition-shadow"
+              >
                 <CardHeader>
+                  {/* ✅ Optional Image Display */}
+                  {business.images?.length > 0 && (
+                    <img
+                      src={business.images[0].url}
+                      alt={business.businessName}
+                      className="w-full h-48 object-cover rounded-t-lg mb-3"
+                    />
+                  )}
+
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <CardTitle className="text-lg font-semibold text-gray-900 mb-1">
@@ -316,41 +381,47 @@ const VendorBusinesses = () => {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className={getStatusColor(business.status)}>
-                        {business.status.isOpen ? 'Active' : 'Pending'}
+                        {business.status.isOpen ? "Active" : "Pending"}
                       </Badge>
                       {business.verified && (
-                        <Badge className="bg-blue-100 text-blue-800">Verified</Badge>
+                        <Badge className="bg-blue-100 text-blue-800">
+                          Verified
+                        </Badge>
                       )}
                     </div>
                   </div>
                 </CardHeader>
+
                 <CardContent>
                   <div className="space-y-3">
                     <p className="text-sm text-gray-600 line-clamp-2">
                       {business.description}
                     </p>
-                    
+
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <MapPin className="h-4 w-4" />
                       <span>{business.fullAddress}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Phone className="h-4 w-4" />
                       <span>{business.contactInfo.phone}</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span>{business.ratings?.average || 0} ({business.ratings?.totalReviews || 0} reviews)</span>
+                      <span>
+                        {business.ratings?.average || 0} (
+                        {business.ratings?.totalReviews || 0} reviews)
+                      </span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Clock className="h-4 w-4" />
                       <span>Services: {business.services.length}</span>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2 mt-4">
                     <Link to={`/business/${business._id}`} className="flex-1">
                       <Button variant="outline" size="sm" className="w-full">
@@ -358,9 +429,12 @@ const VendorBusinesses = () => {
                         View
                       </Button>
                     </Link>
-                    <Link to={`/subscription/${business._id}`} className="flex-1">
-                      <Button 
-                        size="sm" 
+                    <Link
+                      to={`/subscription/${business._id}`}
+                      className="flex-1"
+                    >
+                      <Button
+                        size="sm"
                         className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                       >
                         <Crown className="h-4 w-4 mr-1" />
@@ -368,20 +442,20 @@ const VendorBusinesses = () => {
                       </Button>
                     </Link>
                   </div>
-                  
+
                   <div className="flex gap-2 mt-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="flex-1 text-blue-600 hover:text-blue-700"
                       onClick={() => handleEditBusiness(business._id)}
                     >
                       <Edit className="h-4 w-4 mr-1" />
                       Edit
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       onClick={() => handleDeleteBusiness(business._id)}
                     >

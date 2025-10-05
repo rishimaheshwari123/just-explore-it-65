@@ -18,13 +18,7 @@ const businessSchema = new mongoose.Schema(
         category: {
             type: String,
             required: true,
-            enum: [
-                'Food & Dining', 'Healthcare', 'Education', 'Shopping',
-                'Hotels & Travel', 'Fitness & Wellness', 'Beauty & Spa',
-                'Electronics & Technology', 'Automotive', 'Real Estate',
-                'Financial Services', 'Professional Services', 'Home & Garden',
-                'Entertainment', 'Sports & Recreation', 'Government & Community'
-            ],
+
         },
 
         subCategory: {
@@ -459,12 +453,12 @@ businessSchema.index({ "subscriptions.status": 1, "subscriptions.endDate": 1 });
 businessSchema.virtual('hasActiveSubscription').get(function () {
     if (!this.currentSubscription) return false;
     const now = new Date();
-    return this.currentSubscription.status === 'active' && 
-           this.currentSubscription.endDate > now;
+    return this.currentSubscription.status === 'active' &&
+        this.currentSubscription.endDate > now;
 });
 
 // Method to get subscription priority for search ranking
-businessSchema.methods.getSubscriptionPriority = function() {
+businessSchema.methods.getSubscriptionPriority = function () {
     if (this.hasActiveSubscription) {
         return this.currentSubscription.priority || 0;
     }
