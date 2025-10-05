@@ -128,10 +128,18 @@ const SearchSection = () => {
 const [categorySearch, setCategorySearch] = useState("");
 
   // Include "All Categories" in filtering
-  const allOptions = ["All Categories", ...BUSINESS_CATEGORIES];
-  const filteredCategories = allOptions.filter((cat) =>
-    cat.toLowerCase().includes(categorySearch.toLowerCase())
+  const categoryInputRef = useRef<HTMLInputElement>(null);
+const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+const [filteredCategories, setFilteredCategories] = useState<string[]>(["All Categories", ...BUSINESS_CATEGORIES]);
+
+useEffect(() => {
+  setFilteredCategories(
+    ["All Categories", ...BUSINESS_CATEGORIES].filter((cat) =>
+      cat.toLowerCase().includes(categorySearch.toLowerCase())
+    )
   );
+}, [categorySearch]);
+
 
   return (
     <section className="relative bg-gradient-to-br from-slate-50 via-gray-100 to-slate-200 py-4">
@@ -213,26 +221,21 @@ const [categorySearch, setCategorySearch] = useState("");
   </div>
 
   {/* Category Select */}
-{/* Category Select */}
-<div className="flex-1">
-  <Select
-    value={selectedCategory}
-    onValueChange={(value) => {
-      setSelectedCategory(value);
-      handleInputChange(
-        "root",
-        "category",
-        value === "all" ? "all" : value
-      );
-      setCategorySearch(""); // clear search after select
-    }}
+<div className="flex-1 relative">
+  <div
+    className="h-12 flex items-center border rounded-xl bg-gray-50 px-3 cursor-pointer"
+    onClick={() => setIsCategoryOpen(!isCategoryOpen)}
   >
-    <SelectTrigger className="h-12 bg-gray-50 border-gray-200 text-sm rounded-xl focus-visible:ring-indigo-500">
-      <SelectValue placeholder="All Categories" />
-    </SelectTrigger>
-    <SelectContent>
+    <span className="text-sm text-gray-700">
+      {selectedCategory === "all" ? "All Categories" : selectedCategory}
+    </span>
+  </div>
+
+  {isCategoryOpen && (
+    <div className="absolute top-full mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg z-20">
       {/* Search Input */}
       <input
+        ref={categoryInputRef}
         type="text"
         placeholder="Search category..."
         className="px-2 py-1 mb-2 w-full border rounded"
@@ -240,21 +243,29 @@ const [categorySearch, setCategorySearch] = useState("");
         onChange={(e) => setCategorySearch(e.target.value)}
         autoComplete="off"
       />
-      {/* Filtered Category Options */}
-      {["All Categories", ...BUSINESS_CATEGORIES]
-        .filter((cat) =>
-          cat.toLowerCase().includes(categorySearch.toLowerCase())
-        )
-        .map((category) => (
-          <SelectItem
-            key={category}
-            value={category === "All Categories" ? "all" : category}
-          >
-            {category}
-          </SelectItem>
-        ))}
-    </SelectContent>
-  </Select>
+
+      {/* Filtered Categories */}
+      <div className="max-h-48 overflow-y-auto">
+        {filteredCategories.length > 0 ? (
+          filteredCategories.map((category) => (
+            <div
+              key={category}
+              className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+              onClick={() => {
+                setSelectedCategory(category === "All Categories" ? "all" : category);
+                setCategorySearch("");
+                setIsCategoryOpen(false);
+              }}
+            >
+              {category}
+            </div>
+          ))
+        ) : (
+          <div className="px-3 py-2 text-gray-400">No results found</div>
+        )}
+      </div>
+    </div>
+  )}
 </div>
 
 

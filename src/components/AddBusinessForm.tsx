@@ -1139,21 +1139,31 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
                   <SelectTrigger>
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <input
-                      type="text"
-                      placeholder="Search category..."
-                      className="px-2 py-1 mb-2 w-full border rounded"
-                      value={categorySearch}
-                      onChange={(e) => setCategorySearch(e.target.value)}
-                      autoComplete="off" // prevents browser autocomplete
-                    />
-                    {filteredCategories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+              <SelectContent>
+  <input
+    type="text"
+    placeholder="Search category..."
+    className="px-2 py-1 mb-2 w-full border rounded"
+    value={categorySearch}
+    onChange={(e) => setCategorySearch(e.target.value)}
+    autoComplete="off"
+    onKeyDown={(e) => e.stopPropagation()} // 👈 key events list ko na jayein
+  />
+  {filteredCategories.length > 0 ? (
+    filteredCategories.map((category) => (
+      <SelectItem
+        key={category}
+        value={category}
+        tabIndex={-1} // 👈 isse item focus nahi lega
+      >
+        {category}
+      </SelectItem>
+    ))
+  ) : (
+    <div className="px-2 py-1 text-gray-400">No results found</div>
+  )}
+</SelectContent>
+
                 </Select>
               </div>
 
@@ -1177,22 +1187,24 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
                       }
                     />
                   </SelectTrigger>
-                  <SelectContent>
-                    <input
-                      type="text"
-                      placeholder="Search subcategory..."
-                      className="px-2 py-1 mb-2 w-full border rounded"
-                      value={subCategorySearch}
-                      onChange={(e) => setSubCategorySearch(e.target.value)}
-                      disabled={!formData.category}
-                      autoComplete="off" // prevents browser autocomplete
-                    />
-                    {filteredSubCategories.map((subCategory) => (
-                      <SelectItem key={subCategory} value={subCategory}>
-                        {subCategory}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
+             <SelectContent>
+  <input
+    type="text"
+    placeholder="Search subcategory..."
+    className="px-2 py-1 mb-2 w-full border rounded"
+    value={subCategorySearch}
+    onChange={(e) => setSubCategorySearch(e.target.value)}
+    disabled={!formData.category}
+    autoComplete="off"
+    onKeyDown={(e) => e.stopPropagation()} // 👈 yeh bhi lagao
+  />
+  {filteredSubCategories.map((subCategory) => (
+    <SelectItem key={subCategory} value={subCategory} tabIndex={-1}>
+      {subCategory}
+    </SelectItem>
+  ))}
+</SelectContent>
+
                 </Select>
               </div>
 
