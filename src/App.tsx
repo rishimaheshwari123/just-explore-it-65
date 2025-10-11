@@ -47,6 +47,7 @@ import CreateAdd from "./pages/admin/CreateAdd";
 import VerifyEmail from "./pages/VerifyEmail";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import VendorSubscriptions from "./pages/vendor/VendorSubscriptions";
+import ScrollToTop from "./components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/blogs" element={<Blogs />} />
@@ -69,7 +71,10 @@ const App = () => {
             <Route path="/business/:id" element={<BusinessDetail />} />
             <Route path="/add-business" element={<AddBusiness />} />
             <Route path="/edit-business/:id" element={<EditBusiness />} />
-            <Route path="/subscription/:businessId" element={<SubscriptionPage />} />
+            <Route
+              path="/subscription/:businessId"
+              element={<SubscriptionPage />}
+            />
             <Route path="/blog/:id" element={<SingleBlog />} />
             <Route
               path="/login"

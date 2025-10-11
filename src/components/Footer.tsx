@@ -19,9 +19,13 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <img src="/logo2.png" alt="" className="h-20" />
-            </div>
+            <Link to="/" className="flex items-center">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="h-12 object-contain cursor-pointer transition-transform hover:scale-105"
+              />
+            </Link>
             <p className="text-gray-300 mb-4">
               Your trusted local business directory. Find the best businesses
               near you with verified reviews and ratings.
