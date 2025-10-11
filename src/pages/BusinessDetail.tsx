@@ -25,6 +25,7 @@ import {
 import TopBar from "@/components/TopBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BusinessImageGallery from "./BusinessImageGallery";
 
 interface Business {
   _id: string;
@@ -127,7 +128,8 @@ const BusinessDetail: React.FC = () => {
     try {
       setLoading(true);
       const BASE_URL =
-        import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
+        import.meta.env.VITE_API_BASE_URL ||
+        "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/property/business/${id}`);
       const data = await response.json();
       if (data.success) {
@@ -144,7 +146,7 @@ const BusinessDetail: React.FC = () => {
       setLoading(false);
     }
   };
-   const trackInteraction = async (type: string) => {
+  const trackInteraction = async (type: string) => {
     try {
       await fetch(
         `https://server.businessgurujee.com/api/v1/property/business/${id}/track-interaction`,
@@ -160,28 +162,29 @@ const BusinessDetail: React.FC = () => {
       console.error("Error tracking interaction:", error);
     }
   };
-const handleGetDirections = () => {
-  if (business) {
-    trackInteraction("direction"); // keep tracking if needed
+  const handleGetDirections = () => {
+    if (business) {
+      trackInteraction("direction"); // keep tracking if needed
 
-    const { street, area, city, state, pincode } = business.address;
+      const { street, area, city, state, pincode } = business.address;
 
-    // Construct full address
-    const address = `${street}, ${area}, ${city}, ${state} ${pincode}`;
-    const encodedAddress = encodeURIComponent(address);
+      // Construct full address
+      const address = `${street}, ${area}, ${city}, ${state} ${pincode}`;
+      const encodedAddress = encodeURIComponent(address);
 
-    // Open Google Maps in a new tab
-    window.open(
-      `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`,
-      "_blank"
-    );
-  }
-};
+      // Open Google Maps in a new tab
+      window.open(
+        `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`,
+        "_blank"
+      );
+    }
+  };
 
   const trackView = async () => {
     try {
       const BASE_URL =
-        import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
+        import.meta.env.VITE_API_BASE_URL ||
+        "https://server.businessgurujee.com/api/v1";
       await fetch(`${BASE_URL}/property/business/${id}/interaction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -194,7 +197,8 @@ const handleGetDirections = () => {
 
   const handleCall = (phone: string) => {
     const BASE_URL =
-      import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
+      import.meta.env.VITE_API_BASE_URL ||
+      "https://server.businessgurujee.com/api/v1";
     fetch(`${BASE_URL}/property/business/${id}/interaction`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -214,7 +218,8 @@ const handleGetDirections = () => {
     try {
       setDeleting(true);
       const BASE_URL =
-        import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
+        import.meta.env.VITE_API_BASE_URL ||
+        "https://server.businessgurujee.com/api/v1";
       const response = await fetch(
         `${BASE_URL}/property/business/delete/${id}`,
         {
@@ -379,11 +384,7 @@ const handleGetDirections = () => {
             <div className="lg:col-span-2 space-y-6">
               <Card>
                 <CardContent className="p-0">
-                  <img
-                    src={mainImage}
-                    alt={business.businessName}
-                    className="w-full h-64 object-cover rounded-lg"
-                  />
+                  <BusinessImageGallery images={business.images} />
                 </CardContent>
               </Card>
 
@@ -806,13 +807,13 @@ const handleGetDirections = () => {
                   </div>
 
                   <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleGetDirections}
-                >
-                  <Navigation className="h-4 w-4 mr-2" />
-                  Get Directions
-                </Button>
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleGetDirections}
+                  >
+                    <Navigation className="h-4 w-4 mr-2" />
+                    Get Directions
+                  </Button>
                 </CardContent>
               </Card>
 

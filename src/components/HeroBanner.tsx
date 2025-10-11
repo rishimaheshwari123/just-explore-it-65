@@ -69,7 +69,8 @@ const HeroBanner = () => {
   }, [slides.length]);
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  const prevSlide = () =>
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
     <section className="relative h-[50vh] md:h-[75vh] overflow-hidden">
@@ -85,22 +86,28 @@ const HeroBanner = () => {
           <div
             key={index}
             className={`absolute inset-0 transition-all duration-1000 transform ${
-              index === currentSlide ? "opacity-100 scale-100" : "opacity-0 scale-105"
+              index === currentSlide
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-105"
             }`}
           >
             <div
               className="h-full bg-cover bg-center relative"
               style={{ backgroundImage: `url(${slide.image})` }}
             >
-              <div className={`absolute inset-0 bg-gradient-to-br ${slide.gradient}`} />
+              <div
+                className={`absolute inset-0 bg-gradient-to-br ${slide.gradient}`}
+              />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05)_0%,transparent_50%)] opacity-15"></div>
 
               <div className="relative h-full flex items-center">
                 <div className="container mx-auto px-6">
                   <div className="max-w-2xl text-white">
                     <h2
-                      className={`text-3xl md:text-5xl font-bold mb-4 leading-tight transition-all duration-1000 ${
-                        index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+                      className={`text-2xl md:text-5xl font-bold mb-4 leading-tight transition-all duration-1000 ${
+                        index === currentSlide
+                          ? "translate-y-0 opacity-100"
+                          : "translate-y-8 opacity-0"
                       }`}
                     >
                       <span className="bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent drop-shadow-lg">
@@ -110,7 +117,9 @@ const HeroBanner = () => {
 
                     <p
                       className={`text-lg md:text-2xl mb-3 font-medium transition-all duration-1000 delay-200 ${
-                        index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+                        index === currentSlide
+                          ? "translate-y-0 opacity-100"
+                          : "translate-y-8 opacity-0"
                       }`}
                     >
                       {slide.subtitle}
@@ -119,7 +128,9 @@ const HeroBanner = () => {
                     {slide.description && (
                       <p
                         className={`text-sm md:text-base mb-6 opacity-90 max-w-md transition-all duration-1000 delay-300 ${
-                          index === currentSlide ? "translate-y-0 opacity-90" : "translate-y-8 opacity-0"
+                          index === currentSlide
+                            ? "translate-y-0 opacity-90"
+                            : "translate-y-8 opacity-0"
                         }`}
                       >
                         {slide.description}
@@ -128,7 +139,9 @@ const HeroBanner = () => {
 
                     <div
                       className={`mb-6 transition-all duration-1000 delay-400 ${
-                        index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+                        index === currentSlide
+                          ? "translate-y-0 opacity-100"
+                          : "translate-y-8 opacity-0"
                       }`}
                     >
                       {slide.stats ? (
@@ -141,8 +154,12 @@ const HeroBanner = () => {
                                 className="text-center bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20"
                               >
                                 <Icon className="h-5 w-5 mx-auto mb-1 text-blue-200" />
-                                <div className="text-base font-bold">{stat.value}</div>
-                                <div className="text-xs opacity-80">{stat.label}</div>
+                                <div className="text-base font-bold">
+                                  {stat.value}
+                                </div>
+                                <div className="text-xs opacity-80">
+                                  {stat.label}
+                                </div>
                               </div>
                             );
                           })}
@@ -150,12 +167,20 @@ const HeroBanner = () => {
                       ) : slide.specs ? (
                         <div className="flex gap-6 text-sm md:text-base">
                           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                            <span className="block opacity-70 text-xs">Type</span>
-                            <span className="font-semibold text-base">{slide.specs.class}</span>
+                            <span className="block opacity-70 text-xs">
+                              Type
+                            </span>
+                            <span className="font-semibold text-base">
+                              {slide.specs.class}
+                            </span>
                           </div>
                           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                            <span className="block opacity-70 text-xs">Since</span>
-                            <span className="font-semibold text-base">{slide.specs.year}</span>
+                            <span className="block opacity-70 text-xs">
+                              Since
+                            </span>
+                            <span className="font-semibold text-base">
+                              {slide.specs.year}
+                            </span>
                           </div>
                         </div>
                       ) : null}
@@ -163,7 +188,9 @@ const HeroBanner = () => {
 
                     <div
                       className={`transition-all duration-1000 delay-500 ${
-                        index === currentSlide ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
+                        index === currentSlide
+                          ? "translate-y-0 opacity-100"
+                          : "translate-y-8 opacity-0"
                       }`}
                     >
                       <Button

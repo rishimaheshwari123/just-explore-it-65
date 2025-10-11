@@ -77,7 +77,7 @@ const PopularSearches = () => {
   ];
 
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-5 bg-muted/30">
       <div className="container mx-auto px-4">
         {/* Statistics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
@@ -97,106 +97,6 @@ const PopularSearches = () => {
               </CardContent>
             </Card>
           ))}
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Trending Searches */}
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-6">
-              <div className="flex items-center mb-6">
-                <TrendingUp className="h-6 w-6 text-primary mr-2" />
-                <h3 className="text-xl font-semibold text-foreground">
-                  Trending Searches
-                </h3>
-              </div>
-
-              <div className="space-y-3">
-                {trendingSearches.map((search, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleSearchClick(search.term)}
-                    className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                  >
-                    <div className="flex items-center">
-                      <img
-                        src={search.img}
-                        alt={search.term}
-                        className="h-10 w-10 rounded-md object-cover mr-3"
-                      />
-                      <div>
-                        <span className="font-medium text-foreground">
-                          {search.term}
-                        </span>
-                        {search.trending && (
-                          <span className="ml-2 text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full">
-                            Trending
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <span className="text-sm text-muted-foreground">
-                      {search.count}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Searches */}
-          <Card className="border-0 shadow-md">
-            <CardContent className="p-6">
-              <div className="flex items-center mb-6">
-                <Clock className="h-6 w-6 text-primary mr-2" />
-                <h3 className="text-xl font-semibold text-foreground">
-                  Recent Searches
-                </h3>
-              </div>
-
-              <div className="space-y-3">
-                {recentSearches.map((search, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleSearchClick(search.term)}
-                    className="flex items-center p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                  >
-                    <img
-                      src={search.img}
-                      alt={search.term}
-                      className="h-9 w-9 rounded-md object-cover mr-3"
-                    />
-                    <span className="text-foreground">{search.term}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 space-y-2">
-                <h4 className="font-medium text-foreground mb-3">
-                  Quick Categories
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {[
-                    "Restaurants",
-                    "Hospitals",
-                    "Shopping",
-                    "Education",
-                    "Beauty",
-                    "Automotive",
-                  ].map((category) => (
-                    <Button
-                      key={category}
-                      variant="outline"
-                      size="sm"
-                      className="text-xs"
-                      onClick={() => handleSearchClick(category)}
-                    >
-                      {category}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         <div className="text-center mt-12">

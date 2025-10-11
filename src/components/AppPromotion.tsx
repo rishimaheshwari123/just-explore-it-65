@@ -7,27 +7,27 @@ const AppPromotion = () => {
     {
       icon: Zap,
       title: "Instant Search",
-      description: "Find businesses instantly with our advanced search"
+      description: "Find businesses instantly with our advanced search",
     },
     {
       icon: Star,
       title: "Verified Reviews",
-      description: "Read authentic reviews from real customers"
+      description: "Read authentic reviews from real customers",
     },
     {
       icon: Shield,
       title: "Trusted Listings",
-      description: "All businesses are verified and authentic"
+      description: "All businesses are verified and authentic",
     },
     {
       icon: Users,
       title: "Community Driven",
-      description: "Built by the community, for the community"
-    }
+      description: "Built by the community, for the community",
+    },
   ];
 
   return (
-    <section className="py-16 bg-gradient-to-br from-primary/5 to-secondary/5">
+    <section className="py-5 bg-gradient-to-br from-primary/5 to-secondary/5">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
@@ -36,7 +36,8 @@ const AppPromotion = () => {
               Get the Business Gurujee App
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Discover local businesses on the go! Download our mobile app for a seamless experience with exclusive features and real-time updates.
+              Discover local businesses on the go! Download our mobile app for a
+              seamless experience with exclusive features and real-time updates.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -46,8 +47,12 @@ const AppPromotion = () => {
                     <feature.icon className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-foreground mb-1">{feature.title}</h4>
-                    <p className="text-sm text-muted-foreground">{feature.description}</p>
+                    <h4 className="font-semibold text-foreground mb-1">
+                      {feature.title}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {feature.description}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -58,7 +63,11 @@ const AppPromotion = () => {
                 <Download className="h-5 w-5" />
                 <span>Download for Android</span>
               </Button>
-              <Button variant="outline" size="lg" className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex items-center space-x-2"
+              >
                 <Download className="h-5 w-5" />
                 <span>Download for iOS</span>
               </Button>
@@ -81,7 +90,9 @@ const AppPromotion = () => {
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
-                      <span className="text-background font-bold text-sm">BG</span>
+                      <span className="text-background font-bold text-sm">
+                        BG
+                      </span>
                     </div>
                     <span className="font-semibold">Business Gurujee</span>
                   </div>
@@ -138,9 +149,13 @@ const AppPromotion = () => {
                 Join Thousands of Happy Users
               </h3>
               <p className="text-muted-foreground mb-6">
-                Experience the best way to discover local businesses. Available for free on all devices.
+                Experience the best way to discover local businesses. Available
+                for free on all devices.
               </p>
-              <Button size="lg" className="bg-gradient-to-r from-primary to-secondary">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-primary to-secondary"
+              >
                 Get Started Today
               </Button>
             </CardContent>

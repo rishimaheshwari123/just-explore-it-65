@@ -45,7 +45,8 @@ const Index = () => {
     const fetchHomeData = async () => {
       try {
         const BASE_URL =
-          import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
+          import.meta.env.VITE_API_BASE_URL ||
+          "https://server.businessgurujee.com/api/v1";
 
         // Fetch businesses for stats
         const businessResponse = await fetch(`${BASE_URL}/property/get-all`);
@@ -81,16 +82,12 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <TopBar />
       <Header />
-    
+
       <AdSlider />
       <HeroBanner />
       <SearchSection />
 
-   
-
       <FloatingAd />
-
-   
 
       {/* Enhanced Business Categories with Animation */}
       <section className="py-2 bg-gradient-to-b from-muted/30 to-background ">
@@ -106,7 +103,7 @@ const Index = () => {
       )} */}
 
       {(activeFilter === "all" || activeFilter === "businesses") && (
-        <section className="py-2 bg-muted/20 animate-fade-in">
+        <section className=" bg-muted/20 animate-fade-in">
           <BusinessListing />
         </section>
       )}
@@ -135,8 +132,8 @@ const Index = () => {
       <section className="py-0">
         <PopularSearches />
       </section>
-   {/* Enhanced Stats Section with Animations */}
-      <section className="relative py-16 lg:py-24 bg-gradient-to-br from-background via-muted/20 to-background overflow-hidden">
+      {/* Enhanced Stats Section with Animations */}
+      <section className="relative py-6 lg:py-10 bg-gradient-to-br from-background via-muted/20 to-background overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--primary)/0.1),transparent_50%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,hsl(var(--accent)/0.08),transparent_50%)]" />

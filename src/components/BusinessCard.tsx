@@ -229,223 +229,296 @@ const BusinessCard: React.FC<BusinessCardProps> = ({ business }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group relative">
-      {/* Premium Badge */}
-      {isPremium && (
-        <div className="absolute top-2 left-2 z-10">
-          <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold">
-            <Award className="h-3 w-3 mr-1" />
-            Premium
-          </Badge>
-        </div>
-      )}
-
-      {/* Image Gallery */}
-      <div className="relative h-48 bg-gray-100">
-        {images.length > 0 ? (
-          <div className="flex h-full">
-            <div className="flex-1 relative">
-              <img
-                src={primaryImage}
-                alt={businessName}
-                className="w-full h-full object-cover"
-              />
-              {images.length > 1 && (
-                <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded-lg text-xs flex items-center">
-                  <Camera className="h-3 w-3 mr-1" />+{images.length - 1}
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-400">
-            <Camera className="h-12 w-12" />
-          </div>
-        )}
-
-        {/* Verification Badge */}
-        {verification.isVerified && (
-          <div className="absolute top-2 right-2">
-            <Badge className="bg-green-600 hover:bg-green-700 text-white flex items-center">
-              <Shield className="h-3 w-3 mr-1" />
-              Verified
+    <div>
+      <div className="bg-white hidden md:block rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group relative">
+        {/* Premium Badge */}
+        {isPremium && (
+          <div className="absolute top-2 left-2 z-10">
+            <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-semibold">
+              <Award className="h-3 w-3 mr-1" />
+              Premium
             </Badge>
           </div>
         )}
 
-        {/* Open/Closed Status */}
-        <div className="absolute bottom-2 left-2">
-          <Badge
-            className={`${
-              status.isOpen ? "bg-green-600" : "bg-red-600"
-            } text-white`}
-          >
-            <Clock className="h-3 w-3 mr-1" />
-            {status.message}
-          </Badge>
-        </div>
-      </div>
+        {/* Image Gallery */}
+        <div className="relative h-48 bg-gray-100">
+          {images.length > 0 ? (
+            <div className="flex h-full">
+              <div className="flex-1 relative">
+                <img
+                  src={primaryImage}
+                  alt={businessName}
+                  className="w-full h-full object-cover"
+                />
+                {images.length > 1 && (
+                  <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded-lg text-xs flex items-center">
+                    <Camera className="h-3 w-3 mr-1" />+{images.length - 1}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-400">
+              <Camera className="h-12 w-12" />
+            </div>
+          )}
 
-      {/* Content */}
-      <div className="p-4 pb-[110px]">
-        {" "}
-        {/* Adjusted padding to make space for the buttons */}
-        {/* Header */}
-        <div className="flex justify-between items-start mb-2">
-          <div className="flex-1">
-            <h3 className="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition-colors duration-200">
-              {businessName}
-            </h3>
-            <p className="text-sm text-gray-600">{category}</p>
-            <div className="flex items-center text-xs text-gray-500 mt-1">
-              <MapPin className="h-3 w-3 mr-1" />
-              {fullAddress}
+          {/* Verification Badge */}
+          {verification.isVerified && (
+            <div className="absolute top-2 right-2">
+              <Badge className="bg-green-600 hover:bg-green-700 text-white flex items-center">
+                <Shield className="h-3 w-3 mr-1" />
+                Verified
+              </Badge>
             </div>
+          )}
+
+          {/* Open/Closed Status */}
+          <div className="absolute bottom-2 left-2">
+            <Badge
+              className={`${
+                status.isOpen ? "bg-green-600" : "bg-red-600"
+              } text-white`}
+            >
+              <Clock className="h-3 w-3 mr-1" />
+              {status.message}
+            </Badge>
           </div>
-          <div className="text-right">
-            <div className="flex items-center mb-1">
-              {renderStars(ratings.average)}
-              <span className="ml-1 text-sm font-semibold text-gray-700">
-                {ratings.average.toFixed(1)}
-              </span>
-            </div>
-            <p className="text-xs text-gray-500">
-              ({ratings.totalReviews} reviews)
-            </p>
-            {analytics.totalViews > 0 && (
+        </div>
+
+        {/* Content */}
+        <div className="p-4 pb-[110px]">
+          {" "}
+          {/* Adjusted padding to make space for the buttons */}
+          {/* Header */}
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-gray-900 group-hover:text-purple-700 transition-colors duration-200">
+                {businessName}
+              </h3>
+              <p className="text-sm text-gray-600">{category}</p>
               <div className="flex items-center text-xs text-gray-500 mt-1">
-                <Eye className="h-3 w-3 mr-1" />
-                {analytics.totalViews} views
+                <MapPin className="h-3 w-3 mr-1" />
+                {fullAddress}
               </div>
-            )}
-          </div>
-        </div>
-        {/* Business Info Bar */}
-        {/* Description */}
-        <p className="text-sm text-gray-600 mb-3 line-clamp-2">{description}</p>
-        {/* Services */}
-        {/* Location & Info */}
-        <div className="space-y-2 mb-4">
-          <div className="flex items-center text-sm text-gray-600">
-            <MapPin className="h-4 w-4 mr-2 text-blue-600" />
-            <span className="flex-1 truncate">{fullAddress}</span>
-          </div>
-
-          {/* Business Hours */}
-          <div className="bg-gray-50 p-2 rounded-lg">
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center">
-                <Clock className="h-4 w-4 mr-2 text-gray-600" />
-                <span className="text-gray-600">{status.message}</span>
-              </div>
-              <span className="text-green-600 font-semibold">{priceRange}</span>
             </div>
-
-            <div className="mt-2">
-              <button
-                onClick={() => setShowFullHours(!showFullHours)}
-                className="text-xs text-blue-600 hover:text-blue-800"
-              >
-                {showFullHours ? "Hide" : "Show"} all hours
-              </button>
-
-              {showFullHours && (
-                <div className="mt-2 space-y-1">
-                  {Object.entries(businessHours).map(([day, hours]) => (
-                    <div key={day} className="flex justify-between text-xs">
-                      <span className="capitalize font-medium">{day}:</span>
-                      <span
-                        className={
-                          !hours.isClosed ? "text-green-600" : "text-red-600"
-                        }
-                      >
-                        {!hours.isClosed
-                          ? `${hours.open} - ${hours.close}`
-                          : "Closed"}
-                      </span>
-                    </div>
-                  ))}
+            <div className="text-right">
+              <div className="flex items-center mb-1">
+                {renderStars(ratings.average)}
+                <span className="ml-1 text-sm font-semibold text-gray-700">
+                  {ratings.average.toFixed(1)}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500">
+                ({ratings.totalReviews} reviews)
+              </p>
+              {analytics.totalViews > 0 && (
+                <div className="flex items-center text-xs text-gray-500 mt-1">
+                  <Eye className="h-3 w-3 mr-1" />
+                  {analytics.totalViews} views
                 </div>
               )}
             </div>
           </div>
+          {/* Business Info Bar */}
+          {/* Description */}
+          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+            {description}
+          </p>
+          {/* Services */}
+          {/* Location & Info */}
+          <div className="space-y-2 mb-4">
+            <div className="flex items-center text-sm text-gray-600">
+              <MapPin className="h-4 w-4 mr-2 text-blue-600" />
+              <span className="flex-1 truncate">{fullAddress}</span>
+            </div>
 
-          {/* Contact Info */}
+            {/* Business Hours */}
+            <div className="bg-gray-50 p-2 rounded-lg">
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center">
+                  <Clock className="h-4 w-4 mr-2 text-gray-600" />
+                  <span className="text-gray-600">{status.message}</span>
+                </div>
+                <span className="text-green-600 font-semibold">
+                  {priceRange}
+                </span>
+              </div>
+
+              <div className="mt-2">
+                <button
+                  onClick={() => setShowFullHours(!showFullHours)}
+                  className="text-xs text-blue-600 hover:text-blue-800"
+                >
+                  {showFullHours ? "Hide" : "Show"} all hours
+                </button>
+
+                {showFullHours && (
+                  <div className="mt-2 space-y-1">
+                    {Object.entries(businessHours).map(([day, hours]) => (
+                      <div key={day} className="flex justify-between text-xs">
+                        <span className="capitalize font-medium">{day}:</span>
+                        <span
+                          className={
+                            !hours.isClosed ? "text-green-600" : "text-red-600"
+                          }
+                        >
+                          {!hours.isClosed
+                            ? `${hours.open} - ${hours.close}`
+                            : "Closed"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Contact Info */}
+          </div>
+        </div>
+
+        {/* Action Buttons fixed at the bottom of the card */}
+        <div className="absolute bottom-0 left-0 w-full p-4 bg-white border-t border-gray-200 z-10">
+          <div className="grid grid-cols-4 gap-2 mb-2">
+            <Button
+              onClick={handleCall}
+              size="sm"
+              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center"
+            >
+              <Phone className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={handleWhatsApp}
+              size="sm"
+              className="bg-green-500 hover:bg-green-600 text-white flex items-center justify-center"
+            >
+              <MessageCircle className="h-4 w-4" />
+            </Button>
+            <Button
+              onClick={handleDirections}
+              size="sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center"
+            >
+              <Navigation className="h-4 w-4" />
+            </Button>
+            {contactInfo.website && (
+              <Button
+                onClick={handleWebsite}
+                size="sm"
+                className="bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center"
+              >
+                <Globe className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+
+          {/* Send Inquiry Button */}
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              onClick={handleViewBusiness}
+              size="sm"
+              variant="outline"
+              className="flex items-center justify-center border-purple-600 text-purple-600 hover:bg-purple-50"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              View Business
+            </Button>
+            <BusinessInquiryModal
+              business={business}
+              trigger={
+                <Button
+                  size="sm"
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                >
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Send Inquiry
+                </Button>
+              }
+            />
+          </div>
+
+          {/* Premium Button - Only show if business is not premium */}
+
+          {/* Premium Badge - Show if business is premium */}
+          {isPremium && (
+            <div className="mt-2">
+              <Badge className="w-full justify-center bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-semibold">
+                <Crown className="h-4 w-4 mr-2" />
+                Premium Business
+              </Badge>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Action Buttons fixed at the bottom of the card */}
-      <div className="absolute bottom-0 left-0 w-full p-4 bg-white border-t border-gray-200 z-10">
-        <div className="grid grid-cols-4 gap-2 mb-2">
-          <Button
-            onClick={handleCall}
-            size="sm"
-            className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center"
-          >
-            <Phone className="h-4 w-4" />
-          </Button>
-          <Button
-            onClick={handleWhatsApp}
-            size="sm"
-            className="bg-green-500 hover:bg-green-600 text-white flex items-center justify-center"
-          >
-            <MessageCircle className="h-4 w-4" />
-          </Button>
-          <Button
-            onClick={handleDirections}
-            size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center"
-          >
-            <Navigation className="h-4 w-4" />
-          </Button>
-          {contactInfo.website && (
-            <Button
-              onClick={handleWebsite}
-              size="sm"
-              className="bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center"
-            >
-              <Globe className="h-4 w-4" />
-            </Button>
+      <div
+        className="bg-white block md:hidden rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden cursor-pointer"
+        onClick={handleViewBusiness}
+      >
+        {/* 1. Image (Primary Image) */}
+        <div className="relative h-32 w-full bg-gray-100">
+          <img
+            src={primaryImage}
+            alt={businessName}
+            className="w-full h-full object-cover"
+          />
+
+          {/* Optional: Premium Badge on Image */}
+          {isPremium && (
+            <div className="absolute top-1 left-1 z-10">
+              <Crown className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+            </div>
+          )}
+
+          {/* Optional: Image Count on Image */}
+          {images.length > 1 && (
+            <div className="absolute bottom-1 right-1 bg-black/50 text-white px-1 py-0.5 rounded text-xs flex items-center">
+              <Camera className="h-3 w-3 mr-1" />
+              {images.length}
+            </div>
           )}
         </div>
 
-        {/* Send Inquiry Button */}
-        <div className="grid grid-cols-2 gap-2">
-          <Button
-            onClick={handleViewBusiness}
-            size="sm"
-            variant="outline"
-            className="flex items-center justify-center border-purple-600 text-purple-600 hover:bg-purple-50"
-          >
-            <Eye className="h-4 w-4 mr-2" />
-            View Business
-          </Button>
-          <BusinessInquiryModal
-            business={business}
-            trigger={
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-              >
-                <MessageSquare className="h-4 w-4 mr-2" />
-                Send Inquiry
-              </Button>
-            }
-          />
-        </div>
-        
-        {/* Premium Button - Only show if business is not premium */}
-     
-        
-        {/* Premium Badge - Show if business is premium */}
-        {isPremium && (
-          <div className="mt-2">
-            <Badge className="w-full justify-center bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-semibold">
-              <Crown className="h-4 w-4 mr-2" />
-              Premium Business
-            </Badge>
+        {/* 2. Content */}
+        <div className="p-3">
+          {/* 2a. Business Name */}
+          <div className="mb-2">
+            <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">
+              {businessName}
+            </h3>
           </div>
-        )}
+
+          {/* 2b. Category and Location */}
+          <div className="space-y-1">
+            {/* Category */}
+            <p className="text-xs text-purple-600 font-medium truncate">
+              {category}
+            </p>
+
+            {/* Location */}
+            <div className="flex items-center text-xs text-gray-500">
+              <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
+              <span className="truncate">{fullAddress}</span>
+            </div>
+          </div>
+
+          {/* Compact Action Buttons */}
+          <div className="mt-3 flex gap-2">
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleViewBusiness();
+              }}
+              size="sm"
+              variant="outline"
+              className="w-full h-7 text-xs border-purple-600 text-purple-600 hover:bg-purple-50"
+            >
+              <Eye className="h-3 w-3 mr-1" /> View
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

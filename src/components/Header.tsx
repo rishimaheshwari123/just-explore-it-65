@@ -52,10 +52,10 @@ const Header = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     toast.success("Logged out successfully");
-    navigate('/');
+    navigate("/");
   };
 
   // Get current location using geolocation API
@@ -70,21 +70,22 @@ const Header = () => {
       async (position) => {
         try {
           const { latitude, longitude } = position.coords;
-          
+
           // Reverse geocoding to get city name
           const response = await fetch(
             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyASz6Gqa5Oa3WialPx7Z6ebZTj02Liw-Gk`
           );
           const data = await response.json();
-          
+
           if (data.results && data.results.length > 0) {
             // Extract city name from address components
             const addressComponents = data.results[0].address_components;
-            const city = addressComponents.find((component: any) => 
-              component.types.includes('locality') || 
-              component.types.includes('administrative_area_level_2')
+            const city = addressComponents.find(
+              (component: any) =>
+                component.types.includes("locality") ||
+                component.types.includes("administrative_area_level_2")
             );
-            
+
             if (city) {
               setCurrentLocation(city.long_name);
               toast.success(`Location detected: ${city.long_name}`);
@@ -120,7 +121,7 @@ const Header = () => {
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 600000 // 10 minutes
+        maximumAge: 600000, // 10 minutes
       }
     );
   };
@@ -132,18 +133,17 @@ const Header = () => {
 
   return (
     <header className="bg-background border-b border-border shadow-sm font-sans relative z-50">
-      <div className="max-w-7xl mx-auto px-4 md:px-0 py-3">
+      <div className="w-11/12 mx-auto px-1 md:px-0 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            {/* <div className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-              BG
-            </div>
-            <span className="text-xl font-semibold text-gray-800">
-              Business Gurujee
-            </span> */}
-
-            <img src="/logo.jpg" alt="" className="h-20"/>
+            <Link to="/" className="flex items-center">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className=" h-10 md:h-12 object-contain cursor-pointer transition-transform hover:scale-105"
+              />
+            </Link>
           </div>
 
           {/* Navigation - Desktop */}
@@ -224,52 +224,71 @@ const Header = () => {
                         {user.name?.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="font-medium text-gray-700">{user.name}</span>
+                    <span className="font-medium text-gray-700">
+                      {user.name}
+                    </span>
                     <ChevronDown className="h-4 w-4 text-gray-500" />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="px-3 py-2 border-b">
-                      <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {user.name}
+                      </p>
                       <p className="text-xs text-gray-500">{user.email}</p>
                     </div>
-                    
+
                     {/* Dashboard Links based on user role */}
-                    {user.role === 'user' && (
+                    {user.role === "user" && (
                       <DropdownMenuItem asChild>
-                        <Link to="/user/profile" className="flex items-center space-x-2">
+                        <Link
+                          to="/user/profile"
+                          className="flex items-center space-x-2"
+                        >
                           <LayoutDashboard className="h-4 w-4" />
                           <span>My Dashboard</span>
                         </Link>
                       </DropdownMenuItem>
                     )}
-                    
-                    {user.role === 'vendor' && (
+
+                    {user.role === "vendor" && (
                       <DropdownMenuItem asChild>
-                        <Link to="/vendor/dashboard" className="flex items-center space-x-2">
+                        <Link
+                          to="/vendor/dashboard"
+                          className="flex items-center space-x-2"
+                        >
                           <Store className="h-4 w-4" />
                           <span>Vendor Dashboard</span>
                         </Link>
                       </DropdownMenuItem>
                     )}
-                    
-                    {(user.role === 'admin' || user.role === 'super_admin') && (
+
+                    {(user.role === "admin" || user.role === "super_admin") && (
                       <DropdownMenuItem asChild>
-                        <Link to="/admin/dashboard" className="flex items-center space-x-2">
+                        <Link
+                          to="/admin/dashboard"
+                          className="flex items-center space-x-2"
+                        >
                           <Shield className="h-4 w-4" />
                           <span>Admin Dashboard</span>
                         </Link>
                       </DropdownMenuItem>
                     )}
-                    
+
                     <DropdownMenuItem asChild>
-                      <Link to="/user/profile" className="flex items-center space-x-2">
+                      <Link
+                        to="/user/profile"
+                        className="flex items-center space-x-2"
+                      >
                         <User className="h-4 w-4" />
                         <span>Profile Settings</span>
                       </Link>
                     </DropdownMenuItem>
-                    
+
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="flex items-center space-x-2 text-red-600">
+                    <DropdownMenuItem
+                      onClick={handleLogout}
+                      className="flex items-center space-x-2 text-red-600"
+                    >
                       <LogOut className="h-4 w-4" />
                       <span>Logout</span>
                     </DropdownMenuItem>
@@ -284,7 +303,10 @@ const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem asChild>
-                      <Link to="/user/login" className="flex items-center space-x-2">
+                      <Link
+                        to="/user/login"
+                        className="flex items-center space-x-2"
+                      >
                         <User className="h-4 w-4 text-purple-600" />
                         <div>
                           <p className="font-medium">User Login</p>
@@ -292,24 +314,31 @@ const Header = () => {
                         </div>
                       </Link>
                     </DropdownMenuItem>
-                    
+
                     <DropdownMenuItem asChild>
-                      <Link to="/vendor/login" className="flex items-center space-x-2">
+                      <Link
+                        to="/vendor/login"
+                        className="flex items-center space-x-2"
+                      >
                         <Store className="h-4 w-4 text-green-600" />
                         <div>
                           <p className="font-medium">Vendor Login</p>
-                          <p className="text-xs text-gray-500">For business owners</p>
+                          <p className="text-xs text-gray-500">
+                            For business owners
+                          </p>
                         </div>
                       </Link>
                     </DropdownMenuItem>
-                    
+
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                       <Link to="/login" className="flex items-center space-x-2">
                         <Shield className="h-4 w-4 text-red-600" />
                         <div>
                           <p className="font-medium">Admin Login</p>
-                          <p className="text-xs text-gray-500">For administrators</p>
+                          <p className="text-xs text-gray-500">
+                            For administrators
+                          </p>
                         </div>
                       </Link>
                     </DropdownMenuItem>
@@ -328,7 +357,15 @@ const Header = () => {
         } md:hidden z-50`}
       >
         <div className="flex justify-between items-center p-4 border-b">
-          <span className="text-lg font-semibold text-gray-800">Menu</span>
+          <div className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center">
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="h-8 object-contain cursor-pointer transition-transform hover:scale-105"
+              />
+            </Link>
+          </div>{" "}
           <button
             onClick={toggleSidebar}
             className="text-gray-600 hover:text-purple-600 p-2 rounded-full transition-colors"
@@ -375,12 +412,14 @@ const Header = () => {
                   <div>
                     <p className="font-semibold text-gray-800">{user.name}</p>
                     <p className="text-sm text-gray-600">{user.email}</p>
-                    <p className="text-xs text-purple-600 font-medium capitalize">{user.role} Account</p>
+                    <p className="text-xs text-purple-600 font-medium capitalize">
+                      {user.role} Account
+                    </p>
                   </div>
                 </div>
-                
+
                 {/* Dashboard Link based on role */}
-                {user.role === 'user' && (
+                {user.role === "user" && (
                   <Link
                     to={"/user/profile"}
                     className="flex items-center justify-center space-x-2 w-full px-4 py-3 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 transition-all font-semibold"
@@ -390,8 +429,8 @@ const Header = () => {
                     <span>My Dashboard</span>
                   </Link>
                 )}
-                
-                {user.role === 'vendor' && (
+
+                {user.role === "vendor" && (
                   <Link
                     to={"/vendor/dashboard"}
                     className="flex items-center justify-center space-x-2 w-full px-4 py-3 rounded-full bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all font-semibold"
@@ -401,8 +440,8 @@ const Header = () => {
                     <span>Vendor Dashboard</span>
                   </Link>
                 )}
-                
-                {(user.role === 'admin' || user.role === 'super_admin') && (
+
+                {(user.role === "admin" || user.role === "super_admin") && (
                   <Link
                     to={"/admin/dashboard"}
                     className="flex items-center justify-center space-x-2 w-full px-4 py-3 rounded-full bg-gradient-to-r from-red-600 to-rose-600 text-white hover:from-red-700 hover:to-rose-700 transition-all font-semibold"
@@ -412,7 +451,7 @@ const Header = () => {
                     <span>Admin Dashboard</span>
                   </Link>
                 )}
-                
+
                 <Link
                   to={"/user/profile"}
                   className="flex items-center justify-center space-x-2 w-full px-4 py-2 rounded-full text-purple-600 border border-purple-600 hover:bg-purple-600 hover:text-white transition-colors font-semibold"
@@ -421,7 +460,7 @@ const Header = () => {
                   <User className="h-4 w-4" />
                   <span>Profile Settings</span>
                 </Link>
-                
+
                 <button
                   onClick={() => {
                     handleLogout();
@@ -437,10 +476,14 @@ const Header = () => {
               // Not logged in - smart login options
               <>
                 <div className="text-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">Choose Login Type</h3>
-                  <p className="text-sm text-gray-600">Select your account type to continue</p>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                    Choose Login Type
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    Select your account type to continue
+                  </p>
                 </div>
-                
+
                 <Link
                   to={"/user/login"}
                   className="flex items-center space-x-3 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 transition-all font-semibold"
@@ -452,7 +495,7 @@ const Header = () => {
                     <p className="text-xs opacity-90">For customers & users</p>
                   </div>
                 </Link>
-                
+
                 <Link
                   to={"/vendor/login"}
                   className="flex items-center space-x-3 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-700 hover:to-emerald-700 transition-all font-semibold"
@@ -464,7 +507,7 @@ const Header = () => {
                     <p className="text-xs opacity-90">For business owners</p>
                   </div>
                 </Link>
-                
+
                 <Link
                   to={"/login"}
                   className="flex items-center space-x-3 w-full px-4 py-3 rounded-lg bg-gradient-to-r from-red-600 to-rose-600 text-white hover:from-red-700 hover:to-rose-700 transition-all font-semibold"
@@ -476,7 +519,7 @@ const Header = () => {
                     <p className="text-xs opacity-90">For administrators</p>
                   </div>
                 </Link>
-                
+
                 <div className="pt-3 border-t border-gray-200">
                   <Link
                     to={"/user/register"}

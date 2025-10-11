@@ -105,7 +105,7 @@ const BusinessListing: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>("rating");
   const [priceFilter, setPriceFilter] = useState<string>("all");
 
-  const categories = BUSINESS_CATEGORIES
+  const categories = BUSINESS_CATEGORIES;
   const fetchBusinesses = async () => {
     setLoading(true);
     try {
@@ -218,87 +218,89 @@ const BusinessListing: React.FC = () => {
         </div>
 
         {/* Filters */}
-        {false && <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Search businesses..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+        {false && (
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Search businesses..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              {/* Category Filter */}
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
+                <SelectTrigger>
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Location Filter */}
+              <Select
+                value={selectedLocation}
+                onValueChange={setSelectedLocation}
+              >
+                <SelectTrigger>
+                  <MapPin className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Location" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Locations</SelectItem>
+                  {uniqueLocations.map((location) => (
+                    <SelectItem key={location} value={location}>
+                      {location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Price Filter */}
+              <Select value={priceFilter} onValueChange={setPriceFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Price Range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Prices</SelectItem>
+                  {priceRanges.map((range) => (
+                    <SelectItem key={range} value={range}>
+                      {range}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Sort By */}
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger>
+                  <Star className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="rating">Highest Rated</SelectItem>
+                  <SelectItem value="reviews">Most Reviews</SelectItem>
+                  <SelectItem value="name">Name A-Z</SelectItem>
+                  <SelectItem value="newest">Newest First</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-
-            {/* Category Filter */}
-            <Select
-              value={selectedCategory}
-              onValueChange={setSelectedCategory}
-            >
-              <SelectTrigger>
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Location Filter */}
-            <Select
-              value={selectedLocation}
-              onValueChange={setSelectedLocation}
-            >
-              <SelectTrigger>
-                <MapPin className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Location" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Locations</SelectItem>
-                {uniqueLocations.map((location) => (
-                  <SelectItem key={location} value={location}>
-                    {location}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Price Filter */}
-            <Select value={priceFilter} onValueChange={setPriceFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Price Range" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Prices</SelectItem>
-                {priceRanges.map((range) => (
-                  <SelectItem key={range} value={range}>
-                    {range}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Sort By */}
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger>
-                <Star className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="rating">Highest Rated</SelectItem>
-                <SelectItem value="reviews">Most Reviews</SelectItem>
-                <SelectItem value="name">Name A-Z</SelectItem>
-                <SelectItem value="newest">Newest First</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
-        </div>}
+        )}
 
         {/* Results Count */}
         <div className="mb-6">
@@ -314,7 +316,7 @@ const BusinessListing: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
           </div>
         ) : filteredBusinesses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
             {filteredBusinesses.map((business) => (
               <BusinessCard key={business._id} business={business} />
             ))}

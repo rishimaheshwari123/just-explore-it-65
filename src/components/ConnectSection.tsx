@@ -5,13 +5,13 @@ import { ShieldCheck, CheckCircle2, Clock } from "lucide-react";
 
 const ConnectSection = () => {
   return (
-    <section className="py-20 bg-gradient-to-br from-muted/40 to-background">
-      <div className="container mx-auto px-6 lg:px-12">
+    <section className="py-2 bg-gradient-to-br from-muted/40 to-background">
+      <div className="container mx-auto px-2 lg:px-12">
         {/* The `items-stretch` class ensures both grid children stretch to fill the container height */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
           {/* Left Content */}
           {/* We've added bg-background, padding, and shadow for a consistent look with the right column */}
-          <div className="bg-background p-10 rounded-2xl shadow-xl border border-border flex flex-col justify-between">
+          <div className="bg-background p-5 rounded-2xl shadow-xl border border-border flex flex-col justify-between">
             <div>
               <h2 className="text-4xl md:text-5xl font-bold text-foreground leading-tight mb-4">
                 We connect <br />
