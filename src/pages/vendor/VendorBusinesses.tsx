@@ -213,13 +213,13 @@ const VendorBusinesses = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col md:flex-row items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-emerald-100 rounded-lg">
                 <ShoppingBag className="h-6 w-6 text-emerald-600" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-xl md:text-3xl font-bold text-gray-900">
                   My Businesses
                 </h1>
                 <p className="text-gray-600 mt-1">
