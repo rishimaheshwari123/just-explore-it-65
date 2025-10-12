@@ -1,6 +1,8 @@
 const Inquiry = require("../models/InquiryModel");
 const Business = require("../models/businessModel");
 const Vendor = require("../models/vendorModel");
+const mailSender = require("../utills/mailSender");
+const inquiryNotificationTemplate = require("../mails/inquiryNotificationTemplate");
 
 // Create Business Inquiry
 const createBusinessInquiryCtrl = async (req, res) => {
@@ -63,6 +65,44 @@ const createBusinessInquiryCtrl = async (req, res) => {
         const populatedInquiry = await Inquiry.findById(newInquiry._id)
             .populate('business', 'businessName category contactInfo')
             .populate('vendor', 'name email phone company');
+
+        // Send notification email to vendor (non-blocking)
+        try {
+            const vendorEmail = (business?.vendor?.email) || (business?.contactInfo?.email) || populatedInquiry?.vendor?.email;
+            if (vendorEmail) {
+                const FRONTEND_URL = process.env.FRONTEND_URL || 'https://businessgurujee.com';
+                const businessLink = `${FRONTEND_URL}/business/${businessId}`;
+                const html = inquiryNotificationTemplate({
+                    businessName: business.businessName,
+                    businessLink,
+                    inquiry: {
+                        subject,
+                        inquiryType: inquiryType || 'general',
+                        priority: priority || 'medium',
+                        message,
+                        createdAt: newInquiry.createdAt,
+                        serviceInterest,
+                    },
+                    customer: {
+                        name,
+                        email,
+                        phone,
+                        preferredContact: preferredContact || 'any',
+                        bestTimeToContact: bestTimeToContact || 'anytime',
+                        location: customerLocation || {},
+                    }
+                });
+                await mailSender(
+                    vendorEmail,
+                    `New Inquiry for ${business.businessName}`,
+                    html
+                );
+            } else {
+                console.warn('Vendor email not found for inquiry notification');
+            }
+        } catch (mailError) {
+            console.error('Failed to send inquiry email notification:', mailError);
+        }
 
         res.status(201).json({
             success: true,
