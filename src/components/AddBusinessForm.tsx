@@ -1128,84 +1128,123 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
 
               <div>
                 <Label htmlFor="category">Business Category *</Label>
-                <Select
-                  value={formData.category}
-                  onValueChange={(value) => {
-                    handleInputChange("root", "category", value);
-                    handleInputChange("root", "subCategory", "");
-                    setCategorySearch(""); // clear search after select
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-              <SelectContent>
-  <input
-    type="text"
-    placeholder="Search category..."
-    className="px-2 py-1 mb-2 w-full border rounded"
-    value={categorySearch}
-    onChange={(e) => setCategorySearch(e.target.value)}
-    autoComplete="off"
-    onKeyDown={(e) => e.stopPropagation()} // 👈 key events list ko na jayein
-  />
-  {filteredCategories.length > 0 ? (
-    filteredCategories.map((category) => (
-      <SelectItem
-        key={category}
-        value={category}
-        tabIndex={-1} // 👈 isse item focus nahi lega
-      >
-        {category}
-      </SelectItem>
-    ))
-  ) : (
-    <div className="px-2 py-1 text-gray-400">No results found</div>
-  )}
-</SelectContent>
-
-                </Select>
+                <div className="space-y-2">
+                   <Input
+                     id="categorySearch"
+                     placeholder="Search category..."
+                     value={categorySearch}
+                     onChange={(e) => setCategorySearch(e.target.value)}
+                   />
+                   {categorySearch.trim().length > 0 && (
+                     <div className="border rounded bg-white shadow max-h-40 overflow-y-auto">
+                       {filteredCategories.length > 0 ? (
+                         filteredCategories.slice(0, 20).map((category) => (
+                           <button
+                             type="button"
+                             key={category}
+                             className="w-full text-left px-2 py-1 hover:bg-gray-100"
+                             onClick={() => {
+                               handleInputChange("root", "category", category);
+                               handleInputChange("root", "subCategory", "");
+                               setCategorySearch("");
+                             }}
+                           >
+                             {category}
+                           </button>
+                         ))
+                       ) : (
+                         <div className="px-2 py-1 text-gray-400">No results found</div>
+                       )}
+                     </div>
+                   )}
+                   <select
+                     id="category"
+                     className="w-full border rounded px-2 py-2"
+                     value={formData.category}
+                     onChange={(e) => {
+                       const value = e.target.value;
+                       handleInputChange("root", "category", value);
+                       handleInputChange("root", "subCategory", "");
+                       setCategorySearch("");
+                     }}
+                   >
+                     <option value="" disabled>
+                       Select category
+                     </option>
+                     {filteredCategories.length > 0 ? (
+                       filteredCategories.map((category) => (
+                         <option key={category} value={category}>
+                           {category}
+                         </option>
+                       ))
+                     ) : (
+                       <option value="" disabled>
+                         No results found
+                       </option>
+                     )}
+                   </select>
+                 </div>
               </div>
 
               {/* Subcategory */}
               <div>
                 <Label htmlFor="subCategory">Specialty/Subcategory</Label>
-                <Select
-                  value={formData.subCategory}
-                  onValueChange={(value) => {
-                    handleInputChange("root", "subCategory", value);
-                    setSubCategorySearch(""); // clear search after select
-                  }}
-                  disabled={!formData.category}
-                >
-                  <SelectTrigger>
-                    <SelectValue
-                      placeholder={
-                        formData.category
-                          ? "Select specialty"
-                          : "Select category first"
-                      }
-                    />
-                  </SelectTrigger>
-             <SelectContent>
-  <input
-    type="text"
-    placeholder="Search subcategory..."
-    className="px-2 py-1 mb-2 w-full border rounded"
-    value={subCategorySearch}
-    onChange={(e) => setSubCategorySearch(e.target.value)}
-    disabled={!formData.category}
-    autoComplete="off"
-    onKeyDown={(e) => e.stopPropagation()} // 👈 yeh bhi lagao
-  />
-  {filteredSubCategories.map((subCategory) => (
-    <SelectItem key={subCategory} value={subCategory} tabIndex={-1}>
-      {subCategory}
-    </SelectItem>
-  ))}
-</SelectContent>
-
-                </Select>
+                <div className="space-y-2">
+                   <Input
+                     id="subCategorySearch"
+                     placeholder="Search subcategory..."
+                     value={subCategorySearch}
+                     onChange={(e) => setSubCategorySearch(e.target.value)}
+                     disabled={!formData.category}
+                   />
+                   {formData.category && subCategorySearch.trim().length > 0 && (
+                     <div className="border rounded bg-white shadow max-h-40 overflow-y-auto">
+                       {filteredSubCategories.length > 0 ? (
+                         filteredSubCategories.slice(0, 20).map((subCategory) => (
+                           <button
+                             type="button"
+                             key={subCategory}
+                             className="w-full text-left px-2 py-1 hover:bg-gray-100"
+                             onClick={() => {
+                               handleInputChange("root", "subCategory", subCategory);
+                               setSubCategorySearch("");
+                             }}
+                           >
+                             {subCategory}
+                           </button>
+                         ))
+                       ) : (
+                         <div className="px-2 py-1 text-gray-400">No results found</div>
+                       )}
+                     </div>
+                   )}
+                   <select
+                     id="subCategory"
+                     className="w-full border rounded px-2 py-2"
+                     value={formData.subCategory}
+                     onChange={(e) => {
+                       const value = e.target.value;
+                       handleInputChange("root", "subCategory", value);
+                       setSubCategorySearch("");
+                     }}
+                     disabled={!formData.category}
+                   >
+                     <option value="" disabled>
+                       {formData.category ? "Select specialty" : "Select category first"}
+                     </option>
+                     {filteredSubCategories.length > 0 ? (
+                       filteredSubCategories.map((subCategory) => (
+                         <option key={subCategory} value={subCategory}>
+                           {subCategory}
+                         </option>
+                       ))
+                     ) : (
+                       <option value="" disabled>
+                         {formData.category ? "No results found" : "Select category first"}
+                       </option>
+                     )}
+                   </select>
+                 </div>
               </div>
 
               <div>
