@@ -21,6 +21,7 @@ import {
   Trash2,
   Navigation,
   MessageSquare,
+  Share2,
 } from "lucide-react";
 import TopBar from "@/components/TopBar";
 import Header from "@/components/Header";
@@ -178,6 +179,36 @@ const BusinessDetail: React.FC = () => {
         "_blank"
       );
     }
+  };
+
+  // Share business with a friendly message and link
+  const handleShare = async () => {
+    const shareText = `I found your business on Business Gurujee: ${business?.businessName || ""}. Check it out: ${window.location.href}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: business?.businessName || "Business Gurujee",
+          text: shareText,
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(shareText);
+        toast.success("Share text copied! Paste it anywhere.");
+      }
+      trackInteraction("share");
+    } catch (error) {
+      console.error("Error sharing:", error);
+      await navigator.clipboard.writeText(shareText);
+      toast.success("Share text copied! Paste it anywhere.");
+    }
+  };
+
+  // Share via WhatsApp with prefilled message
+  const handleWhatsAppShare = () => {
+    const text = `I found your business on Business Gurujee: ${business?.businessName || ""}\n${window.location.href}`;
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    trackInteraction("whatsapp_share");
+    window.open(waUrl, "_blank");
   };
 
   const trackView = async () => {
@@ -766,6 +797,15 @@ const BusinessDetail: React.FC = () => {
                     </Button>
                     <BusinessInquiryModal business={business} />
                     <BusinessReviewModal business={business} />
+                    {/* Share Business */}
+                    {/* <Button variant="outline" className="w-full" onClick={handleShare}>
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Share Business
+                    </Button> */}
+                    <Button variant="outline" className="w-full" onClick={handleWhatsAppShare}>
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Share on WhatsApp
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

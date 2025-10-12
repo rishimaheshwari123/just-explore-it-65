@@ -331,7 +331,7 @@ const Header = () => {
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
+                    {/* <DropdownMenuItem asChild>
                       <Link to="/login" className="flex items-center space-x-2">
                         <Shield className="h-4 w-4 text-red-600" />
                         <div>
@@ -341,7 +341,7 @@ const Header = () => {
                           </p>
                         </div>
                       </Link>
-                    </DropdownMenuItem>
+                    </DropdownMenuItem> */}
                   </DropdownMenuContent>
                 </DropdownMenu>
               )}
