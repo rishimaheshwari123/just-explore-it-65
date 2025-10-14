@@ -20,15 +20,17 @@ interface GooglePlacesAutocompleteProps {
   placeholder?: string;
   className?: string;
   value?: string;
+  mode?: 'address' | 'city'; // controls display and suggestion intent
 }
 
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || 'AIzaSyASz6Gqa5Oa3WialPx7Z6ebZTj02Liw-Gk';
+const GOOGLE_MAPS_API_KEY =  'AIzaSyASz6Gqa5Oa3WialPx7Z6ebZTj02Liw-Gk';
 
 const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({
   onPlaceSelect,
   placeholder = "Search for address...",
   className = "",
-  value = ""
+  value = "",
+  mode = 'address',
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
@@ -59,7 +61,9 @@ const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({
                 'geometry',
                 'name'
               ],
-              types: ['address']
+              // Hint to autocomplete: when mode is 'city', prefer cities
+              // Note: '(cities)' hint may not be strictly enforced by Autocomplete, but helps in many cases.
+              types: mode === 'city' ? ['(cities)'] : ['address']
             }
           );
 
@@ -69,7 +73,8 @@ const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({
             if (place && place.geometry && place.geometry.location) {
               const placeDetails = extractPlaceDetails(place);
               onPlaceSelect(placeDetails);
-              setInputValue(placeDetails.formattedAddress);
+              // Display only the city when in city mode; otherwise show full formatted address
+              setInputValue(mode === 'city' ? (placeDetails.city || placeDetails.formattedAddress) : placeDetails.formattedAddress);
             }
           });
         }
@@ -157,6 +162,11 @@ const GooglePlacesAutocomplete: React.FC<GooglePlacesAutocompleteProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
+
+  // Keep input synced if parent value changes externally
+  useEffect(() => {
+    setInputValue(value || '');
+  }, [value]);
 
   return (
     <div className="relative">
