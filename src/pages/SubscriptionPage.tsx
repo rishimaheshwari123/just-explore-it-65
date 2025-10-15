@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Crown, 
-  Check, 
-  Star, 
-  Shield, 
-  Zap, 
-  TrendingUp, 
-  Users, 
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  Crown,
+  Check,
+  Star,
+  Shield,
+  Zap,
+  TrendingUp,
+  Users,
   BarChart3,
   Headphones,
   Globe,
@@ -16,14 +16,14 @@ import {
   ArrowLeft,
   CreditCard,
   MapPin,
-  Phone
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { toast } from 'react-hot-toast';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
+  Phone,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
 interface SubscriptionPlan {
   _id: string;
@@ -76,65 +76,137 @@ const SubscriptionPage: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch subscription plans
-      const plansResponse = await axios.get('https://server.businessgurujee.com/api/v1/subscriptions/plans');
+      const plansResponse = await axios.get(
+        "https://server.businessgurujee.com/api/v1/subscription/plans"
+      );
       setPlans(plansResponse.data.data || []);
-console.log(plansResponse)
+      console.log(plansResponse);
       // Fetch business details if businessId is provided
       if (businessId) {
-        const businessResponse = await axios.get(`https://server.businessgurujee.com/api/v1/property/business/${businessId}`);
+        const businessResponse = await axios.get(
+          `https://server.businessgurujee.com/api/v1/property/business/${businessId}`
+        );
         setBusiness(businessResponse.data.business);
-        console.log(businessResponse.data.business)
+        console.log(businessResponse.data.business);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast.error('Failed to load subscription plans');
+      console.error("Error fetching data:", error);
+      toast.error("Failed to load subscription plans");
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePurchase = async (planId: string, planName: string, price: number) => {
+  const handlePurchase = async (planId, planName, price) => {
     if (!businessId) {
-      toast.error('Business ID is required');
+      toast.error("Business ID is required");
       return;
     }
 
     try {
       setPurchasing(planId);
-      
-      const response = await axios.post('https://server.businessgurujee.com/api/v1/subscriptions/purchase', {
-        businessId,
-        planId,
-        vendorId:user._id
-      });
 
-      if (response.data.success) {
-        toast.success(`Successfully purchased ${planName} plan!`);
-        // Refresh business data
-        await fetchData();
-        // Navigate back to business page after a delay
-        setTimeout(() => {
-          navigate(`/business/${businessId}`);
-        }, 2000);
+      // Step 1️⃣: Create Razorpay order from backend
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/razorpay/capturePayment`,
+        { amount: price },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      if (!data?.order) {
+        toast.error("Failed to initiate payment.");
+        setPurchasing(null);
+        return;
       }
-    } catch (error: any) {
-      console.error('Purchase error:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to purchase subscription';
-      toast.error(errorMessage);
-    } finally {
+
+      // Step 2️⃣: Configure Razorpay checkout options
+      const options = {
+        key: "rzp_test_lQz64anllWjB83", // ✅ your Razorpay key
+        amount: data.order.amount,
+        currency: data.order.currency,
+        name: "Business Gurujee",
+        description: `${planName} Subscription Payment`,
+        order_id: data.order.id,
+        handler: async (response) => {
+          try {
+            toast.loading("Verifying payment...");
+
+            // Step 3️⃣: Send payment verification to backend
+            const startDate = new Date();
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + 365); // Example: 1-year plan
+
+            const verifyResponse = await axios.post(
+              `${import.meta.env.VITE_API_BASE_URL}/razorpay/verifyPayment`,
+              {
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                business: businessId,
+                vendor: user._id,
+                subscriptionPlan: planId,
+                planName,
+                price,
+                startDate,
+                endDate,
+                paymentMethod: "Razorpay",
+                autoRenewal: false,
+                features: [
+                  "Increased business visibility",
+                  "Priority listing",
+                  "Customer support",
+                  "Analytics dashboard",
+                  "Profile badge",
+                ],
+                priority: 1,
+              },
+              { headers: { "Content-Type": "application/json" } }
+            );
+
+            toast.dismiss();
+
+            if (verifyResponse?.data?.success) {
+              toast.success("Payment successful! Subscription activated.");
+              await fetchData();
+              navigate(`/business/${businessId}`);
+            } else {
+              toast.error("Payment verification failed.");
+            }
+          } catch (error) {
+            toast.dismiss();
+            console.error("Error verifying payment:", error);
+            toast.error("Error verifying payment.");
+          } finally {
+            setPurchasing(null);
+          }
+        },
+        prefill: {
+          name: user?.name,
+          email: user?.email,
+          contact: user?.phone,
+        },
+        theme: { color: "#f63b60" },
+      };
+
+      // Step 4️⃣: Open Razorpay checkout popup
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error("Purchase error:", error);
+      toast.error("Failed to start payment process.");
       setPurchasing(null);
     }
   };
 
   const getPlanIcon = (planName: string) => {
     switch (planName.toLowerCase()) {
-      case 'basic premium':
+      case "basic premium":
         return <Star className="h-8 w-8 text-blue-500" />;
-      case 'business pro':
+      case "business pro":
         return <TrendingUp className="h-8 w-8 text-purple-500" />;
-      case 'enterprise elite':
+      case "enterprise elite":
         return <Crown className="h-8 w-8 text-yellow-500" />;
       default:
         return <Shield className="h-8 w-8 text-gray-500" />;
@@ -143,14 +215,14 @@ console.log(plansResponse)
 
   const getPlanColor = (planName: string) => {
     switch (planName.toLowerCase()) {
-      case 'basic premium':
-        return 'from-blue-500 to-blue-600';
-      case 'business pro':
-        return 'from-purple-500 to-purple-600';
-      case 'enterprise elite':
-        return 'from-yellow-500 to-orange-500';
+      case "basic premium":
+        return "from-blue-500 to-blue-600";
+      case "business pro":
+        return "from-purple-500 to-purple-600";
+      case "enterprise elite":
+        return "from-yellow-500 to-orange-500";
       default:
-        return 'from-gray-500 to-gray-600';
+        return "from-gray-500 to-gray-600";
     }
   };
 
@@ -181,9 +253,13 @@ console.log(plansResponse)
                 Back
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Subscription Plans</h1>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  Subscription Plans
+                </h1>
                 {business && (
-                  <p className="text-gray-600">Upgrade {business.businessName} to premium</p>
+                  <p className="text-gray-600">
+                    Upgrade {business.businessName} to premium
+                  </p>
                 )}
               </div>
             </div>
@@ -192,107 +268,110 @@ console.log(plansResponse)
       </div>
 
       {/* Business Details Section */}
-     {business && (
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-    <Card className="mb-6 shadow-lg">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-3">
-          {/* First image (logo/banner) */}
-          {business.images?.[0] && (
-            <img
-              src={business.images[0].url}
-              alt={business.businessName}
-              className="h-16 w-16 object-cover rounded-lg"
-            />
-          )}
-
-          {/* Business name + category */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              {business.businessName}
-            </h2>
-            <p className="text-gray-600">
-              {business.category} {business.subCategory && `- ${business.subCategory}`}
-            </p>
-          </div>
-
-          {/* Premium badge */}
-          {business.isPremium && (
-            <Badge className="bg-purple-100 text-purple-800 ml-auto">
-              <Crown className="h-3 w-3 mr-1" />
-              Premium
-            </Badge>
-          )}
-        </CardTitle>
-      </CardHeader>
-
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left Side - Details */}
-          <div className="space-y-4">
-            <p className="text-gray-700">{business.description}</p>
-
-            {/* Address */}
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <MapPin className="h-4 w-4" />
-              <span>
-                {business.address?.street}, {business.address?.area}, {business.address?.city},{" "}
-                {business.address?.state} - {business.address?.pincode}
-              </span>
-            </div>
-
-            {/* Contact */}
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Phone className="h-4 w-4" />
-              <span>{business.contactInfo?.primaryPhone}</span>
-            </div>
-
-            {/* Website */}
-            {business.contactInfo?.website && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <Globe className="h-4 w-4" />
-                <a
-                  href={business.contactInfo.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  {business.contactInfo.website}
-                </a>
-              </div>
-            )}
-          </div>
-
-          {/* Right Side - Ratings & More Images */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-              <span className="font-semibold">{business.ratings?.average || 0}</span>
-              <span className="text-gray-600">
-                ({business.ratings?.totalReviews || 0} reviews)
-              </span>
-            </div>
-
-            {/* Image thumbnails */}
-            {business.images && business.images.length > 0 && (
-              <div className="grid grid-cols-3 gap-2">
-                {business.images.slice(0, 3).map((image, index) => (
+      {business && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <Card className="mb-6 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-3">
+                {/* First image (logo/banner) */}
+                {business.images?.[0] && (
                   <img
-                    key={image._id || index}
-                    src={image.url}
-                    alt={`${business.businessName} ${index + 1}`}
-                    className="w-full h-20 object-cover rounded-lg"
+                    src={business.images[0].url}
+                    alt={business.businessName}
+                    className="h-16 w-16 object-cover rounded-lg"
                   />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  </div>
-)}
+                )}
 
+                {/* Business name + category */}
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {business.businessName}
+                  </h2>
+                  <p className="text-gray-600">
+                    {business.category}{" "}
+                    {business.subCategory && `- ${business.subCategory}`}
+                  </p>
+                </div>
+
+                {/* Premium badge */}
+                {business.isPremium && (
+                  <Badge className="bg-purple-100 text-purple-800 ml-auto">
+                    <Crown className="h-3 w-3 mr-1" />
+                    Premium
+                  </Badge>
+                )}
+              </CardTitle>
+            </CardHeader>
+
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Left Side - Details */}
+                <div className="space-y-4">
+                  <p className="text-gray-700">{business.description}</p>
+
+                  {/* Address */}
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span>
+                      {business.address?.street}, {business.address?.area},{" "}
+                      {business.address?.city}, {business.address?.state} -{" "}
+                      {business.address?.pincode}
+                    </span>
+                  </div>
+
+                  {/* Contact */}
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Phone className="h-4 w-4" />
+                    <span>{business.contactInfo?.primaryPhone}</span>
+                  </div>
+
+                  {/* Website */}
+                  {business.contactInfo?.website && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Globe className="h-4 w-4" />
+                      <a
+                        href={business.contactInfo.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline"
+                      >
+                        {business.contactInfo.website}
+                      </a>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right Side - Ratings & More Images */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                    <span className="font-semibold">
+                      {business.ratings?.average || 0}
+                    </span>
+                    <span className="text-gray-600">
+                      ({business.ratings?.totalReviews || 0} reviews)
+                    </span>
+                  </div>
+
+                  {/* Image thumbnails */}
+                  {business.images && business.images.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2">
+                      {business.images.slice(0, 3).map((image, index) => (
+                        <img
+                          key={image._id || index}
+                          src={image.url}
+                          alt={`${business.businessName} ${index + 1}`}
+                          className="w-full h-20 object-cover rounded-lg"
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Current Subscription Status */}
       {business?.currentSubscription && (
@@ -306,7 +385,10 @@ console.log(plansResponse)
                     Current Plan: {business.currentSubscription.planName}
                   </h3>
                   <p className="text-sm text-green-600">
-                    Active until {new Date(business.currentSubscription.endDate).toLocaleDateString()}
+                    Active until{" "}
+                    {new Date(
+                      business.currentSubscription.endDate
+                    ).toLocaleDateString()}
                   </p>
                 </div>
               </div>
@@ -322,18 +404,22 @@ console.log(plansResponse)
             Choose Your Perfect Plan
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">
-            Boost your business visibility and get more customers with our premium subscription plans
+            Boost your business visibility and get more customers with our
+            premium subscription plans
           </p>
-          
+
           {/* Sorting Advantage Highlight */}
           <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-6 max-w-4xl mx-auto">
             <div className="flex items-center justify-center gap-3 mb-3">
               <TrendingUp className="h-6 w-6 text-orange-600" />
-              <h3 className="text-xl font-bold text-gray-900">🎯 Premium Search Advantage</h3>
+              <h3 className="text-xl font-bold text-gray-900">
+                🎯 Premium Search Advantage
+              </h3>
             </div>
             <p className="text-gray-700 mb-4">
-              Premium businesses automatically appear <strong>first in all search results</strong>, 
-              giving you maximum visibility and more customer inquiries.
+              Premium businesses automatically appear{" "}
+              <strong>first in all search results</strong>, giving you maximum
+              visibility and more customer inquiries.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div className="flex items-center gap-2">
@@ -360,10 +446,10 @@ console.log(plansResponse)
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {plans.map((plan) => (
-            <Card 
-              key={plan._id} 
+            <Card
+              key={plan._id}
               className={`relative overflow-hidden transition-all duration-300 hover:shadow-xl ${
-                plan.priority === 2 ? 'ring-2 ring-purple-500 scale-105' : ''
+                plan.priority === 2 ? "ring-2 ring-purple-500 scale-105" : ""
               }`}
             >
               {plan.priority === 2 && (
@@ -371,14 +457,22 @@ console.log(plansResponse)
                   Most Popular
                 </div>
               )}
-              
-              <CardHeader className={`text-center ${plan.priority === 2 ? 'pt-12' : 'pt-6'}`}>
+
+              <CardHeader
+                className={`text-center ${
+                  plan.priority === 2 ? "pt-12" : "pt-6"
+                }`}
+              >
                 <div className="flex justify-center mb-4">
                   {getPlanIcon(plan.name)}
                 </div>
-                <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
+                <CardTitle className="text-2xl font-bold">
+                  {plan.name}
+                </CardTitle>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-gray-900">₹{plan.price.toLocaleString()}</span>
+                  <span className="text-4xl font-bold text-gray-900">
+                    ₹{plan.price.toLocaleString()}
+                  </span>
                   <span className="text-gray-600 ml-2">/year</span>
                 </div>
                 <p className="text-gray-600 mt-2">{plan.description}</p>
@@ -395,17 +489,24 @@ console.log(plansResponse)
                 </div>
 
                 <Button
-                  onClick={() => handlePurchase(plan._id, plan.name, plan.price)}
-                  disabled={purchasing === plan._id || (business?.currentSubscription?.status === 'active')}
-                  className={`w-full bg-gradient-to-r ${getPlanColor(plan.name)} hover:opacity-90 text-white font-semibold py-3`}
+                  onClick={() =>
+                    handlePurchase(plan._id, plan.name, plan.price)
+                  }
+                  disabled={
+                    purchasing === plan._id ||
+                    business?.currentSubscription?.status === "active"
+                  }
+                  className={`w-full bg-gradient-to-r ${getPlanColor(
+                    plan.name
+                  )} hover:opacity-90 text-white font-semibold py-3`}
                 >
                   {purchasing === plan._id ? (
                     <div className="flex items-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                       Processing...
                     </div>
-                  ) : business?.currentSubscription?.status === 'active' ? (
-                    'Current Plan'
+                  ) : business?.currentSubscription?.status === "active" ? (
+                    "Current Plan"
                   ) : (
                     <div className="flex items-center gap-2">
                       <CreditCard className="h-4 w-4" />
@@ -424,10 +525,11 @@ console.log(plansResponse)
             Why Choose Premium?
           </h3>
           <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
-            Premium businesses get up to 5x more visibility and 3x more customer inquiries. 
-            Join thousands of successful businesses already using our premium features.
+            Premium businesses get up to 5x more visibility and 3x more customer
+            inquiries. Join thousands of successful businesses already using our
+            premium features.
           </p>
-          
+
           {/* Main Benefits Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div className="text-center group hover:transform hover:scale-105 transition-all duration-300">
@@ -435,28 +537,39 @@ console.log(plansResponse)
                 <TrendingUp className="h-10 w-10 text-blue-600" />
               </div>
               <h4 className="font-bold text-lg mb-2">🚀 Top Search Rankings</h4>
-              <p className="text-gray-600 text-sm">Appear first in search results and get 5x more visibility than free listings</p>
+              <p className="text-gray-600 text-sm">
+                Appear first in search results and get 5x more visibility than
+                free listings
+              </p>
             </div>
             <div className="text-center group hover:transform hover:scale-105 transition-all duration-300">
               <div className="bg-gradient-to-br from-green-100 to-green-200 rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center group-hover:shadow-lg">
                 <Users className="h-10 w-10 text-green-600" />
               </div>
               <h4 className="font-bold text-lg mb-2">📈 More Customers</h4>
-              <p className="text-gray-600 text-sm">Premium businesses receive 3x more customer inquiries and calls</p>
+              <p className="text-gray-600 text-sm">
+                Premium businesses receive 3x more customer inquiries and calls
+              </p>
             </div>
             <div className="text-center group hover:transform hover:scale-105 transition-all duration-300">
               <div className="bg-gradient-to-br from-purple-100 to-purple-200 rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center group-hover:shadow-lg">
                 <BarChart3 className="h-10 w-10 text-purple-600" />
               </div>
               <h4 className="font-bold text-lg mb-2">📊 Advanced Analytics</h4>
-              <p className="text-gray-600 text-sm">Track performance, customer behavior, and optimize your business strategy</p>
+              <p className="text-gray-600 text-sm">
+                Track performance, customer behavior, and optimize your business
+                strategy
+              </p>
             </div>
             <div className="text-center group hover:transform hover:scale-105 transition-all duration-300">
               <div className="bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-full p-6 w-20 h-20 mx-auto mb-4 flex items-center justify-center group-hover:shadow-lg">
                 <Headphones className="h-10 w-10 text-yellow-600" />
               </div>
               <h4 className="font-bold text-lg mb-2">⚡ Priority Support</h4>
-              <p className="text-gray-600 text-sm">Get instant help from our dedicated support team whenever you need it</p>
+              <p className="text-gray-600 text-sm">
+                Get instant help from our dedicated support team whenever you
+                need it
+              </p>
             </div>
           </div>
 
@@ -471,8 +584,12 @@ console.log(plansResponse)
                   <Check className="h-3 w-3 text-white" />
                 </div>
                 <div>
-                  <h5 className="font-semibold text-gray-900">Featured Business Badge</h5>
-                  <p className="text-sm text-gray-600">Stand out with premium badges and verification marks</p>
+                  <h5 className="font-semibold text-gray-900">
+                    Featured Business Badge
+                  </h5>
+                  <p className="text-sm text-gray-600">
+                    Stand out with premium badges and verification marks
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -480,8 +597,12 @@ console.log(plansResponse)
                   <Check className="h-3 w-3 text-white" />
                 </div>
                 <div>
-                  <h5 className="font-semibold text-gray-900">Priority in All Searches</h5>
-                  <p className="text-sm text-gray-600">Always appear before free listings in search results</p>
+                  <h5 className="font-semibold text-gray-900">
+                    Priority in All Searches
+                  </h5>
+                  <p className="text-sm text-gray-600">
+                    Always appear before free listings in search results
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -489,8 +610,12 @@ console.log(plansResponse)
                   <Check className="h-3 w-3 text-white" />
                 </div>
                 <div>
-                  <h5 className="font-semibold text-gray-900">Enhanced Business Profile</h5>
-                  <p className="text-sm text-gray-600">Showcase unlimited photos, videos, and detailed information</p>
+                  <h5 className="font-semibold text-gray-900">
+                    Enhanced Business Profile
+                  </h5>
+                  <p className="text-sm text-gray-600">
+                    Showcase unlimited photos, videos, and detailed information
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -498,8 +623,12 @@ console.log(plansResponse)
                   <Check className="h-3 w-3 text-white" />
                 </div>
                 <div>
-                  <h5 className="font-semibold text-gray-900">Customer Review Management</h5>
-                  <p className="text-sm text-gray-600">Tools to manage and respond to customer reviews</p>
+                  <h5 className="font-semibold text-gray-900">
+                    Customer Review Management
+                  </h5>
+                  <p className="text-sm text-gray-600">
+                    Tools to manage and respond to customer reviews
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -507,8 +636,12 @@ console.log(plansResponse)
                   <Check className="h-3 w-3 text-white" />
                 </div>
                 <div>
-                  <h5 className="font-semibold text-gray-900">Social Media Integration</h5>
-                  <p className="text-sm text-gray-600">Connect your social profiles and WhatsApp business</p>
+                  <h5 className="font-semibold text-gray-900">
+                    Social Media Integration
+                  </h5>
+                  <p className="text-sm text-gray-600">
+                    Connect your social profiles and WhatsApp business
+                  </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -516,8 +649,12 @@ console.log(plansResponse)
                   <Check className="h-3 w-3 text-white" />
                 </div>
                 <div>
-                  <h5 className="font-semibold text-gray-900">Lead Generation Tools</h5>
-                  <p className="text-sm text-gray-600">Advanced tools to capture and convert more leads</p>
+                  <h5 className="font-semibold text-gray-900">
+                    Lead Generation Tools
+                  </h5>
+                  <p className="text-sm text-gray-600">
+                    Advanced tools to capture and convert more leads
+                  </p>
                 </div>
               </div>
             </div>
@@ -530,8 +667,12 @@ console.log(plansResponse)
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
               <div>
-                <div className="text-4xl font-bold text-yellow-400 mb-2">5x</div>
-                <p className="text-gray-300">More visibility than free listings</p>
+                <div className="text-4xl font-bold text-yellow-400 mb-2">
+                  5x
+                </div>
+                <p className="text-gray-300">
+                  More visibility than free listings
+                </p>
               </div>
               <div>
                 <div className="text-4xl font-bold text-green-400 mb-2">3x</div>
@@ -539,7 +680,9 @@ console.log(plansResponse)
               </div>
               <div>
                 <div className="text-4xl font-bold text-blue-400 mb-2">85%</div>
-                <p className="text-gray-300">Of premium businesses report increased revenue</p>
+                <p className="text-gray-300">
+                  Of premium businesses report increased revenue
+                </p>
               </div>
             </div>
           </div>
