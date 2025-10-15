@@ -1533,6 +1533,7 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
                 <div>
                   <Label htmlFor="city">City *</Label>
                   <GooglePlacesAutocomplete
+                    mode="city"
                     onPlaceSelect={(placeDetails) => {
                       setFormData((prev) => ({
                         ...prev,
