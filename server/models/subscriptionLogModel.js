@@ -36,8 +36,23 @@ const subscriptionLogSchema = new mongoose.Schema({
         required: true
     },
     paymentDetails: {
+        // Core identifiers
         transactionId: String,
+        orderId: String,
+        signature: String,
+
+        // Amount & currency
+        amount: Number,
+        currency: String,
+        taxRate: Number,
+        taxAmount: Number,
+        subtotal: Number,
+
+        // Method and gateway
         paymentMethod: String,
+        processorStatus: String,
+
+        // Timestamps
         paymentDate: {
             type: Date,
             default: Date.now

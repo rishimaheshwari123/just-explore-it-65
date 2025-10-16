@@ -49,6 +49,12 @@ interface SubscriptionLog {
     paymentMethod: string;
     paymentDate: string;
     paymentStatus: 'completed' | 'pending' | 'failed';
+    // Added fields for GST breakdown
+    amount?: number;
+    currency?: string;
+    taxRate?: number;
+    taxAmount?: number;
+    subtotal?: number;
   };
   metadata: {
     userAgent: string;
@@ -323,7 +329,7 @@ const SubscriptionLogs = () => {
                 <TableRow>
                   <TableHead>Business & Vendor</TableHead>
                   <TableHead>Plan Details</TableHead>
-                  <TableHead>Amount</TableHead>
+                  <TableHead>Amount (incl. GST)</TableHead>
                   <TableHead>Action</TableHead>
                   <TableHead>Payment Method</TableHead>
                   <TableHead>Transaction ID</TableHead>
@@ -356,11 +362,22 @@ const SubscriptionLogs = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1">
-                        <span className="font-semibold text-gray-900">
-                          ₹{subscription.amount?.toLocaleString() || 0}
-                        </span>
-                        <span className="text-sm text-gray-500">INR</span>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Subtotal</span>
+                          <span className="text-gray-800">₹{(subscription.paymentDetails?.subtotal ?? subscription.amount)?.toLocaleString?.() ?? subscription.paymentDetails?.subtotal ?? subscription.amount}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">GST (18%)</span>
+                          <span className="text-gray-800">₹{(subscription.paymentDetails?.taxAmount ?? ((subscription.paymentDetails?.subtotal ?? subscription.amount) * 0.18))?.toLocaleString?.() ?? (subscription.paymentDetails?.taxAmount ?? ((subscription.paymentDetails?.subtotal ?? subscription.amount) * 0.18)).toFixed?.(2) ?? (subscription.paymentDetails?.taxAmount ?? ((subscription.paymentDetails?.subtotal ?? subscription.amount) * 0.18))}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-gray-900">Total</span>
+                          <div className="flex items-center gap-1">
+                            <span className="font-semibold text-gray-900">₹{subscription.amount?.toLocaleString() || 0}</span>
+                            <span className="text-xs text-gray-500">INR</span>
+                          </div>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>

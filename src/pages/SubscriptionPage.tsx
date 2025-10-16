@@ -23,6 +23,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "react-hot-toast";
 import axios from "axios";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { useSelector } from "react-redux";
 
 interface SubscriptionPlan {
@@ -127,7 +129,7 @@ const SubscriptionPage: React.FC = () => {
         amount: data.order.amount,
         currency: data.order.currency,
         name: "Business Gurujee",
-        description: `${planName} Subscription Payment`,
+        description: `${planName} Subscription Payment (incl. 18% GST)`,
         order_id: data.order.id,
         handler: async (response) => {
           try {
@@ -169,6 +171,75 @@ const SubscriptionPage: React.FC = () => {
 
             if (verifyResponse?.data?.success) {
               toast.success("Payment successful! Subscription activated.");
+              // Generate and download PDF receipt immediately
+              try {
+                const subscription = verifyResponse.data.subscription;
+                const receiptCtx = verifyResponse.data.receiptContext || {};
+                const doc = new jsPDF();
+
+                // Header
+                doc.setFontSize(18);
+                doc.text("Business Gurujee", 14, 18);
+                doc.setFontSize(12);
+                doc.text("Payment Receipt", 14, 26);
+
+                // Amount breakdown (GST 18%)
+                const subtotal = Number(
+                  (subscription?.paymentDetails?.subtotal ?? price).toFixed ?
+                  (subscription?.paymentDetails?.subtotal ?? price).toFixed(2) :
+                  subscription?.paymentDetails?.subtotal ?? price
+                );
+                const taxAmount = Number(
+                  (subscription?.paymentDetails?.taxAmount ?? subtotal * 0.18).toFixed ?
+                  (subtotal * 0.18).toFixed(2) :
+                  subscription?.paymentDetails?.taxAmount ?? subtotal * 0.18
+                );
+                const total = Number(
+                  (subscription?.paymentDetails?.amount ?? subtotal + taxAmount).toFixed ?
+                  (subtotal + taxAmount).toFixed(2) :
+                  subscription?.paymentDetails?.amount ?? subtotal + taxAmount
+                );
+
+                // Details table
+                const body = [
+                  ["Receipt Date", new Date(subscription?.paymentDetails?.paymentDate || Date.now()).toLocaleString()],
+                  ["Business ID", businessId],
+                  ["Vendor", `${user?.name || "-"} (${user?.email || "-"})`],
+                  ["Plan", planName],
+                  ["Subtotal", `₹ ${subtotal}`],
+                  ["GST (18%)", `₹ ${taxAmount}`],
+                  ["Total", `₹ ${total}`],
+                  ["Currency", subscription?.paymentDetails?.currency || receiptCtx?.order?.currency || "INR"],
+                  ["Payment Method", subscription?.paymentDetails?.paymentMethod || "Razorpay"],
+                  ["Payment Status", subscription?.paymentDetails?.processorStatus || subscription?.paymentDetails?.paymentStatus || "completed"],
+                  ["Order ID", subscription?.paymentDetails?.orderId || response.razorpay_order_id],
+                  ["Payment ID", subscription?.paymentDetails?.transactionId || response.razorpay_payment_id],
+                  ["Signature", subscription?.paymentDetails?.signature || response.razorpay_signature],
+                ];
+
+                autoTable(doc, {
+                  head: [["Field", "Value"]],
+                  body,
+                  startY: 34,
+                  styles: { fontSize: 10 },
+                  headStyles: { fillColor: [246, 59, 96] },
+                });
+
+                // Footer
+                const finalY = (doc as any).lastAutoTable?.finalY || 34;
+                doc.setFontSize(10);
+                doc.text(
+                  "Thank you for your purchase! For support, contact support@businessgurujee.com",
+                  14,
+                  finalY + 10
+                );
+
+                const filename = `Receipt_BusinessGurujee_${planName.replace(/\s+/g, "_")}_${new Date().toISOString().split("T")[0]}.pdf`;
+                doc.save(filename);
+              } catch (pdfErr) {
+                console.error("Error generating receipt:", pdfErr);
+                toast.error("Payment successful, but failed to download receipt.");
+              }
               await fetchData();
               navigate(`/business/${businessId}`);
             } else {
@@ -474,6 +545,7 @@ const SubscriptionPage: React.FC = () => {
                     ₹{plan.price.toLocaleString()}
                   </span>
                   <span className="text-gray-600 ml-2">/year</span>
+                  <div className="text-xs text-gray-600 mt-1">+ 18% GST applicable</div>
                 </div>
                 <p className="text-gray-600 mt-2">{plan.description}</p>
               </CardHeader>
@@ -486,6 +558,22 @@ const SubscriptionPage: React.FC = () => {
                       <span className="text-gray-700">{feature}</span>
                     </div>
                   ))}
+                </div>
+
+                {/* Amount Summary (GST) */}
+                <div className="bg-gray-50 border rounded-lg p-3 mb-4">
+                  <div className="flex justify-between text-sm">
+                    <span>Subtotal</span>
+                    <span>₹{plan.price.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>GST (18%)</span>
+                    <span>₹{(plan.price * 0.18).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold">
+                    <span>Total</span>
+                    <span>₹{(plan.price * 1.18).toFixed(2)}</span>
+                  </div>
                 </div>
 
                 <Button
@@ -510,7 +598,7 @@ const SubscriptionPage: React.FC = () => {
                   ) : (
                     <div className="flex items-center gap-2">
                       <CreditCard className="h-4 w-4" />
-                      Purchase Plan
+                      Purchase Plan (incl. 18% GST)
                     </div>
                   )}
                 </Button>

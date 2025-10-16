@@ -109,6 +109,12 @@ const purchaseSubscription = async (req, res) => {
         const endDate = new Date();
         endDate.setFullYear(endDate.getFullYear() + plan.duration);
 
+        // Compute GST 18%
+        const baseAmount = plan.price;
+        const taxRate = 0.18;
+        const gstAmount = Number((baseAmount * taxRate).toFixed(2));
+        const totalAmount = Number((baseAmount + gstAmount).toFixed(2));
+
         // Create new subscription
         const subscription = new BusinessSubscription({
             business: businessId,
@@ -118,9 +124,19 @@ const purchaseSubscription = async (req, res) => {
             planName: plan.name,
             startDate,
             endDate,
-            price: plan.price,
+            price: totalAmount,
             status: 'active',
-            paymentDetails: paymentDetails || {},
+            paymentDetails: {
+                ...(paymentDetails || {}),
+                amount: totalAmount,
+                currency: 'INR',
+                taxRate,
+                taxAmount: gstAmount,
+                subtotal: baseAmount,
+                total: totalAmount,
+                paymentStatus: 'completed',
+                paymentDate: new Date()
+            },
             features: plan.features,
             priority: plan.priority
         });
@@ -133,7 +149,7 @@ const purchaseSubscription = async (req, res) => {
             planName: plan.name,
             startDate,
             endDate,
-            price: plan.price,
+            price: totalAmount,
             status: 'active',
             features: plan.features,
             priority: plan.priority
@@ -160,19 +176,24 @@ const purchaseSubscription = async (req, res) => {
 
         await business.save();
 
-        // Log subscription activity
+        // Log subscription activity (GST-inclusive)
         await SubscriptionLog.logActivity({
             business: businessId,
             vendor: vendorId,
             subscription: subscription._id,
             plan: planId,
             action: 'purchased',
-            amount: plan.price,
+            amount: totalAmount,
             paymentDetails: {
                 transactionId: paymentDetails?.transactionId || `TXN_${Date.now()}`,
                 paymentMethod: paymentDetails?.paymentMethod || 'online',
                 paymentDate: new Date(),
-                paymentStatus: 'completed'
+                paymentStatus: 'completed',
+                amount: totalAmount,
+                currency: 'INR',
+                taxRate,
+                taxAmount: gstAmount,
+                subtotal: baseAmount
             },
             metadata: {
                 userAgent: req.headers['user-agent'] || '',

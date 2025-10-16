@@ -80,8 +80,38 @@ const businessSubscriptionSchema = new mongoose.Schema({
     default: 'active'
   },
   paymentDetails: {
-    transactionId: String,
-    paymentMethod: String,
+    // Core identifiers
+    transactionId: String, // razorpay_payment_id
+    orderId: String,       // razorpay_order_id
+    signature: String,     // razorpay_signature
+
+    // Amount & currency
+    amount: Number,        // in INR (rupees)
+    currency: String,      // e.g., 'INR'
+
+    // Tax breakdown (GST)
+    taxRate: { type: Number, default: 0.18 },
+    taxAmount: Number,
+    subtotal: Number,
+    total: Number,
+
+    // Method and gateway
+    paymentMethod: String, // e.g., 'card', 'upi', 'netbanking'
+    processor: {
+      name: { type: String, default: 'Razorpay' },
+      fee: { type: Number, default: 0 },
+      tax: { type: Number, default: 0 }
+    },
+
+    // Payer info (if available from gateway)
+    email: String,
+    contact: String,
+
+    // Status info
+    processorStatus: String, // razorpay payment status
+    captured: Boolean,
+
+    // Timestamps
     paymentDate: Date,
     paymentStatus: {
       type: String,
