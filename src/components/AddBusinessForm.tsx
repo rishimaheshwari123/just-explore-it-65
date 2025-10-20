@@ -40,6 +40,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import GooglePlacesAutocomplete from "./GooglePlacesAutocomplete";
 import { getAllVendorAPI } from "@/service/operations/vendor";
+import StateInput from "./StateInput";
 
 interface BusinessFormData {
   businessName: string;
@@ -459,6 +460,19 @@ const CITY_DATA = {
   Patna: { state: "Bihar", pincode: "800001", lat: 25.5941, lng: 85.1376 },
   Vadodara: { state: "Gujarat", pincode: "390001", lat: 22.3072, lng: 73.1812 },
 };
+
+
+
+
+const INDIAN_STATES = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
+  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
+  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
+  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
+  "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
+];
 
 interface AddBusinessFormProps {
   mode?: "add" | "edit";
@@ -1074,6 +1088,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
     : [];
 
 
+
+
+    
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -1560,16 +1577,14 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
                 </div>
 
                 <div>
-                  <Label htmlFor="state">State *</Label>
-                  <Input
-                    id="state"
-                    value={formData.address.state}
-                    placeholder="State (auto-filled)"
-                    readOnly
-                    className="bg-muted"
-                    required
-                  />
-                </div>
+  <Label htmlFor="state">State *</Label>
+  <StateInput
+    value={formData.address.state}
+    onChange={(value) =>
+      handleInputChange("address", "state", value)
+    }
+  />
+</div>
 
                 <div>
                   <Label htmlFor="pincode">Pincode *</Label>

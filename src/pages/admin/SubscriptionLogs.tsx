@@ -77,6 +77,72 @@ const SubscriptionLogs = () => {
     pages: 1,
     total: 0
   });
+  // Cache for fetched vendor details when logs return only vendorId
+  const [vendorsCache, setVendorsCache] = useState<Record<string, { _id: string; name: string; email: string }>>({});
+
+  // Helper: fetch vendor by id (fallback when API doesn't populate vendor)
+  const fetchVendorById = async (vendorId: string) => {
+    try {
+      const res = await fetch(`https://server.businessgurujee.com/api/v1/vendor/get/${vendorId}`);
+      const json = await res.json();
+      if (json?.success && json?.vendor) {
+        const v = json.vendor;
+        return { _id: v._id, name: v.name || 'N/A', email: v.email || 'N/A' };
+      }
+    } catch (e) {
+      console.error('Error fetching vendor fallback:', e);
+    }
+    return { _id: vendorId, name: 'N/A', email: 'N/A' };
+  };
+
+  // Resolve missing vendor details if logs contain vendorId instead of populated object
+  const resolveMissingVendorDetails = async (logs: any[]) => {
+    const updatedLogs = [...logs];
+    // Collect vendorIds needing fetch
+    const idsToFetch = Array.from(
+      new Set(
+        updatedLogs
+          .map((l) => (typeof l.vendor === 'string' ? l.vendor : null))
+          .filter(Boolean)
+      )
+    ) as string[];
+
+    // Fetch details for missing vendors (skip those already cached)
+    const fetchPromises = idsToFetch
+      .filter((id) => !vendorsCache[id])
+      .map(async (id) => {
+        const details = await fetchVendorById(id);
+        return { id, details };
+      });
+
+    if (fetchPromises.length) {
+      try {
+        const fetched = await Promise.all(fetchPromises);
+        const newCache: Record<string, { _id: string; name: string; email: string }> = { ...vendorsCache };
+        fetched.forEach(({ id, details }) => {
+          newCache[id] = details;
+        });
+        setVendorsCache(newCache);
+      } catch (err) {
+        console.error('Error resolving vendor details:', err);
+      }
+    }
+
+    // Attach vendor objects where needed
+    const finalLogs = updatedLogs.map((l) => {
+      if (typeof l.vendor === 'string') {
+        const id = l.vendor as string;
+        const v = vendorsCache[id];
+        return {
+          ...l,
+          vendor: v || { _id: id, name: 'N/A', email: 'N/A' },
+        };
+      }
+      return l;
+    });
+
+    return finalLogs as SubscriptionLog[];
+  };
 
   const fetchSubscriptionLogs = async (page = 1) => {
     try {
@@ -85,7 +151,11 @@ const SubscriptionLogs = () => {
       const data = await response.json();
       
       if (data.success) {
-        setSubscriptions(data.data.logs);
+        // First set raw logs
+        const logs = data.data.logs || [];
+        // Resolve vendor details if not populated
+        const enriched = await resolveMissingVendorDetails(logs);
+        setSubscriptions(enriched);
         setPagination(data.data.pagination);
       } else {
         toast.error('Failed to fetch subscription logs');
