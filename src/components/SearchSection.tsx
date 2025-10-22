@@ -52,7 +52,7 @@ const SearchSection = () => {
 
       const script = document.createElement("script");
       // IMPORTANT: Replace this placeholder with your actual key, loaded from a secure environment variable.
-      const apiKey = "YOUR_GOOGLE_MAPS_API_KEY";
+      const apiKey = "AIzaSyASz6Gqa5Oa3WialPx7Z6ebZTj02Liw-Gk";
       script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
       script.async = true;
       script.onload = () => {
