@@ -23,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "react-hot-toast";
 import axios from "axios";
+
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useSelector } from "react-redux";
@@ -125,7 +126,7 @@ const SubscriptionPage: React.FC = () => {
 
       // Step 2️⃣: Configure Razorpay checkout options
       const options = {
-        key: "rzp_test_lQz64anllWjB83", // ✅ your Razorpay key
+        key: "rzp_live_RXNNi6vqWQruCx", // ✅ your Razorpay key
         amount: data.order.amount,
         currency: data.order.currency,
         name: "Business Gurujee",
