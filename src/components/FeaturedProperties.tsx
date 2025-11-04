@@ -79,7 +79,7 @@ const FeaturedProperties = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://server.businessgurujee.com/api/v1/property/getAll?category=Real Estate&limit=8"
+        "http://localhost:8001/api/v1/property/getAll?category=Real Estate&limit=8"
       );
 
       if (!response.ok) {

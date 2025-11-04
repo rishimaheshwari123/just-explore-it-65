@@ -76,7 +76,7 @@ const LocationServices: React.FC = () => {
       }
 
       const response = await fetch(
-        `https://server.businessgurujee.com/api/v1/property/businesses?${params.toString()}`
+        `http://localhost:8001/api/v1/property/businesses?${params.toString()}`
       );
       const data = await response.json();
 

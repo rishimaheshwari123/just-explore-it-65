@@ -35,12 +35,12 @@ import {
   Camera,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { imageUpload } from "@/service/operations/image";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import GooglePlacesAutocomplete from "./GooglePlacesAutocomplete";
 import { getAllVendorAPI } from "@/service/operations/vendor";
-import StateInput from "./StateInput";
 
 interface BusinessFormData {
   businessName: string;
@@ -460,19 +460,6 @@ const CITY_DATA = {
   Patna: { state: "Bihar", pincode: "800001", lat: 25.5941, lng: 85.1376 },
   Vadodara: { state: "Gujarat", pincode: "390001", lat: 22.3072, lng: 73.1812 },
 };
-
-
-
-
-const INDIAN_STATES = [
-  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram",
-  "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu",
-  "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal",
-  "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu",
-  "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
-];
 
 interface AddBusinessFormProps {
   mode?: "add" | "edit";
@@ -1040,27 +1027,39 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
       // Add images as JSON string since they are now URLs
       submitData.append("images", JSON.stringify(formData.images));
 
-      let response;
-      if (mode === "edit" && businessId) {
-        response = await updateBusinessAPI(businessId, submitData);
+      // New flow: For vendor add-mode, do NOT create business first. Initiate payment first.
+      if (mode !== "edit" && user?.role === "vendor") {
+        try {
+          toast.info("Initiating payment to proceed with listing...");
+          await initiateRequiredSubscriptionPayment(submitData);
+        } catch (payErr) {
+          console.error("Payment initiation error:", payErr);
+          toast.error("Payment step failed or cancelled. Business not created.");
+        }
       } else {
-        response = await createBusinessAPI(submitData);
-      }
+        // For edit-mode or non-vendor roles, keep existing create/update behavior
+        let response;
+        if (mode === "edit" && businessId) {
+          response = await updateBusinessAPI(businessId, submitData);
+        } else {
+          response = await createBusinessAPI(submitData);
+        }
 
-      if (response && response.success) {
-        toast.success(
-          mode === "edit"
-            ? "Business updated successfully!"
-            : "Business listed successfully!"
-        );
-        navigate("/vendor/dashboard");
-      } else {
-        toast.error(
-          response?.message ||
-          (mode === "edit"
-            ? "Failed to update business"
-            : "Failed to list business")
-        );
+        if (response && response.success) {
+          toast.success(
+            mode === "edit"
+              ? "Business updated successfully!"
+              : "Business created successfully!"
+          );
+          navigate("/vendor/dashboard");
+        } else {
+          toast.error(
+            response?.message ||
+            (mode === "edit"
+              ? "Failed to update business"
+              : "Failed to list business")
+          );
+        }
       }
     } catch (error) {
       console.error("Error submitting business:", error);
@@ -1068,6 +1067,107 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
     } finally {
       setLoading(false);
     }
+  };
+
+  // Required subscription plan (must be purchased before listing)
+  const REQUIRED_PLAN_ID = "68d82c963b1b20fc6809a54a";
+
+  // Initiate Razorpay flow for required subscription plan
+  const initiateRequiredSubscriptionPayment = async (submitData: FormData) => {
+    // Fetch required plan details (price, name, duration)
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
+    const planResp = await axios.get(`${baseUrl}/subscription/plans/${REQUIRED_PLAN_ID}`);
+    const plan = planResp?.data?.data;
+    if (!plan?._id) {
+      throw new Error("Required plan not found");
+    }
+
+    // Create Razorpay order with 18% GST applied by backend
+    const orderResp = await axios.post(
+      `${baseUrl}/razorpay/capturePayment`,
+      { amount: plan.price },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    const order = orderResp?.data?.order;
+    if (!order?.id) {
+      throw new Error("Failed to initiate payment order");
+    }
+
+    const startDate = new Date();
+    const endDate = new Date(startDate.getTime() + (plan.duration || 365) * 24 * 60 * 60 * 1000);
+
+    const options: any = {
+      key: "rzp_test_lQz64anllWjB83",
+      amount: order.amount,
+      currency: order.currency,
+      name: "Business Gurujee",
+      description: `${plan.name} Subscription Payment (incl. 18% GST)`,
+      order_id: order.id,
+      handler: async (response: any) => {
+        try {
+          // 1) Payment successful -> create business now (ensures no creation without payment)
+          toast.loading("Creating business after payment...");
+          const createResp = await createBusinessAPI(submitData);
+
+          if (!createResp?.success || !createResp?.business?._id) {
+            toast.dismiss();
+            throw new Error(createResp?.message || "Business creation failed after payment");
+          }
+
+          const createdBusinessId = createResp.business._id;
+
+          // 2) Verify payment and attach subscription + activate listing
+          const verifyResp = await axios.post(
+            `${baseUrl}/razorpay/verifyPayment`,
+            {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              business: createdBusinessId,
+              vendor: user?._id,
+              subscriptionPlan: REQUIRED_PLAN_ID,
+              planName: plan.name,
+              price: plan.price,
+              startDate,
+              endDate,
+              paymentMethod: "Razorpay",
+              autoRenewal: false,
+              features: plan.features || [],
+              priority: plan.priority || 1,
+            },
+            { headers: { "Content-Type": "application/json" } }
+          );
+
+          toast.dismiss();
+
+          if (verifyResp?.data?.success) {
+            toast.success(verifyResp?.data?.message || "Payment successful! Listing activated.");
+            navigate("/vendor/dashboard");
+          } else {
+            toast.error(verifyResp?.data?.message || "Payment verification failed");
+          }
+        } catch (err) {
+          toast.dismiss();
+          console.error("Verify payment error:", err);
+          toast.error("Payment verification failed.");
+        }
+      },
+      prefill: {
+        name: user?.name,
+        email: user?.email,
+        contact: user?.phone,
+      },
+      theme: { color: "#f63b60" },
+      modal: {
+        ondismiss: () => {
+          toast.info("Payment cancelled. Complete payment to activate listing.");
+        },
+      },
+    };
+
+    // Open Razorpay checkout
+    const rzp = new (window as any).Razorpay(options);
+    rzp.open();
   };
 
 
@@ -1088,9 +1188,6 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
     : [];
 
 
-
-
-    
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -1577,14 +1674,16 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
                 </div>
 
                 <div>
-  <Label htmlFor="state">State *</Label>
-  <StateInput
-    value={formData.address.state}
-    onChange={(value) =>
-      handleInputChange("address", "state", value)
-    }
-  />
-</div>
+                  <Label htmlFor="state">State *</Label>
+                  <Input
+                    id="state"
+                    value={formData.address.state}
+                    placeholder="State (auto-filled)"
+                    readOnly
+                    className="bg-muted"
+                    required
+                  />
+                </div>
 
                 <div>
                   <Label htmlFor="pincode">Pincode *</Label>

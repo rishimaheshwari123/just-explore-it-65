@@ -82,14 +82,14 @@ const SubscriptionPage: React.FC = () => {
 
       // Fetch subscription plans
       const plansResponse = await axios.get(
-        "https://server.businessgurujee.com/api/v1/subscription/plans"
+        "http://localhost:8001/api/v1/subscription/plans"
       );
       setPlans(plansResponse.data.data || []);
       console.log(plansResponse);
       // Fetch business details if businessId is provided
       if (businessId) {
         const businessResponse = await axios.get(
-          `https://server.businessgurujee.com/api/v1/property/business/${businessId}`
+          `http://localhost:8001/api/v1/property/business/${businessId}`
         );
         setBusiness(businessResponse.data.business);
         console.log(businessResponse.data.business);
@@ -126,7 +126,7 @@ const SubscriptionPage: React.FC = () => {
 
       // Step 2️⃣: Configure Razorpay checkout options
       const options = {
-        key: "rzp_live_RXNNi6vqWQruCx", // ✅ your Razorpay key
+        key: "rzp_test_lQz64anllWjB83", // ✅ your Razorpay key
         amount: data.order.amount,
         currency: data.order.currency,
         name: "Business Gurujee",

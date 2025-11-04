@@ -202,11 +202,11 @@ const BusinessListing = () => {
 
       console.log(
         "API URL:",
-        `https://server.businessgurujee.com/api/v1/property/businesses?${params.toString()}`
+        `http://localhost:8001/api/v1/property/businesses?${params.toString()}`
       );
 
       const response = await fetch(
-        `https://server.businessgurujee.com/api/v1/property/businesses?${params.toString()}`
+        `http://localhost:8001/api/v1/property/businesses?${params.toString()}`
       );
       const data = await response.json();
 
@@ -244,7 +244,7 @@ const BusinessListing = () => {
   const handleCall = (phone: string, businessId: string) => {
     // Track call interaction
     fetch(
-      `https://server.businessgurujee.com/api/v1/property/business/${businessId}/interaction`,
+      `http://localhost:8001/api/v1/property/business/${businessId}/interaction`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

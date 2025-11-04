@@ -41,6 +41,8 @@ const createRazorpayOrderCtrl = async (req, res) => {
 
 
 
+// Listing activation: after any successful payment, activate pending business
+
 const verifyPaymentCtrl = async (req, res) => {
     try {
         const {
@@ -195,6 +197,11 @@ const verifyPaymentCtrl = async (req, res) => {
                 businessDoc.premiumFeatures.analyticsAccess = plan.features?.includes('Advanced Analytics') || false;
                 businessDoc.premiumFeatures.customBranding = plan.features?.includes('Custom Branding') || false;
 
+                // Activate listing after successful subscription purchase
+                if (businessDoc.status === 'pending') {
+                    businessDoc.status = 'active';
+                }
+
                 await businessDoc.save();
             }
         } catch (bizErr) {
@@ -237,7 +244,7 @@ const verifyPaymentCtrl = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Payment verified and subscription activated successfully.",
+            message: "Payment verified. Subscription activated and business listed.",
             subscription: newSubscription,
             receiptContext: {
                 order: {

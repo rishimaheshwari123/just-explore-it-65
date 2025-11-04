@@ -300,7 +300,7 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://server.businessgurujee.com/api/v1/property/businesses/${businessId}`
+        `http://localhost:8001/api/v1/property/businesses/${businessId}`
       );
       const data = await response.json();
 
@@ -577,8 +577,8 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
 
       const url =
         mode === "add"
-          ? "https://server.businessgurujee.com/api/v1/property/create-business"
-          : `https://server.businessgurujee.com/api/v1/property/businesses/${businessId}`;
+          ? "http://localhost:8001/api/v1/property/create-business"
+          : `http://localhost:8001/api/v1/property/businesses/${businessId}`;
 
       const method = mode === "add" ? "POST" : "PUT";
 

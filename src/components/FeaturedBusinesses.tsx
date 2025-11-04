@@ -137,7 +137,7 @@ const FeaturedBusinesses = () => {
       }
 
       const response = await fetch(
-        `https://server.businessgurujee.com/api/v1/property/featured-businesses?page=${page}&limit=12`
+        `http://localhost:8001/api/v1/property/featured-businesses?page=${page}&limit=12`
       );
 
       if (!response.ok) {
@@ -251,7 +251,7 @@ const FeaturedBusinesses = () => {
     try {
       // Track call interaction
       await fetch(
-        `https://server.businessgurujee.com/api/v1/property/business/${businessId}/track-interaction`,
+        `http://localhost:8001/api/v1/property/business/${businessId}/track-interaction`,
         {
           method: "POST",
           headers: {
@@ -276,7 +276,7 @@ const FeaturedBusinesses = () => {
     try {
       // Track direction interaction
       await fetch(
-        `https://server.businessgurujee.com/api/v1/property/business/${businessId}/track-interaction`,
+        `http://localhost:8001/api/v1/property/business/${businessId}/track-interaction`,
         {
           method: "POST",
           headers: {

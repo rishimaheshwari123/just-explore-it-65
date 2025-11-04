@@ -224,6 +224,7 @@ const createBusinessCtrl = async (req, res) => {
             paymentMethods: paymentMethods || [],
             amenities: amenities || [],
             vendor,
+            status: 'pending',
         });
 
         await Vendor.findByIdAndUpdate(vendor, {
@@ -232,7 +233,7 @@ const createBusinessCtrl = async (req, res) => {
 
         return res.status(201).json({
             success: true,
-            message: "Business created successfully!",
+            message: "Business created and set to pending. Complete subscription payment to list.",
             business,
         });
     } catch (error) {
