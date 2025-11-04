@@ -91,7 +91,7 @@ const VendorSupport: React.FC = () => {
   // Fetch tickets
   const fetchTickets = async () => {
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/tickets/user/${user?._id}`);
       const data = await response.json();
 
@@ -124,7 +124,7 @@ const VendorSupport: React.FC = () => {
     }
 
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/tickets/create`, {
         method: 'POST',
         headers: {
@@ -160,7 +160,7 @@ const VendorSupport: React.FC = () => {
     if (!newMessage.trim()) return;
 
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/tickets/message/${ticketId}`, {
         method: 'POST',
         headers: {

@@ -111,7 +111,7 @@ const BusinessManagement: React.FC = () => {
   const fetchBusinesses = async () => {
     try {
       setLoading(true);
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/property/businesses?limit=1000`);
       const data = await response.json();
       
@@ -150,7 +150,7 @@ const BusinessManagement: React.FC = () => {
   // Update business status
   const updateBusinessStatus = async (businessId: string, status: string) => {
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/property/business/update/${businessId}`, {
         method: 'PUT',
         headers: {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   ChevronLeft,
   ChevronRight,
@@ -7,65 +8,37 @@ import {
   Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroBanner from "@/assets/hero-banner.jpg";
-import heroBanner2 from "@/assets/5.png";
-import heroBanner3 from "@/assets/2.png";
+import { heroCarousel } from "@/service/apis";
 
 const HeroBanner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [slides, setSlides] = useState<any[]>([]);
 
-  const slides = [
-    {
-      title: "Find What You Need",
-      subtitle: "All listings in one place",
-      description: "Connect with trusted businesses near you.",
-      image: heroBanner,
-      gradient: "from-purple-900/40 via-blue-900/30 to-black/20",
-      stats: [
-        { icon: Users, label: "Users", value: "50K+" },
-        { icon: Star, label: "Listings", value: "10K+" },
-        { icon: TrendingUp, label: "Success", value: "95%" },
-      ],
-    },
-    {
-      title: "Buy • Sell • Rent",
-      subtitle: "Post & discover instantly",
-      description: "Browse verified listings and contact sellers fast.",
-      specs: {
-        class: "Marketplace",
-        year: "2024",
-      },
-      image: heroBanner2,
-      gradient: "from-indigo-900/40 via-purple-900/30 to-pink-900/20",
-      stats: [
-        { icon: Users, label: "Customers", value: "25K+" },
-        { icon: Star, label: "Rating", value: "4.8" },
-        { icon: TrendingUp, label: "Growth", value: "200%" },
-      ],
-    },
-    {
-      title: "Connect & Grow",
-      subtitle: "Start your journey here",
-      description: "Join thousands of successful businesses.",
-      specs: {
-        class: "Growth Hub",
-        year: "2024",
-      },
-      image: heroBanner3,
-      gradient: "from-emerald-900/40 via-teal-900/30 to-cyan-900/20",
-      stats: [
-        { icon: Users, label: "Partners", value: "15K+" },
-        { icon: Star, label: "Stories", value: "8K+" },
-        { icon: TrendingUp, label: "Revenue", value: "150%" },
-      ],
-    },
-  ];
+  const fetchSlides = async () => {
+    try {
+      const res = await axios.get(`${heroCarousel.LIST}?onlyActive=true`);
+      if (res?.data?.success) {
+        const items = (res.data.items || []).filter(
+          (it: any) => !!it.image && (!!it.title || !!it.subtitle || !!it.description)
+        );
+        setSlides(items);
+      }
+    } catch (e) {
+      console.error("Failed to load hero slides", e);
+    }
+  };
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timer);
+    fetchSlides();
+  }, []);
+
+  useEffect(() => {
+    if (slides.length > 1) {
+      const timer = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+      }, 5000);
+      return () => clearInterval(timer);
+    }
   }, [slides.length]);
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -96,7 +69,7 @@ const HeroBanner = () => {
               style={{ backgroundImage: `url(${slide.image})` }}
             >
               <div
-                className={`absolute inset-0 bg-gradient-to-br ${slide.gradient}`}
+                className={`absolute inset-0 bg-gradient-to-br ${slide.gradient || "from-purple-900/40 via-blue-900/30 to-black/20"}`}
               />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05)_0%,transparent_50%)] opacity-15"></div>
 
@@ -144,46 +117,7 @@ const HeroBanner = () => {
                           : "translate-y-8 opacity-0"
                       }`}
                     >
-                      {slide.stats ? (
-                        <div className="grid grid-cols-3 gap-4 max-w-md">
-                          {slide.stats.map((stat, statIndex) => {
-                            const Icon = stat.icon;
-                            return (
-                              <div
-                                key={statIndex}
-                                className="text-center bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20"
-                              >
-                                <Icon className="h-5 w-5 mx-auto mb-1 text-blue-200" />
-                                <div className="text-base font-bold">
-                                  {stat.value}
-                                </div>
-                                <div className="text-xs opacity-80">
-                                  {stat.label}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : slide.specs ? (
-                        <div className="flex gap-6 text-sm md:text-base">
-                          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                            <span className="block opacity-70 text-xs">
-                              Type
-                            </span>
-                            <span className="font-semibold text-base">
-                              {slide.specs.class}
-                            </span>
-                          </div>
-                          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-                            <span className="block opacity-70 text-xs">
-                              Since
-                            </span>
-                            <span className="font-semibold text-base">
-                              {slide.specs.year}
-                            </span>
-                          </div>
-                        </div>
-                      ) : null}
+                      {/* Stats/specs not used for dynamic items */}
                     </div>
 
                     <div
@@ -193,13 +127,20 @@ const HeroBanner = () => {
                           : "translate-y-8 opacity-0"
                       }`}
                     >
-                      <Button
-                        size="lg"
-                        className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl px-6 py-3 text-base shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 border border-white/20 backdrop-blur-sm"
-                      >
-                        Explore Now
-                        <TrendingUp className="ml-2 h-5 w-5" />
-                      </Button>
+                      {slide.buttonText && (
+                        <Button
+                          size="lg"
+                          className="bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl px-6 py-3 text-base shadow-lg hover:shadow-purple-500/25 transform hover:scale-105 transition-all duration-300 border border-white/20 backdrop-blur-sm"
+                          onClick={() => {
+                            if (slide.buttonLink) {
+                              window.location.href = slide.buttonLink;
+                            }
+                          }}
+                        >
+                          {slide.buttonText}
+                          <TrendingUp className="ml-2 h-5 w-5" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>

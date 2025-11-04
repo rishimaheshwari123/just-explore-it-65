@@ -84,7 +84,7 @@ const BusinessDetail = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:8001/api/v1/property/business/${id}`
+        `https://server.businessgurujee.com/api/v1/property/business/${id}`
       );
       const data = await response.json();
 
@@ -109,7 +109,7 @@ const BusinessDetail = () => {
   const trackInteraction = async (type: string) => {
     try {
       await fetch(
-        `http://localhost:8001/api/v1/property/business/${id}/track-interaction`,
+        `https://server.businessgurujee.com/api/v1/property/business/${id}/track-interaction`,
         {
           method: "POST",
           headers: {

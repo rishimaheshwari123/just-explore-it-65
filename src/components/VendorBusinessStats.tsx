@@ -77,7 +77,7 @@ const VendorBusinessStats: React.FC<VendorBusinessStatsProps> = ({ vendorId }) =
   const fetchVendorBusinesses = async () => {
     try {
       setLoading(true);
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/property/businesses/vendor/${vendorId}`);
       const data = await response.json();
       

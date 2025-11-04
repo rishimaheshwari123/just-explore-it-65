@@ -44,6 +44,7 @@ import AdminSupport from "./pages/admin/AdminSupport";
 import UsersManagement from "./pages/admin/UsersManagement";
 import SubscriptionLogs from "./pages/admin/SubscriptionLogs";
 import CreateAdd from "./pages/admin/CreateAdd";
+import HeroCarousel from "./pages/admin/HeroCarousel";
 import VerifyEmail from "./pages/VerifyEmail";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import VendorSubscriptions from "./pages/vendor/VendorSubscriptions";
@@ -203,6 +204,15 @@ const App = () => {
                       <ProtectedRoute requiredPermission="ads">
                         <CreateAdd />
                       </ProtectedRoute>
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="hero-carousel"
+                  element={
+                    <PrivateRoute>
+                      {/* Allow both admin and super_admin without special permission */}
+                      <HeroCarousel />
                     </PrivateRoute>
                   }
                 />

@@ -130,7 +130,7 @@ const BusinessDetail: React.FC = () => {
       setLoading(true);
       const BASE_URL =
         import.meta.env.VITE_API_BASE_URL ||
-        "http://localhost:8001/api/v1";
+        "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/property/business/${id}`);
       const data = await response.json();
       if (data.success) {
@@ -150,7 +150,7 @@ const BusinessDetail: React.FC = () => {
   const trackInteraction = async (type: string) => {
     try {
       await fetch(
-        `http://localhost:8001/api/v1/property/business/${id}/track-interaction`,
+        `https://server.businessgurujee.com/api/v1/property/business/${id}/track-interaction`,
         {
           method: "POST",
           headers: {
@@ -215,7 +215,7 @@ const BusinessDetail: React.FC = () => {
     try {
       const BASE_URL =
         import.meta.env.VITE_API_BASE_URL ||
-        "http://localhost:8001/api/v1";
+        "https://server.businessgurujee.com/api/v1";
       await fetch(`${BASE_URL}/property/business/${id}/interaction`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -229,7 +229,7 @@ const BusinessDetail: React.FC = () => {
   const handleCall = (phone: string) => {
     const BASE_URL =
       import.meta.env.VITE_API_BASE_URL ||
-      "http://localhost:8001/api/v1";
+      "https://server.businessgurujee.com/api/v1";
     fetch(`${BASE_URL}/property/business/${id}/interaction`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -250,7 +250,7 @@ const BusinessDetail: React.FC = () => {
       setDeleting(true);
       const BASE_URL =
         import.meta.env.VITE_API_BASE_URL ||
-        "http://localhost:8001/api/v1";
+        "https://server.businessgurujee.com/api/v1";
       const response = await fetch(
         `${BASE_URL}/property/business/delete/${id}`,
         {

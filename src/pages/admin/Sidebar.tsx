@@ -149,6 +149,13 @@ const Sidebar = () => {
       color: "text-pink-600",
       permission: "super_admin_only",
     },
+    {
+      to: "/admin/hero-carousel",
+      icon: FileText,
+      label: "Hero Carousel",
+      color: "text-blue-600",
+      permission: null,
+    },
   ];
 
   // Filter menu items based on user permissions

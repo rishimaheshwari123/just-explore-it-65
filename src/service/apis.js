@@ -90,3 +90,12 @@ export const customerSupport = {
 
 
 }
+
+// Hero Carousel endpoints
+export const heroCarousel = {
+  CREATE: BASE_URL + "/hero-carousel/create",
+  LIST: BASE_URL + "/hero-carousel/list",
+  UPDATE: (id) => BASE_URL + `/hero-carousel/${id}`,
+  TOGGLE: (id) => BASE_URL + `/hero-carousel/${id}/toggle`,
+  DELETE: (id) => BASE_URL + `/hero-carousel/${id}`,
+};

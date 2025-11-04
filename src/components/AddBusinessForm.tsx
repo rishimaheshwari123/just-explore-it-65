@@ -1097,7 +1097,7 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
     const endDate = new Date(startDate.getTime() + (plan.duration || 365) * 24 * 60 * 60 * 1000);
 
     const options: any = {
-      key: "rzp_test_lQz64anllWjB83",
+      key: "rzp_live_RXNNi6vqWQruCx",
       amount: order.amount,
       currency: order.currency,
       name: "Business Gurujee",

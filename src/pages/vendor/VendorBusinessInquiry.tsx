@@ -67,7 +67,7 @@ const VendorBusinessInquiry = () => {
   const fetchInquiries = async () => {
     try {
       setLoading(true);
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8001/api/v1";
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
       const response = await fetch(`${BASE_URL}/inquiry/vendor/${user._id}`);
       const data = await response.json();
       

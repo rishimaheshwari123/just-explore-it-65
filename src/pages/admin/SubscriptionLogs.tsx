@@ -83,7 +83,7 @@ const SubscriptionLogs = () => {
   // Helper: fetch vendor by id (fallback when API doesn't populate vendor)
   const fetchVendorById = async (vendorId: string) => {
     try {
-      const res = await fetch(`http://localhost:8001/api/v1/vendor/get/${vendorId}`);
+      const res = await fetch(`https://server.businessgurujee.com/api/v1/vendor/get/${vendorId}`);
       const json = await res.json();
       if (json?.success && json?.vendor) {
         const v = json.vendor;
@@ -147,7 +147,7 @@ const SubscriptionLogs = () => {
   const fetchSubscriptionLogs = async (page = 1) => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8001/api/v1/subscription/logs?page=${page}&limit=50`);
+      const response = await fetch(`https://server.businessgurujee.com/api/v1/subscription/logs?page=${page}&limit=50`);
       const data = await response.json();
       
       if (data.success) {

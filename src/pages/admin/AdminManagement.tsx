@@ -156,7 +156,7 @@ const AdminManagement = () => {
     try {
       // Call register API to create admin
       const response = await fetch(
-        "http://localhost:8001/api/v1/auth/register",
+        "https://server.businessgurujee.com/api/v1/auth/register",
         {
           method: "POST",
           headers: {

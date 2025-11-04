@@ -48,6 +48,7 @@ app.use("/api/v1/customer-support", require("./routes/customerSupportRoute"))
 app.use("/api/v1/ads", require("./routes/adsRoute"));
 app.use("/api/v1/subscription", require("./routes/subscriptionRoutes"));
 app.use("/api/v1/razorpay", require("./routes/razorpayRoute"))
+app.use("/api/v1/hero-carousel", require("./routes/heroCarouselRoute"))
 
 
 
