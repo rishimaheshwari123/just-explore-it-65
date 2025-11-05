@@ -165,7 +165,7 @@ const getVendorInquiriesCtrl = async (req, res) => {
         if (priority) filter.priority = priority;
 
         const inquiries = await Inquiry.find(filter)
-            .populate('business', 'businessName category contactInfo images')
+            .populate('business', 'businessName category contactInfo images subscriptions')
             .sort({ createdAt: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit);

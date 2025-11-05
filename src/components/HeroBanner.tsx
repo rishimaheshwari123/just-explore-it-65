@@ -46,13 +46,15 @@ const HeroBanner = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <section className="relative h-[50vh] md:h-[75vh] overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
-        <div className="absolute top-32 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
-        <div className="absolute bottom-20 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-ping"></div>
-        <div className="absolute top-1/2 right-10 w-1 h-1 bg-white/20 rounded-full animate-pulse"></div>
-      </div>
+
+<section className="relative h-auto md:h-[75vh] overflow-hidden aspect-[6/4] md:aspect-auto">
+    <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute top-10 left-10 w-2 h-2 bg-white/20 rounded-full animate-pulse"></div>
+      <div className="absolute top-32 right-20 w-1 h-1 bg-white/30 rounded-full animate-bounce"></div>
+      <div className="absolute bottom-20 left-1/4 w-1.5 h-1.5 bg-white/25 rounded-full animate-ping"></div>
+      <div className="absolute top-1/2 right-10 w-1 h-1 bg-white/20 rounded-full animate-pulse"></div>
+    </div>
+
 
       <div className="relative h-full">
         {slides.map((slide, index) => (
