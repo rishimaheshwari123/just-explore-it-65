@@ -8,6 +8,16 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      "/sitemap.xml": {
+        target: "https://server.businessgurujee.com",
+        changeOrigin: true,
+      },
+      "/api": {
+        target: "https://server.businessgurujee.com",
+        changeOrigin: true,
+      }
+    }
   },
   plugins: [
     react(),
