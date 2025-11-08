@@ -227,7 +227,8 @@ const Blogs = () => {
                   <div className="relative">
                     <img
                       src={
-                        blog.image || "/placeholder.svg?height=300&width=400"
+                        blog.images[0] ||
+                        "/placeholder.svg?height=300&width=400"
                       }
                       alt={blog.title}
                       className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
@@ -244,9 +245,10 @@ const Blogs = () => {
                       <h3 className="text-xl font-semibold text-gray-900 line-clamp-2 mb-2">
                         {blog.title}
                       </h3>
-                      <p className="text-gray-600 text-sm line-clamp-3">
-                        {blog.desc}
-                      </p>
+                      <div
+                        className="text-gray-600 text-sm line-clamp-3"
+                        dangerouslySetInnerHTML={{ __html: blog.desc }}
+                      />
                     </div>
 
                     <div className="flex items-center justify-between text-sm text-gray-500 mb-4">

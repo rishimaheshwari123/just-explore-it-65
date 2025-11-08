@@ -24,7 +24,7 @@ export const imageUpload = async (data, token) => {
             throw new Error("Could Not Upload Images")
         }
         toast.success("Images Uploaded Successfully")
-        
+
         // Extract direct URLs from the response
         result = response?.data?.images?.map(img => img.secure_url || img.url) || []
 

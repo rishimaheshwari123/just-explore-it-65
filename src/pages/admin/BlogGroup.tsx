@@ -1,84 +1,105 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { getSingleBlogAPI, updateBlogApi } from "@/service/operations/blog";
+import { imageUpload } from "@/service/operations/image";
+import { Camera, Upload, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
-  const maxWords = 3000;
-
   const [formData, setFormData] = useState({
     title: "",
-    desc: "",
-    type: "",
-    image: "",
+    description: "",
+    images: [],
   });
 
+  const maxWords = 3000;
+
+  // Fetch single blog
   const getSingleBlog = async (id) => {
     try {
       const response = await getSingleBlogAPI(id);
       if (response) {
-        const blog = response;
         setFormData({
-          title: blog.title,
-          desc: blog.desc,
-          type: blog.type,
-          image: blog.image,
+          title: response.title,
+          description: response.desc,
+          images: Array.isArray(response.images)
+            ? response.images
+            : response.image
+            ? [response.image]
+            : [],
         });
-      } else {
-        throw new Error(response);
       }
     } catch (error) {
-      toast.error(error);
+      toast.error("Failed to load blog data");
     }
   };
 
   useEffect(() => {
-    if (blogId && isOpen) {
-      getSingleBlog(blogId);
-    }
-  }, [isOpen, blogId]);
+    if (blogId && isOpen) getSingleBlog(blogId);
+  }, [blogId, isOpen]);
 
+  // Handle text input
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "desc") {
+    if (name === "description") {
       const wordCount = value.trim().split(/\s+/).length;
-      if (wordCount > maxWords) {
-        alert(`You cannot exceed ${maxWords} words.`);
-        return;
-      }
+      if (wordCount > maxWords) return;
     }
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleFileChange = (e) => {
-    setFormData({
-      ...formData,
-      image: e.target.files[0],
-    });
+  // Handle ReactQuill
+  const handleQuillChange = (value) => {
+    const wordCount = value
+      .replace(/<[^>]+>/g, " ")
+      .trim()
+      .split(/\s+/).length;
+    if (wordCount > maxWords) return;
+    setFormData((prev) => ({ ...prev, description: value }));
   };
 
+  // Image upload
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    try {
+      const uploadedUrls = await imageUpload(files);
+      setFormData((prev) => ({
+        ...prev,
+        images: [...prev.images, ...uploadedUrls].slice(0, 10),
+      }));
+    } catch (error) {
+      toast.error("Failed to upload images");
+    }
+  };
+
+  const removeImage = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("title", formData.title);
-      formDataToSend.append("desc", formData.desc);
-      formDataToSend.append("type", formData.type);
-      if (formData.image) {
-        formDataToSend.append("image", formData.image);
-      }
+      const data = new FormData();
+      data.append("title", formData.title);
+      data.append("desc", formData.description);
+      data.append("images", JSON.stringify(formData.images));
 
-      const response = await updateBlogApi(blogId, formDataToSend);
-
-      if (response?.success) {
-        getAllBlogs();
-
-        onClose();
-      }
+      await updateBlogApi(blogId, data);
+      getAllBlogs();
+      onClose();
     } catch (error) {
-      toast.error("Oops, something went wrong!");
+      toast.error("Something went wrong!");
     }
   };
 
@@ -88,81 +109,113 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
         isOpen ? "block" : "hidden"
       } fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center`}
     >
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full md:w-3/4 lg:w-1/2 h-[95%] overflow-scroll py-6">
-        <h6 className="text-blue-600 text-center text-2xl md:text-3xl border-b-2 border-blue-600 pb-2">
-          {blogId ? "Edit Blog" : "Add Blog"}
-        </h6>
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 gap-6 mt-8 md:grid-cols-2"
-        >
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-lg md:text-xl font-bold mb-2"
-              htmlFor="title"
-            >
-              Title: <span className="text-red-500">*</span>
-            </label>
-            <input
+      <div className="bg-white p-8 rounded-xl shadow-xl w-full md:w-3/4 lg:w-1/2 max-h-[95vh] overflow-y-auto">
+        <h2 className="text-3xl font-bold text-center text-blue-600 border-b-2 border-blue-600 pb-3">
+          Edit Blog
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-6 mt-6">
+          {/* Title */}
+          <div className="space-y-2">
+            <Label className="text-lg font-semibold">Title *</Label>
+            <Input
               type="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
               name="title"
-              id="title"
               value={formData.title}
               onChange={handleChange}
               required
+              className="text-lg"
             />
           </div>
 
-          <div className="space-y-2 col-span-2">
-            <label
-              htmlFor="desc"
-              className="block text-gray-700 text-lg md:text-xl font-bold mb-2"
-            >
-              Description *
-            </label>
-            <textarea
-              name="desc"
-              value={formData.desc}
-              onChange={handleChange}
-              rows="6"
-              className="w-full border p-3 rounded-md text-lg resize-none"
-              placeholder="Enter blog description (max 3000 words)"
-              required
-            />
+          {/* Description */}
+          <div className="space-y-2">
+            <Label className="text-lg font-semibold">Description *</Label>
+            <div className="border rounded-lg overflow-hidden shadow-sm">
+              <ReactQuill
+                theme="snow"
+                value={formData.description}
+                onChange={handleQuillChange}
+                className="h-44"
+              />
+            </div>
           </div>
 
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-lg md:text-xl font-bold mb-2"
-              htmlFor="image"
-            >
-              Image:
-            </label>
-            <input
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
-              id="image"
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-            />
+          {/* Image Upload */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-lg flex items-center gap-2">
+              <Camera className="h-5 w-5 text-gray-600" /> Upload Images (Max
+              10)
+            </h4>
+
+            <div className="border border-gray-300 rounded-xl p-6 bg-gray-50 hover:bg-gray-100 transition cursor-pointer text-center">
+              <Label
+                htmlFor="imageUpload"
+                className="cursor-pointer flex flex-col items-center gap-2"
+              >
+                <Upload className="h-8 w-8 text-blue-600" />
+                <p className="text-sm font-medium text-gray-700">
+                  Click to upload images
+                </p>
+                <span className="text-xs text-gray-500">
+                  JPG, PNG up to 5MB each
+                </span>
+              </Label>
+              <Input
+                type="file"
+                id="imageUpload"
+                className="hidden"
+                multiple
+                onChange={handleImageUpload}
+                accept="image/png, image/jpeg"
+              />
+            </div>
+
+            {/* Image Preview */}
+            {formData.images.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+                {formData.images.map((img, index) => (
+                  <div
+                    key={index}
+                    className="relative group border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition"
+                  >
+                    <img
+                      src={img}
+                      alt="Blog"
+                      className="w-full h-28 object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition bg-white border hover:bg-red-500 hover:text-white rounded-full"
+                      onClick={() => removeImage(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center justify-center md:justify-start">
-            <button
-              className="px-6 py-2 bg-black text-white rounded-md text-base md:text-lg hover:bg-gray-800 transition"
+          {/* Submit Button */}
+          <div className="flex justify-center gap-4">
+            <Button
               type="submit"
+              className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg transition"
             >
-              {blogId ? "Update Blog" : "Create Blog"}
-            </button>
+              Update Blog
+            </Button>
+            <Button
+              type="button"
+              className="px-10 py-3 bg-gray-500 hover:bg-gray-600 text-white text-lg font-semibold rounded-lg transition"
+              onClick={onClose}
+            >
+              Close
+            </Button>
           </div>
         </form>
-        <button
-          className="mt-4 px-6 py-2 bg-gray-500 text-white rounded-md text-base hover:bg-gray-600"
-          onClick={onClose}
-        >
-          Close
-        </button>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Calendar, Clock, Share2, User } from "lucide-react";
 import { getSingleBlogAPI, getAllBlogsAPI } from "@/service/operations/blog";
+import BlogImages from "./BlogImages";
 
 const SingleBlog = () => {
   const { id } = useParams();
@@ -128,13 +129,15 @@ const SingleBlog = () => {
           <div className="mb-4">
             <Badge className="bg-white text-amber-600 mb-4">{blog.type}</Badge>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">{blog.title}</h1>
+          <h1 className="text-3xl md:text-4xl text-black font-bold mb-4">
+            {blog.title}
+          </h1>
           <div className="flex items-center space-x-6 text-sm">
-            <span className="flex items-center">
+            <span className="flex text-black items-center">
               <Calendar className="w-4 h-4 mr-2" />
               {formatDate(blog.createdAt)}
             </span>
-            <span className="flex items-center">
+            <span className="flex text-black items-center">
               <Clock className="w-4 h-4 mr-2" />
               {calculateReadingTime(blog.desc)}
             </span>
@@ -152,23 +155,20 @@ const SingleBlog = () => {
       </section>
 
       {/* Blog Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
           {/* Featured Image */}
           <div className="w-full h-96 overflow-hidden">
-            <img
-              src={blog.image || "/placeholder.svg?height=400&width=800"}
-              alt={blog.title}
-              className="w-full h-full object-cover"
-            />
+            <BlogImages images={blog.images} alt={blog.title} />
           </div>
 
           {/* Blog Content */}
           <div className="p-8">
             <div className="prose prose-lg max-w-none">
-              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {blog.desc}
-              </p>
+              <div
+                className="text-gray-600 text-sm line-clamp-3"
+                dangerouslySetInnerHTML={{ __html: blog.desc }}
+              />
             </div>
 
             {/* Author Info */}

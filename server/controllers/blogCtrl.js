@@ -3,54 +3,48 @@ const blogModel = require("../models/blogModel")
 
 const createBlogsCtrl = async (req, res) => {
   try {
-    const { title, desc } = req.body;
-    const image = req.files.image;
+    const { title, desc, images } = req.body;
 
-    if (!title || !desc || !image) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide all fields"
-      })
+    if (!title || !desc || !images) {
+      return res.status(400).json({ success: false, message: "Please provide all fields" });
     }
-    const thumnailImage = await uploadImageToCloudinary(image, process.env.FOLDER_NAME)
+
+    // parse stringified array
+    const parsedImages = JSON.parse(images);
+
+    if (!parsedImages.length) {
+      return res.status(400).json({ success: false, message: "Please upload images" });
+    }
 
     const blog = await blogModel.create({
       title,
       desc,
-      image: thumnailImage.secure_url
-    })
+      images: parsedImages // direct array of URLs
+    });
 
-    return res.status(201).json({
-      success: true,
-      message: "Blog created successfully!",
-      blog
-    })
-
+    return res.status(201).json({ success: true, message: "Blog created successfully", blog });
   } catch (error) {
-    console.log(error)
-    return res.status(500).send({
-      success: false,
-      message: "Error in create blog api!"
-    })
+    console.log("Blog Create Error:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong" });
   }
-}
+};
+
 
 const updateBlogCtrl = async (req, res) => {
   try {
-    console.log(req.params)
-    const { blogId } = req.params; // Get the blogId from the URL params
+    const { blogId } = req.params;
     const { title, desc, type } = req.body;
-    let image = req.files?.image;
-
-    // Validate if required fields are present
-    if (!title || !desc || !type) {
+    let images = req.body.images ? JSON.parse(req.body.images) : []; // images array from frontend
+    console.log(req.body)
+    // Validate required fields
+    if (!title || !desc) {
       return res.status(400).json({
         success: false,
         message: "Please provide all required fields",
       });
     }
 
-    // Find the blog by its ID
+    // Find existing blog
     const blog = await blogModel.findById(blogId);
     if (!blog) {
       return res.status(404).json({
@@ -59,27 +53,32 @@ const updateBlogCtrl = async (req, res) => {
       });
     }
 
-    // If there's a new image, upload it to Cloudinary, otherwise use the current image URL
-    if (image) {
-      const thumnailImage = await uploadImageToCloudinary(
-        image,
-        process.env.FOLDER_NAME
+    // Handle newly uploaded files if any
+    if (req.files && req.files.length > 0) {
+      const uploadedImages = await Promise.all(
+        req.files.map((file) =>
+          uploadImageToCloudinary(file, process.env.FOLDER_NAME)
+        )
       );
-      image = thumnailImage.secure_url; // Get the secure URL of the image
-    } else {
-      image = blog.image; // Keep the existing image if no new one is uploaded
+
+      const uploadedUrls = uploadedImages.map((img) => img.secure_url);
+      // Merge existing images with new uploads
+      images = [...blog.images || [], ...uploadedUrls].slice(0, 10); // max 10 images
+    } else if (!images.length) {
+      // If no images provided and no existing images, fallback to empty array
+      images = blog.images || [];
     }
 
-    // Update the blog in the database
+    // Update blog
     const updatedBlog = await blogModel.findByIdAndUpdate(
       blogId,
       {
         title,
         desc,
         type,
-        image,
+        images,
       },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     return res.status(200).json({
@@ -89,12 +88,13 @@ const updateBlogCtrl = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({
+    return res.status(500).json({
       success: false,
       message: "Error in update blog API!",
     });
   }
 };
+
 
 
 const getAllBlogsCtrl = async (req, res) => {
