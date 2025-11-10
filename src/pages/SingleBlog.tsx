@@ -20,12 +20,43 @@ const SingleBlog = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Calculate reading time
-  const calculateReadingTime = (text) => {
+  // Extract plain text from HTML
+  const getPlainText = (html) => {
+    if (!html) return "";
+    const tmp = document.createElement("div");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+  };
+
+  // Calculate reading time from HTML or plain text
+  const calculateReadingTime = (textOrHtml) => {
     const wordsPerMinute = 200;
-    const words = text.split(" ").length;
-    const minutes = Math.ceil(words / wordsPerMinute);
+    const plain = getPlainText(textOrHtml || "");
+    const words = plain.trim() === "" ? 0 : plain.trim().split(/\s+/).length;
+    const minutes = Math.max(1, Math.ceil(words / wordsPerMinute));
     return `${minutes} min read`;
+  };
+
+  // Basic HTML sanitizer
+  const sanitizeHtml = (html) => {
+    if (!html) return "";
+    const temp = document.createElement("div");
+    temp.innerHTML = html;
+    // Remove script and style tags
+    temp.querySelectorAll("script, style").forEach((el) => el.remove());
+    // Remove event handlers and javascript: URLs
+    temp.querySelectorAll("*").forEach((el) => {
+      Array.from(el.attributes).forEach((attr) => {
+        const name = attr.name.toLowerCase();
+        const value = String(attr.value || "").toLowerCase();
+        if (name.startsWith("on")) {
+          el.removeAttribute(attr.name);
+        } else if ((name === "href" || name === "src") && value.startsWith("javascript:")) {
+          el.removeAttribute(attr.name);
+        }
+      });
+    });
+    return temp.innerHTML;
   };
 
   // Get single blog
@@ -126,9 +157,12 @@ const SingleBlog = () => {
             Back to Blogs
           </Button>
           <div className="mb-4">
-            <Badge className="bg-white text-amber-600 mb-4">{blog.type}</Badge>
+            <Badge className="bg-white text-amber-600 mb-2">{blog.type}</Badge>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">{blog.title}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">{blog.title}</h1>
+          {blog.subtitle && (
+            <p className="text-lg opacity-90 mb-4">{blog.subtitle}</p>
+          )}
           <div className="flex items-center space-x-6 text-sm">
             <span className="flex items-center">
               <Calendar className="w-4 h-4 mr-2" />
@@ -148,6 +182,9 @@ const SingleBlog = () => {
               Share
             </Button>
           </div>
+          {blog.slug && (
+            <div className="mt-3 text-xs opacity-80">Slug: {blog.slug}</div>
+          )}
         </div>
       </section>
 
@@ -162,14 +199,47 @@ const SingleBlog = () => {
               className="w-full h-full object-cover"
             />
           </div>
+          {/* Additional Images Gallery */}
+          {Array.isArray(blog.images) && blog.images.length > 1 && (
+            <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {blog.images.slice(1).map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt={`image-${idx}`}
+                  className="w-full h-24 object-cover rounded"
+                />
+              ))}
+            </div>
+          )}
 
           {/* Blog Content */}
           <div className="p-8">
             <div className="prose prose-lg max-w-none">
-              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {blog.desc}
-              </p>
+              <div
+                className="text-gray-700 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(blog.desc) }}
+              />
             </div>
+
+            {/* Keywords and Tags */}
+            {(Array.isArray(blog.keywords) && blog.keywords.length > 0) ||
+            (Array.isArray(blog.tags) && blog.tags.length > 0) ? (
+              <div className="mt-6 flex flex-wrap gap-2">
+                {Array.isArray(blog.keywords) &&
+                  blog.keywords.map((kw, i) => (
+                    <Badge key={`kw-${i}`} className="bg-amber-100 text-amber-800">
+                      {kw}
+                    </Badge>
+                  ))}
+                {Array.isArray(blog.tags) &&
+                  blog.tags.map((tag, i) => (
+                    <Badge key={`tag-${i}`} variant="secondary" className="bg-gray-100 text-gray-800">
+                      {tag}
+                    </Badge>
+                  ))}
+              </div>
+            ) : null}
 
             {/* Author Info */}
             <div className="border-t pt-6 mt-8">

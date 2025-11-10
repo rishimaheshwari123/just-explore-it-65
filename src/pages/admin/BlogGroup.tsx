@@ -1,15 +1,46 @@
 import React, { useState, useEffect } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
 import { getSingleBlogAPI, updateBlogApi } from "@/service/operations/blog";
 
 const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
   const maxWords = 3000;
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["blockquote", "code-block"],
+      ["link", "image"],
+      [{ align: [] }],
+      ["clean"],
+    ],
+  };
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "blockquote",
+    "code-block",
+    "link",
+    "image",
+    "align",
+  ];
 
   const [formData, setFormData] = useState({
     title: "",
+    subtitle: "",
+    slug: "",
     desc: "",
-    type: "",
+    keywords: "",
+    tags: "",
     image: "",
+    images: [] as File[],
   });
 
   const getSingleBlog = async (id) => {
@@ -18,10 +49,14 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
       if (response) {
         const blog = response;
         setFormData({
-          title: blog.title,
-          desc: blog.desc,
-          type: blog.type,
-          image: blog.image,
+          title: blog.title || "",
+          subtitle: blog.subtitle || "",
+          slug: blog.slug || "",
+          desc: blog.desc || "",
+          keywords: (blog.keywords || []).join(", "),
+          tags: (blog.tags || []).join(", "),
+          image: blog.image || "",
+          images: [],
         });
       } else {
         throw new Error(response);
@@ -53,9 +88,11 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
   };
 
   const handleFileChange = (e) => {
+    const files = Array.from(e.target.files || []);
     setFormData({
       ...formData,
-      image: e.target.files[0],
+      image: files[0],
+      images: files as File[],
     });
   };
 
@@ -64,10 +101,16 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
+      formDataToSend.append("subtitle", formData.subtitle || "");
+      formDataToSend.append("slug", formData.slug || "");
       formDataToSend.append("desc", formData.desc);
-      formDataToSend.append("type", formData.type);
+      if (formData.keywords) formDataToSend.append("keywords", formData.keywords);
+      if (formData.tags) formDataToSend.append("tags", formData.tags);
       if (formData.image) {
         formDataToSend.append("image", formData.image);
+      }
+      if (formData.images && formData.images.length) {
+        formData.images.forEach((file) => formDataToSend.append("images", file));
       }
 
       const response = await updateBlogApi(blogId, formDataToSend);
@@ -121,14 +164,81 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
             >
               Description *
             </label>
-            <textarea
-              name="desc"
+            <ReactQuill
+              theme="snow"
               value={formData.desc}
+              onChange={(value) => {
+                const plain = value.replace(/<[^>]*>/g, " ");
+                const wordCount = plain.trim().split(/\s+/).length;
+                if (wordCount > maxWords) {
+                  alert(`You cannot exceed ${maxWords} words.`);
+                  return;
+                }
+                setFormData({ ...formData, desc: value });
+              }}
+              modules={quillModules}
+              formats={quillFormats}
+              className="bg-white"
+            />
+          </div>
+
+          {/* Subtitle */}
+          <div className="mb-4">
+            <label className="block text-gray-700 text-lg md:text-xl font-bold mb-2" htmlFor="subtitle">
+              Subtitle
+            </label>
+            <input
+              type="text"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
+              name="subtitle"
+              id="subtitle"
+              value={formData.subtitle}
               onChange={handleChange}
-              rows="6"
-              className="w-full border p-3 rounded-md text-lg resize-none"
-              placeholder="Enter blog description (max 3000 words)"
-              required
+            />
+          </div>
+
+          {/* Slug */}
+          <div className="mb-4">
+            <label className="block text-gray-700 text-lg md:text-xl font-bold mb-2" htmlFor="slug">
+              Slug
+            </label>
+            <input
+              type="text"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
+              name="slug"
+              id="slug"
+              value={formData.slug}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Keywords */}
+          <div className="mb-4">
+            <label className="block text-gray-700 text-lg md:text-xl font-bold mb-2" htmlFor="keywords">
+              Keywords (comma-separated)
+            </label>
+            <input
+              type="text"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
+              name="keywords"
+              id="keywords"
+              value={formData.keywords}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Tags */}
+          <div className="mb-4">
+            <label className="block text-gray-700 text-lg md:text-xl font-bold mb-2" htmlFor="tags">
+              Tags (comma-separated)
+            </label>
+            <input
+              type="text"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
+              name="tags"
+              id="tags"
+              value={formData.tags}
+              onChange={handleChange}
             />
           </div>
 
@@ -144,6 +254,7 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
               id="image"
               type="file"
               accept="image/*"
+              multiple
               onChange={handleFileChange}
             />
           </div>

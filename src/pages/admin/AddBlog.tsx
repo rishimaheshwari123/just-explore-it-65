@@ -1,13 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import { createBlogAPI } from "@/service/operations/blog";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 
 const AddBlog = () => {
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["blockquote", "code-block"],
+      ["link", "image"],
+      [{ align: [] }],
+      ["clean"],
+    ],
+  };
+
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "blockquote",
+    "code-block",
+    "link",
+    "image",
+    "align",
+  ];
   const [formData, setFormData] = useState({
     title: "",
-    description: "",
-    image: null,
+    subtitle: "",
+    slug: "",
+    descriptionHtml: "",
+    keywords: "",
+    tags: "",
+    images: [] as File[],
   });
 
   const user = useSelector((state: RootState) => state.auth?.user ?? null);
@@ -19,13 +51,29 @@ const AddBlog = () => {
       [name]: value,
     });
   };
+  
+  // Auto-generate slug from title, but allow manual edits
+  useEffect(() => {
+    if (!formData.slug && formData.title) {
+      const s = formData.title
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-");
+      setFormData((prev) => ({ ...prev, slug: s }));
+    }
+  }, [formData.title]);
 
-  const handleFileChange = (e) => {
+  const handleImagesChange = (e) => {
+    const files = Array.from(e.target.files || []);
     setFormData({
       ...formData,
-      image: e.target.files[0],
+      images: files as File[],
     });
   };
+
+  // React Quill editor value handled via formData.descriptionHtml
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,17 +81,35 @@ const AddBlog = () => {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
-      formDataToSend.append("desc", formData.description);
-      formDataToSend.append("image", formData.image);
+      formDataToSend.append("subtitle", formData.subtitle || "");
+      formDataToSend.append("slug", formData.slug || "");
+      // Send HTML from React Quill editor
+      formDataToSend.append("desc", formData.descriptionHtml || "");
+
+      // Keywords & tags as comma-separated strings
+      if (formData.keywords) formDataToSend.append("keywords", formData.keywords);
+      if (formData.tags) formDataToSend.append("tags", formData.tags);
+
+      // Images: append multiple; also append first as `image` for compatibility
+      if (formData.images && formData.images.length > 0) {
+        formDataToSend.append("image", formData.images[0]);
+        formData.images.forEach((file) => formDataToSend.append("images", file));
+      }
 
       const response = await createBlogAPI(formDataToSend);
 
       if (response) {
         setFormData({
           title: "",
-          description: "",
-          image: "",
+          subtitle: "",
+          slug: "",
+          descriptionHtml: "",
+          keywords: "",
+          tags: "",
+          images: [],
         });
+        // Reset editor value
+        // ReactQuill is controlled via state; already cleared above
       }
     } catch (error) {
       console.log(error);
@@ -78,40 +144,111 @@ const AddBlog = () => {
           />
         </div>
 
-        {/* Description */}
+        {/* Subtitle */}
         <div>
-          <label
-            htmlFor="description"
-            className="block font-medium text-gray-700 text-xl mb-2"
-          >
-            Description: <span className="text-red-500">*</span>
+          <label className="block text-gray-600 text-xl font-bold mb-2" htmlFor="subtitle">
+            Subtitle
           </label>
-          <textarea
-            name="description"
-            id="description"
-            rows="6"
+          <input
+            type="text"
             className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-600 leading-tight focus:outline-none focus:shadow-outline text-xl"
-            value={formData.description}
+            name="subtitle"
+            id="subtitle"
+            value={formData.subtitle}
             onChange={handleChange}
-            required
-          ></textarea>
+          />
         </div>
 
-        {/* Image */}
+        {/* Slug */}
         <div>
-          <label
-            className="block text-gray-600 text-xl font-bold mb-2"
-            htmlFor="image"
-          >
-            Image:
+          <label className="block text-gray-600 text-xl font-bold mb-2" htmlFor="slug">
+            Slug
+          </label>
+          <input
+            type="text"
+            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-600 leading-tight focus:outline-none focus:shadow-outline text-xl"
+            name="slug"
+            id="slug"
+            value={formData.slug}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* Description (React Quill Editor) */}
+        <div>
+          <label htmlFor="descriptionHtml" className="block font-medium text-gray-700 text-xl mb-2">
+            Description (HTML): <span className="text-red-500">*</span>
+          </label>
+          <ReactQuill
+            theme="snow"
+            value={formData.descriptionHtml}
+            onChange={(value) => setFormData({ ...formData, descriptionHtml: value })}
+            modules={quillModules}
+            formats={quillFormats}
+            className="bg-white"
+          />
+          <p className="text-sm text-gray-500 mt-2">Rich text supported: headings, lists, links, images, and code.</p>
+        </div>
+
+        {/* Keywords */}
+        <div>
+          <label className="block text-gray-600 text-xl font-bold mb-2" htmlFor="keywords">
+            Keywords (comma-separated)
+          </label>
+          <input
+            type="text"
+            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-600 leading-tight focus:outline-none focus:shadow-outline text-xl"
+            name="keywords"
+            id="keywords"
+            value={formData.keywords}
+            onChange={handleChange}
+            placeholder="e.g., real estate, homes, property"
+          />
+        </div>
+
+        {/* Tags */}
+        <div>
+          <label className="block text-gray-600 text-xl font-bold mb-2" htmlFor="tags">
+            Tags (comma-separated)
+          </label>
+          <input
+            type="text"
+            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-600 leading-tight focus:outline-none focus:shadow-outline text-xl"
+            name="tags"
+            id="tags"
+            value={formData.tags}
+            onChange={handleChange}
+            placeholder="e.g., market, trends, tips"
+          />
+        </div>
+
+        {/* Images */}
+        <div>
+          <label className="block text-gray-600 text-xl font-bold mb-2" htmlFor="images">
+            Images
           </label>
           <input
             className="appearance-none border rounded w-full py-3 px-4 text-gray-600 leading-tight focus:outline-none focus:shadow-outline text-xl"
-            id="image"
+            id="images"
             type="file"
             accept="image/*"
-            onChange={handleFileChange}
+            multiple
+            onChange={handleImagesChange}
           />
+          {formData.images.length > 0 && (
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              {formData.images.map((file, idx) => (
+                <div key={idx} className="border rounded p-2">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`preview-${idx}`}
+                    className="w-full h-32 object-cover"
+                  />
+                  <p className="text-xs mt-1 truncate">{file.name}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Submit Button */}

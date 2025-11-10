@@ -5,14 +5,35 @@ const blogSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    subtitle: {
+        type: String,
+        trim: true
+    },
+    slug: {
+        type: String,
+        trim: true,
+        unique: true,
+        index: true
+    },
     desc: {
         type: String,
         required: true
     },
+    keywords: [{
+        type: String,
+        trim: true
+    }],
+    tags: [{
+        type: String,
+        trim: true
+    }],
     image: {
         type: String,
-        required: true
+        required: false
     },
+    images: [{
+        type: String
+    }]
 }, {
     timestamps: true
 });
