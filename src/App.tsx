@@ -66,6 +66,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/blogs" element={<Blogs />} />
+            <Route path="/blogs/:slug" element={<SingleBlog />} />
             <Route path="/properties" element={<Index />} />
             <Route path="/contact" element={<Index />} />
 
@@ -77,6 +78,7 @@ const App = () => {
               path="/subscription/:businessId"
               element={<SubscriptionPage />}
             />
+            {/* Backward compatibility: old id-based route */}
             <Route path="/blog/:id" element={<SingleBlog />} />
             <Route
               path="/login"

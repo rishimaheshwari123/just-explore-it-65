@@ -3,23 +3,53 @@ const blogModel = require("../models/blogModel")
 
 const createBlogsCtrl = async (req, res) => {
   try {
-    const { title, desc, images } = req.body;
+    const { title, subtitle, slug, desc, images, tags, keywords, type } = req.body;
 
     if (!title || !desc || !images) {
-      return res.status(400).json({ success: false, message: "Please provide all fields" });
+      return res.status(400).json({ success: false, message: "Please provide all required fields: title, description, images" });
     }
 
-    // parse stringified array
+    // Parse stringified arrays from frontend
     const parsedImages = JSON.parse(images);
+    const parsedTags = tags ? JSON.parse(tags) : [];
+    const parsedKeywords = keywords ? JSON.parse(keywords) : [];
 
     if (!parsedImages.length) {
-      return res.status(400).json({ success: false, message: "Please upload images" });
+      return res.status(400).json({ success: false, message: "Please upload at least one image" });
+    }
+
+    // Slugify helper
+    const slugify = (text) => {
+      return (text || "")
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    };
+
+    // Determine slug
+    let finalSlug = (slug || slugify(title));
+    if (!finalSlug) {
+      return res.status(400).json({ success: false, message: "Unable to generate slug" });
+    }
+
+    // Ensure slug uniqueness by appending a counter if needed
+    let uniqueSlug = finalSlug.toLowerCase();
+    let counter = 1;
+    while (await blogModel.findOne({ slug: uniqueSlug })) {
+      uniqueSlug = `${finalSlug}-${counter++}`;
     }
 
     const blog = await blogModel.create({
       title,
+      subtitle,
+      slug: uniqueSlug,
       desc,
-      images: parsedImages // direct array of URLs
+      images: parsedImages,
+      tags: parsedTags,
+      keywords: parsedKeywords,
+      type,
     });
 
     return res.status(201).json({ success: true, message: "Blog created successfully", blog });
@@ -33,8 +63,10 @@ const createBlogsCtrl = async (req, res) => {
 const updateBlogCtrl = async (req, res) => {
   try {
     const { blogId } = req.params;
-    const { title, desc, type } = req.body;
+    const { title, subtitle, slug, desc, type, tags, keywords } = req.body;
     let images = req.body.images ? JSON.parse(req.body.images) : []; // images array from frontend
+    const parsedTags = tags ? JSON.parse(tags) : undefined;
+    const parsedKeywords = keywords ? JSON.parse(keywords) : undefined;
     console.log(req.body)
     // Validate required fields
     if (!title || !desc) {
@@ -70,16 +102,35 @@ const updateBlogCtrl = async (req, res) => {
     }
 
     // Update blog
-    const updatedBlog = await blogModel.findByIdAndUpdate(
-      blogId,
-      {
-        title,
-        desc,
-        type,
-        images,
-      },
-      { new: true }
-    );
+    // Prepare update payload
+    const updatePayload = { title, subtitle, desc, type, images };
+
+    // Handle slug update (ensure uniqueness if changed)
+    if (slug) {
+      const slugify = (text) => {
+        return (text || "")
+          .toString()
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      };
+      let desiredSlug = slugify(slug);
+      if (!desiredSlug) desiredSlug = slugify(title);
+      if (desiredSlug !== blog.slug) {
+        let uniqueSlug = desiredSlug;
+        let counter = 1;
+        while (await blogModel.findOne({ slug: uniqueSlug, _id: { $ne: blogId } })) {
+          uniqueSlug = `${desiredSlug}-${counter++}`;
+        }
+        updatePayload.slug = uniqueSlug;
+      }
+    }
+
+    if (parsedTags) updatePayload.tags = parsedTags;
+    if (parsedKeywords) updatePayload.keywords = parsedKeywords;
+
+    const updatedBlog = await blogModel.findByIdAndUpdate(blogId, updatePayload, { new: true });
 
     return res.status(200).json({
       success: true,

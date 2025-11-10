@@ -95,8 +95,9 @@ const Blogs = () => {
     });
 
   // Handle blog click
-  const handleBlogClick = (blogId) => {
-    navigate(`/blog/${blogId}`);
+  const handleBlogClick = (blog) => {
+    const slugOrId = blog.slug || blog._id;
+    navigate(`/blogs/${slugOrId}`);
   };
 
   // Clear filters
@@ -222,7 +223,7 @@ const Blogs = () => {
                 <Card
                   key={blog._id}
                   className="overflow-hidden hover:shadow-xl transition-all duration-300 group bg-white cursor-pointer"
-                  onClick={() => handleBlogClick(blog._id)}
+                  onClick={() => handleBlogClick(blog)}
                 >
                   <div className="relative">
                     <img

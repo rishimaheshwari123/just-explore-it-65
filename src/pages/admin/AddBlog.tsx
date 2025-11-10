@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createBlogAPI } from "@/service/operations/blog";
 import { imageUpload } from "@/service/operations/image";
 import { useSelector } from "react-redux";
@@ -14,8 +14,12 @@ import { toast } from "react-hot-toast";
 const AddBlog = () => {
   const [formData, setFormData] = useState({
     title: "",
+    subtitle: "",
+    slug: "",
     description: "",
     images: [],
+    tagsText: "",
+    keywordsText: "",
   });
 
   const user = useSelector((state: RootState) => state.auth?.user ?? null);
@@ -27,6 +31,20 @@ const AddBlog = () => {
       [name]: value,
     });
   };
+
+  // Auto-generate slug from title if slug not manually edited
+  useEffect(() => {
+    const slugify = (text: string) =>
+      text
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+
+    if (formData.title && (!formData.slug || formData.slug === "")) {
+      setFormData((prev) => ({ ...prev, slug: slugify(formData.title) }));
+    }
+  }, [formData.title]);
 
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files || []);
@@ -59,17 +77,36 @@ const AddBlog = () => {
       const data = new FormData();
 
       data.append("title", formData.title);
+      if (formData.subtitle) data.append("subtitle", formData.subtitle);
+      if (formData.slug) data.append("slug", formData.slug);
       data.append("desc", formData.description);
 
       // ✅ images array ko JSON.stringify karke bhejna zaroori hai
       data.append("images", JSON.stringify(formData.images));
 
+      // Tags and Keywords as arrays (comma-separated input)
+      const tagsArray = formData.tagsText
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0);
+      const keywordsArray = formData.keywordsText
+        .split(",")
+        .map((k) => k.trim())
+        .filter((k) => k.length > 0);
+
+      data.append("tags", JSON.stringify(tagsArray));
+      data.append("keywords", JSON.stringify(keywordsArray));
+
       await createBlogAPI(data);
 
       setFormData({
         title: "",
+        subtitle: "",
+        slug: "",
         description: "",
         images: [],
+        tagsText: "",
+        keywordsText: "",
       });
     } catch (error) {
       console.log(error);
@@ -88,21 +125,48 @@ const AddBlog = () => {
         onSubmit={handleSubmit}
         className="bg-white shadow-lg rounded-xl p-8 space-y-8 border border-gray-200"
       >
-        {/* Title Input */}
-        <div className="space-y-2">
-          <label className="text-xl font-semibold text-gray-800">
-            Blog Title <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-            className="w-full border-gray-300 rounded-lg px-4 py-3 text-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
-            placeholder="Enter blog title..."
-          />
-        </div>
+      {/* Title Input */}
+      <div className="space-y-2">
+        <label className="text-xl font-semibold text-gray-800">
+          Blog Title <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          required
+          className="w-full border-gray-300 rounded-lg px-4 py-3 text-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          placeholder="Enter blog title..."
+        />
+      </div>
+
+      {/* Subtitle */}
+      <div className="space-y-2">
+        <label className="text-xl font-semibold text-gray-800">Subtitle</label>
+        <input
+          type="text"
+          name="subtitle"
+          value={formData.subtitle}
+          onChange={handleChange}
+          className="w-full border-gray-300 rounded-lg px-4 py-3 text-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          placeholder="Optional subtitle..."
+        />
+      </div>
+
+      {/* Slug */}
+      <div className="space-y-2">
+        <label className="text-xl font-semibold text-gray-800">Slug</label>
+        <input
+          type="text"
+          name="slug"
+          value={formData.slug}
+          onChange={handleChange}
+          className="w-full border-gray-300 rounded-lg px-4 py-3 text-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          placeholder="auto-generated-from-title, editable"
+        />
+        <p className="text-xs text-gray-500">Example: my-blog-post</p>
+      </div>
 
         {/* Description (React Quill) */}
         <div className="space-y-2">
@@ -179,6 +243,32 @@ const AddBlog = () => {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Tags */}
+        <div className="space-y-2">
+          <label className="text-xl font-semibold text-gray-800">Tags</label>
+          <input
+            type="text"
+            name="tagsText"
+            value={formData.tagsText}
+            onChange={handleChange}
+            className="w-full border-gray-300 rounded-lg px-4 py-3 text-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            placeholder="comma-separated: travel, hotel, booking"
+          />
+        </div>
+
+        {/* Keywords */}
+        <div className="space-y-2">
+          <label className="text-xl font-semibold text-gray-800">Keywords</label>
+          <input
+            type="text"
+            name="keywordsText"
+            value={formData.keywordsText}
+            onChange={handleChange}
+            className="w-full border-gray-300 rounded-lg px-4 py-3 text-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            placeholder="comma-separated: best hotels, cheap flights"
+          />
         </div>
 
         {/* Submit Button */}

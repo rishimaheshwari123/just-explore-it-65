@@ -8,7 +8,7 @@ import { getSingleBlogAPI, getAllBlogsAPI } from "@/service/operations/blog";
 import BlogImages from "./BlogImages";
 
 const SingleBlog = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
   const [relatedBlogs, setRelatedBlogs] = useState([]);
@@ -29,18 +29,27 @@ const SingleBlog = () => {
     return `${minutes} min read`;
   };
 
-  // Get single blog
-  const getSingleBlog = async (blogId) => {
+  // Helper: check if param looks like a Mongo ObjectId
+  const isObjectId = (val) => /^[a-fA-F0-9]{24}$/.test(val || "");
+
+  // Get single blog by id or slug
+  const getSingleBlog = async (slugOrId) => {
     try {
       setLoading(true);
-      const response = await getSingleBlogAPI(blogId);
-      if (response) {
-        setBlog(response);
-        // Get related blogs of the same type
-        getRelatedBlogs(response.type, blogId);
-      } else {
-        throw new Error("Blog not found");
+      let blogData = null;
+      if (isObjectId(slugOrId)) {
+        const byId = await getSingleBlogAPI(slugOrId);
+        blogData = byId || null;
       }
+      if (!blogData) {
+        const all = await getAllBlogsAPI();
+        blogData = all.find((b) => (b.slug || "") === (slugOrId || "")) || null;
+      }
+      if (!blogData) throw new Error("Blog not found");
+
+      setBlog(blogData);
+      // Get related blogs of the same type
+      getRelatedBlogs(blogData.type, blogData._id);
     } catch (error) {
       console.error("Error fetching blog:", error);
       setError("Failed to load blog. Please try again.");
@@ -66,10 +75,10 @@ const SingleBlog = () => {
   };
 
   useEffect(() => {
-    if (id) {
-      getSingleBlog(id);
+    if (slug) {
+      getSingleBlog(slug);
     }
-  }, [id]);
+  }, [slug]);
 
   // Handle share
   const handleShare = () => {
@@ -87,8 +96,9 @@ const SingleBlog = () => {
   };
 
   // Handle related blog click
-  const handleRelatedBlogClick = (blogId) => {
-    navigate(`/blog/${blogId}`);
+  const handleRelatedBlogClick = (b) => {
+    const slugOrId = b.slug || b._id;
+    navigate(`/blogs/${slugOrId}`);
   };
 
   if (loading) {
@@ -201,7 +211,7 @@ const SingleBlog = () => {
                 <Card
                   key={relatedBlog._id}
                   className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
-                  onClick={() => handleRelatedBlogClick(relatedBlog._id)}
+                  onClick={() => handleRelatedBlogClick(relatedBlog)}
                 >
                   <div className="relative">
                     <img

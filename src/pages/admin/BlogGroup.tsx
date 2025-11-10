@@ -12,8 +12,12 @@ import "react-quill/dist/quill.snow.css";
 const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
   const [formData, setFormData] = useState({
     title: "",
+    subtitle: "",
+    slug: "",
     description: "",
     images: [],
+    tagsText: "",
+    keywordsText: "",
   });
 
   const maxWords = 3000;
@@ -24,13 +28,17 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
       const response = await getSingleBlogAPI(id);
       if (response) {
         setFormData({
-          title: response.title,
-          description: response.desc,
+          title: response.title || "",
+          subtitle: response.subtitle || "",
+          slug: response.slug || "",
+          description: response.desc || "",
           images: Array.isArray(response.images)
             ? response.images
             : response.image
             ? [response.image]
             : [],
+          tagsText: Array.isArray(response.tags) ? response.tags.join(", ") : "",
+          keywordsText: Array.isArray(response.keywords) ? response.keywords.join(", ") : "",
         });
       }
     } catch (error) {
@@ -92,8 +100,22 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
     try {
       const data = new FormData();
       data.append("title", formData.title);
+      if (formData.subtitle) data.append("subtitle", formData.subtitle);
+      if (formData.slug) data.append("slug", formData.slug);
       data.append("desc", formData.description);
       data.append("images", JSON.stringify(formData.images));
+
+      const tagsArray = formData.tagsText
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0);
+      const keywordsArray = formData.keywordsText
+        .split(",")
+        .map((k) => k.trim())
+        .filter((k) => k.length > 0);
+
+      data.append("tags", JSON.stringify(tagsArray));
+      data.append("keywords", JSON.stringify(keywordsArray));
 
       await updateBlogApi(blogId, data);
       getAllBlogs();
@@ -128,6 +150,32 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
             />
           </div>
 
+          {/* Subtitle */}
+          <div className="space-y-2">
+            <Label className="text-lg font-semibold">Subtitle</Label>
+            <Input
+              type="text"
+              name="subtitle"
+              value={formData.subtitle}
+              onChange={handleChange}
+              className="text-lg"
+            />
+          </div>
+
+          {/* Slug */}
+          <div className="space-y-2">
+            <Label className="text-lg font-semibold">Slug</Label>
+            <Input
+              type="text"
+              name="slug"
+              value={formData.slug}
+              onChange={handleChange}
+              className="text-lg"
+              placeholder="my-blog-post"
+            />
+            <p className="text-xs text-gray-500">Unique URL identifier</p>
+          </div>
+
           {/* Description */}
           <div className="space-y-2">
             <Label className="text-lg font-semibold">Description *</Label>
@@ -139,6 +187,32 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
                 className="h-44"
               />
             </div>
+          </div>
+
+          {/* Tags */}
+          <div className="space-y-2">
+            <Label className="text-lg font-semibold">Tags</Label>
+            <Input
+              type="text"
+              name="tagsText"
+              value={formData.tagsText}
+              onChange={handleChange}
+              className="text-lg"
+              placeholder="comma-separated: travel, hotel, booking"
+            />
+          </div>
+
+          {/* Keywords */}
+          <div className="space-y-2">
+            <Label className="text-lg font-semibold">Keywords</Label>
+            <Input
+              type="text"
+              name="keywordsText"
+              value={formData.keywordsText}
+              onChange={handleChange}
+              className="text-lg"
+              placeholder="comma-separated: best hotels, cheap flights"
+            />
           </div>
 
           {/* Image Upload */}
