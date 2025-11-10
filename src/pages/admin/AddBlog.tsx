@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import { useState } from "react";
 import { createBlogAPI } from "@/service/operations/blog";
 import { imageUpload } from "@/service/operations/image";
 import { useSelector } from "react-redux";
@@ -14,40 +12,10 @@ import { Input } from "@/components/ui/input";
 import { toast } from "react-hot-toast";
 
 const AddBlog = () => {
-  const quillModules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ["bold", "italic", "underline", "strike"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["blockquote", "code-block"],
-      ["link", "image"],
-      [{ align: [] }],
-      ["clean"],
-    ],
-  };
-
-  const quillFormats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "list",
-    "bullet",
-    "blockquote",
-    "code-block",
-    "link",
-    "image",
-    "align",
-  ];
   const [formData, setFormData] = useState({
     title: "",
-    subtitle: "",
-    slug: "",
-    descriptionHtml: "",
-    keywords: "",
-    tags: "",
-    images: [] as File[],
+    description: "",
+    images: [],
   });
 
   const user = useSelector((state: RootState) => state.auth?.user ?? null);
@@ -59,66 +27,50 @@ const AddBlog = () => {
       [name]: value,
     });
   };
-  
-  // Auto-generate slug from title, but allow manual edits
-  useEffect(() => {
-    if (!formData.slug && formData.title) {
-      const s = formData.title
-        .toLowerCase()
-        .trim()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-");
-      setFormData((prev) => ({ ...prev, slug: s }));
-    }
-  }, [formData.title]);
 
-  const handleImagesChange = (e) => {
+  const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files || []);
-    setFormData({
-      ...formData,
-      images: files as File[],
-    });
+    if (files.length === 0) return;
+
+    try {
+      const uploadedUrls = await imageUpload(files);
+
+      setFormData((prev) => ({
+        ...prev,
+        images: [...prev.images, ...uploadedUrls].slice(0, 10),
+      }));
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      toast.error("Failed to upload images");
+    }
   };
 
-  // React Quill editor value handled via formData.descriptionHtml
+  const removeImage = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("title", formData.title);
-      formDataToSend.append("subtitle", formData.subtitle || "");
-      formDataToSend.append("slug", formData.slug || "");
-      // Send HTML from React Quill editor
-      formDataToSend.append("desc", formData.descriptionHtml || "");
+      const data = new FormData();
 
-      // Keywords & tags as comma-separated strings
-      if (formData.keywords) formDataToSend.append("keywords", formData.keywords);
-      if (formData.tags) formDataToSend.append("tags", formData.tags);
+      data.append("title", formData.title);
+      data.append("desc", formData.description);
 
-      // Images: append multiple; also append first as `image` for compatibility
-      if (formData.images && formData.images.length > 0) {
-        formDataToSend.append("image", formData.images[0]);
-        formData.images.forEach((file) => formDataToSend.append("images", file));
-      }
+      // ✅ images array ko JSON.stringify karke bhejna zaroori hai
+      data.append("images", JSON.stringify(formData.images));
 
       await createBlogAPI(data);
 
-      if (response) {
-        setFormData({
-          title: "",
-          subtitle: "",
-          slug: "",
-          descriptionHtml: "",
-          keywords: "",
-          tags: "",
-          images: [],
-        });
-        // Reset editor value
-        // ReactQuill is controlled via state; already cleared above
-      }
+      setFormData({
+        title: "",
+        description: "",
+        images: [],
+      });
     } catch (error) {
       console.log(error);
       toast.error("Something went wrong");
@@ -152,107 +104,77 @@ const AddBlog = () => {
           />
         </div>
 
-        {/* Subtitle */}
-        <div>
-          <label className="block text-gray-600 text-xl font-bold mb-2" htmlFor="subtitle">
-            Subtitle
+        {/* Description (React Quill) */}
+        <div className="space-y-2">
+          <label className="text-xl font-semibold text-gray-800">
+            Description <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-600 leading-tight focus:outline-none focus:shadow-outline text-xl"
-            name="subtitle"
-            id="subtitle"
-            value={formData.subtitle}
-            onChange={handleChange}
-          />
+          <div className="border rounded-lg overflow-hidden shadow-sm">
+            <ReactQuill
+              theme="snow"
+              value={formData.description}
+              onChange={(value) =>
+                setFormData((prev) => ({ ...prev, description: value }))
+              }
+              className="h-44"
+            />
+          </div>
         </div>
 
-        {/* Slug */}
-        <div>
-          <label className="block text-gray-600 text-xl font-bold mb-2" htmlFor="slug">
-            Slug
-          </label>
-          <input
-            type="text"
-            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-600 leading-tight focus:outline-none focus:shadow-outline text-xl"
-            name="slug"
-            id="slug"
-            value={formData.slug}
-            onChange={handleChange}
-          />
-        </div>
+        {/* Image Upload Section */}
+        <div className="space-y-4">
+          <h4 className="font-semibold text-lg text-gray-800 flex items-center gap-2">
+            <Camera className="h-5 w-5 text-gray-600" />
+            Upload Blog Images (Max 10)
+          </h4>
 
-        {/* Description (React Quill Editor) */}
-        <div>
-          <label htmlFor="descriptionHtml" className="block font-medium text-gray-700 text-xl mb-2">
-            Description (HTML): <span className="text-red-500">*</span>
-          </label>
-          <ReactQuill
-            theme="snow"
-            value={formData.descriptionHtml}
-            onChange={(value) => setFormData({ ...formData, descriptionHtml: value })}
-            modules={quillModules}
-            formats={quillFormats}
-            className="bg-white"
-          />
-          <p className="text-sm text-gray-500 mt-2">Rich text supported: headings, lists, links, images, and code.</p>
-        </div>
+          <div className="border border-gray-300 rounded-xl p-6 bg-gray-50 hover:bg-gray-100 transition cursor-pointer text-center">
+            <Label
+              htmlFor="imageUpload"
+              className="cursor-pointer flex flex-col items-center gap-2"
+            >
+              <Upload className="h-8 w-8 text-blue-600" />
+              <p className="text-sm font-medium text-gray-700">
+                Click to upload images
+              </p>
+              <span className="text-xs text-gray-500">
+                JPG, PNG up to 5MB each
+              </span>
+            </Label>
 
-        {/* Keywords */}
-        <div>
-          <label className="block text-gray-600 text-xl font-bold mb-2" htmlFor="keywords">
-            Keywords (comma-separated)
-          </label>
-          <input
-            type="text"
-            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-600 leading-tight focus:outline-none focus:shadow-outline text-xl"
-            name="keywords"
-            id="keywords"
-            value={formData.keywords}
-            onChange={handleChange}
-            placeholder="e.g., real estate, homes, property"
-          />
-        </div>
+            <Input
+              type="file"
+              id="imageUpload"
+              className="hidden"
+              multiple
+              onChange={handleImageUpload}
+              accept="image/png, image/jpeg"
+            />
+          </div>
 
-        {/* Tags */}
-        <div>
-          <label className="block text-gray-600 text-xl font-bold mb-2" htmlFor="tags">
-            Tags (comma-separated)
-          </label>
-          <input
-            type="text"
-            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-600 leading-tight focus:outline-none focus:shadow-outline text-xl"
-            name="tags"
-            id="tags"
-            value={formData.tags}
-            onChange={handleChange}
-            placeholder="e.g., market, trends, tips"
-          />
-        </div>
-
-        {/* Images */}
-        <div>
-          <label className="block text-gray-600 text-xl font-bold mb-2" htmlFor="images">
-            Images
-          </label>
-          <input
-            className="appearance-none border rounded w-full py-3 px-4 text-gray-600 leading-tight focus:outline-none focus:shadow-outline text-xl"
-            id="images"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImagesChange}
-          />
+          {/* Image preview grid */}
           {formData.images.length > 0 && (
-            <div className="mt-3 grid grid-cols-2 gap-3">
-              {formData.images.map((file, idx) => (
-                <div key={idx} className="border rounded p-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+              {formData.images.map((img, index) => (
+                <div
+                  key={index}
+                  className="relative group border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition"
+                >
                   <img
-                    src={URL.createObjectURL(file)}
-                    alt={`preview-${idx}`}
-                    className="w-full h-32 object-cover"
+                    src={img}
+                    alt="Blog"
+                    className="w-full h-28 object-cover"
                   />
-                  <p className="text-xs mt-1 truncate">{file.name}</p>
+
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition bg-white border hover:bg-red-500 hover:text-white rounded-full"
+                    onClick={() => removeImage(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
               ))}
             </div>

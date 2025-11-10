@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
 import { getSingleBlogAPI, updateBlogApi } from "@/service/operations/blog";
 import { imageUpload } from "@/service/operations/image";
@@ -12,42 +10,10 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
 const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
-  const maxWords = 3000;
-  const quillModules = {
-    toolbar: [
-      [{ header: [1, 2, 3, false] }],
-      ["bold", "italic", "underline", "strike"],
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["blockquote", "code-block"],
-      ["link", "image"],
-      [{ align: [] }],
-      ["clean"],
-    ],
-  };
-  const quillFormats = [
-    "header",
-    "bold",
-    "italic",
-    "underline",
-    "strike",
-    "list",
-    "bullet",
-    "blockquote",
-    "code-block",
-    "link",
-    "image",
-    "align",
-  ];
-
   const [formData, setFormData] = useState({
     title: "",
-    subtitle: "",
-    slug: "",
-    desc: "",
-    keywords: "",
-    tags: "",
-    image: "",
-    images: [] as File[],
+    description: "",
+    images: [],
   });
 
   const maxWords = 3000;
@@ -58,17 +24,14 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
       const response = await getSingleBlogAPI(id);
       if (response) {
         setFormData({
-          title: blog.title || "",
-          subtitle: blog.subtitle || "",
-          slug: blog.slug || "",
-          desc: blog.desc || "",
-          keywords: (blog.keywords || []).join(", "),
-          tags: (blog.tags || []).join(", "),
-          image: blog.image || "",
-          images: [],
+          title: response.title,
+          description: response.desc,
+          images: Array.isArray(response.images)
+            ? response.images
+            : response.image
+            ? [response.image]
+            : [],
         });
-      } else {
-        throw new Error(response);
       }
     } catch (error) {
       toast.error("Failed to load blog data");
@@ -115,13 +78,11 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
     }
   };
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files || []);
-    setFormData({
-      ...formData,
-      image: files[0],
-      images: files as File[],
-    });
+  const removeImage = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
   };
 
   // Submit form
@@ -129,19 +90,10 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
     e.preventDefault();
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("title", formData.title);
-      formDataToSend.append("subtitle", formData.subtitle || "");
-      formDataToSend.append("slug", formData.slug || "");
-      formDataToSend.append("desc", formData.desc);
-      if (formData.keywords) formDataToSend.append("keywords", formData.keywords);
-      if (formData.tags) formDataToSend.append("tags", formData.tags);
-      if (formData.image) {
-        formDataToSend.append("image", formData.image);
-      }
-      if (formData.images && formData.images.length) {
-        formData.images.forEach((file) => formDataToSend.append("images", file));
-      }
+      const data = new FormData();
+      data.append("title", formData.title);
+      data.append("desc", formData.description);
+      data.append("images", JSON.stringify(formData.images));
 
       await updateBlogApi(blogId, data);
       getAllBlogs();
@@ -176,106 +128,75 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
             />
           </div>
 
-          <div className="space-y-2 col-span-2">
-            <label
-              htmlFor="desc"
-              className="block text-gray-700 text-lg md:text-xl font-bold mb-2"
-            >
-              Description *
-            </label>
-            <ReactQuill
-              theme="snow"
-              value={formData.desc}
-              onChange={(value) => {
-                const plain = value.replace(/<[^>]*>/g, " ");
-                const wordCount = plain.trim().split(/\s+/).length;
-                if (wordCount > maxWords) {
-                  alert(`You cannot exceed ${maxWords} words.`);
-                  return;
-                }
-                setFormData({ ...formData, desc: value });
-              }}
-              modules={quillModules}
-              formats={quillFormats}
-              className="bg-white"
-            />
+          {/* Description */}
+          <div className="space-y-2">
+            <Label className="text-lg font-semibold">Description *</Label>
+            <div className="border rounded-lg overflow-hidden shadow-sm">
+              <ReactQuill
+                theme="snow"
+                value={formData.description}
+                onChange={handleQuillChange}
+                className="h-44"
+              />
+            </div>
           </div>
 
-          {/* Subtitle */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-lg md:text-xl font-bold mb-2" htmlFor="subtitle">
-              Subtitle
-            </label>
-            <input
-              type="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
-              name="subtitle"
-              id="subtitle"
-              value={formData.subtitle}
-              onChange={handleChange}
-            />
-          </div>
+          {/* Image Upload */}
+          <div className="space-y-4">
+            <h4 className="font-semibold text-lg flex items-center gap-2">
+              <Camera className="h-5 w-5 text-gray-600" /> Upload Images (Max
+              10)
+            </h4>
 
-          {/* Slug */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-lg md:text-xl font-bold mb-2" htmlFor="slug">
-              Slug
-            </label>
-            <input
-              type="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
-              name="slug"
-              id="slug"
-              value={formData.slug}
-              onChange={handleChange}
-            />
-          </div>
+            <div className="border border-gray-300 rounded-xl p-6 bg-gray-50 hover:bg-gray-100 transition cursor-pointer text-center">
+              <Label
+                htmlFor="imageUpload"
+                className="cursor-pointer flex flex-col items-center gap-2"
+              >
+                <Upload className="h-8 w-8 text-blue-600" />
+                <p className="text-sm font-medium text-gray-700">
+                  Click to upload images
+                </p>
+                <span className="text-xs text-gray-500">
+                  JPG, PNG up to 5MB each
+                </span>
+              </Label>
+              <Input
+                type="file"
+                id="imageUpload"
+                className="hidden"
+                multiple
+                onChange={handleImageUpload}
+                accept="image/png, image/jpeg"
+              />
+            </div>
 
-          {/* Keywords */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-lg md:text-xl font-bold mb-2" htmlFor="keywords">
-              Keywords (comma-separated)
-            </label>
-            <input
-              type="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
-              name="keywords"
-              id="keywords"
-              value={formData.keywords}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* Tags */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-lg md:text-xl font-bold mb-2" htmlFor="tags">
-              Tags (comma-separated)
-            </label>
-            <input
-              type="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
-              name="tags"
-              id="tags"
-              value={formData.tags}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-lg md:text-xl font-bold mb-2"
-              htmlFor="image"
-            >
-              Image:
-            </label>
-            <input
-              className="appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
-              id="image"
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={handleFileChange}
-            />
+            {/* Image Preview */}
+            {formData.images.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+                {formData.images.map((img, index) => (
+                  <div
+                    key={index}
+                    className="relative group border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition"
+                  >
+                    <img
+                      src={img}
+                      alt="Blog"
+                      className="w-full h-28 object-cover"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition bg-white border hover:bg-red-500 hover:text-white rounded-full"
+                      onClick={() => removeImage(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Submit Button */}
