@@ -2,8 +2,16 @@ import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { createBlogAPI } from "@/service/operations/blog";
+import { imageUpload } from "@/service/operations/image";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { Camera, Upload, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { toast } from "react-hot-toast";
 
 const AddBlog = () => {
   const quillModules = {
@@ -96,7 +104,7 @@ const AddBlog = () => {
         formData.images.forEach((file) => formDataToSend.append("images", file));
       }
 
-      const response = await createBlogAPI(formDataToSend);
+      await createBlogAPI(data);
 
       if (response) {
         setFormData({
@@ -113,34 +121,34 @@ const AddBlog = () => {
       }
     } catch (error) {
       console.log(error);
+      toast.error("Something went wrong");
     }
   };
 
   return (
-    <>
-      <h6 className="text-blue-600 text-center text-3xl border-b-2 border-blue-600 pb-2">
-        Add Blogs
-      </h6>
+    <div className="max-w-4xl mx-auto mt-10 mb-16">
+      {/* Heading */}
+      <h2 className="text-4xl font-bold text-center text-blue-600 mb-8">
+        Create New Blog
+      </h2>
+
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col space-y-6 mt-10 max-w-3xl mx-auto"
+        className="bg-white shadow-lg rounded-xl p-8 space-y-8 border border-gray-200"
       >
-        {/* Title */}
-        <div>
-          <label
-            className="block text-gray-600 text-xl font-bold mb-2"
-            htmlFor="title"
-          >
-            Title: <span className="text-red-500">*</span>
+        {/* Title Input */}
+        <div className="space-y-2">
+          <label className="text-xl font-semibold text-gray-800">
+            Blog Title <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
-            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-600 leading-tight focus:outline-none focus:shadow-outline text-xl"
             name="title"
-            id="title"
             value={formData.title}
             onChange={handleChange}
             required
+            className="w-full border-gray-300 rounded-lg px-4 py-3 text-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            placeholder="Enter blog title..."
           />
         </div>
 
@@ -252,16 +260,16 @@ const AddBlog = () => {
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-center">
+        <div className="pt-4 flex justify-center">
           <button
-            className="px-6 py-3 bg-blue-600 text-white rounded-md text-xl hover:bg-blue-700 transition"
             type="submit"
+            className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white text-xl font-semibold rounded-lg shadow-md transition"
           >
             Create Blog
           </button>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 

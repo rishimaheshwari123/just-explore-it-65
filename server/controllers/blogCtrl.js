@@ -135,6 +135,7 @@ const updateBlogCtrl = async (req, res) => {
         images: newImages.length ? newImages : blog.images,
       },
       { new: true }
+      { new: true }
     );
 
     return res.status(200).json({
@@ -144,12 +145,13 @@ const updateBlogCtrl = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).send({
+    return res.status(500).json({
       success: false,
       message: "Error in update blog API!",
     });
   }
 };
+
 
 
 const getAllBlogsCtrl = async (req, res) => {

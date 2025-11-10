@@ -3,6 +3,13 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { toast } from "react-toastify";
 import { getSingleBlogAPI, updateBlogApi } from "@/service/operations/blog";
+import { imageUpload } from "@/service/operations/image";
+import { Camera, Upload, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
   const maxWords = 3000;
@@ -43,11 +50,13 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
     images: [] as File[],
   });
 
+  const maxWords = 3000;
+
+  // Fetch single blog
   const getSingleBlog = async (id) => {
     try {
       const response = await getSingleBlogAPI(id);
       if (response) {
-        const blog = response;
         setFormData({
           title: blog.title || "",
           subtitle: blog.subtitle || "",
@@ -62,29 +71,48 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
         throw new Error(response);
       }
     } catch (error) {
-      toast.error(error);
+      toast.error("Failed to load blog data");
     }
   };
 
   useEffect(() => {
-    if (blogId && isOpen) {
-      getSingleBlog(blogId);
-    }
-  }, [isOpen, blogId]);
+    if (blogId && isOpen) getSingleBlog(blogId);
+  }, [blogId, isOpen]);
 
+  // Handle text input
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "desc") {
+    if (name === "description") {
       const wordCount = value.trim().split(/\s+/).length;
-      if (wordCount > maxWords) {
-        alert(`You cannot exceed ${maxWords} words.`);
-        return;
-      }
+      if (wordCount > maxWords) return;
     }
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Handle ReactQuill
+  const handleQuillChange = (value) => {
+    const wordCount = value
+      .replace(/<[^>]+>/g, " ")
+      .trim()
+      .split(/\s+/).length;
+    if (wordCount > maxWords) return;
+    setFormData((prev) => ({ ...prev, description: value }));
+  };
+
+  // Image upload
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    try {
+      const uploadedUrls = await imageUpload(files);
+      setFormData((prev) => ({
+        ...prev,
+        images: [...prev.images, ...uploadedUrls].slice(0, 10),
+      }));
+    } catch (error) {
+      toast.error("Failed to upload images");
+    }
   };
 
   const handleFileChange = (e) => {
@@ -96,8 +124,10 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
     });
   };
 
+  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
@@ -113,15 +143,11 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
         formData.images.forEach((file) => formDataToSend.append("images", file));
       }
 
-      const response = await updateBlogApi(blogId, formDataToSend);
-
-      if (response?.success) {
-        getAllBlogs();
-
-        onClose();
-      }
+      await updateBlogApi(blogId, data);
+      getAllBlogs();
+      onClose();
     } catch (error) {
-      toast.error("Oops, something went wrong!");
+      toast.error("Something went wrong!");
     }
   };
 
@@ -131,29 +157,22 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
         isOpen ? "block" : "hidden"
       } fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center`}
     >
-      <div className="bg-white p-8 rounded-lg shadow-xl w-full md:w-3/4 lg:w-1/2 h-[95%] overflow-scroll py-6">
-        <h6 className="text-blue-600 text-center text-2xl md:text-3xl border-b-2 border-blue-600 pb-2">
-          {blogId ? "Edit Blog" : "Add Blog"}
-        </h6>
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-1 gap-6 mt-8 md:grid-cols-2"
-        >
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-lg md:text-xl font-bold mb-2"
-              htmlFor="title"
-            >
-              Title: <span className="text-red-500">*</span>
-            </label>
-            <input
+      <div className="bg-white p-8 rounded-xl shadow-xl w-full md:w-3/4 lg:w-1/2 max-h-[95vh] overflow-y-auto">
+        <h2 className="text-3xl font-bold text-center text-blue-600 border-b-2 border-blue-600 pb-3">
+          Edit Blog
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-6 mt-6">
+          {/* Title */}
+          <div className="space-y-2">
+            <Label className="text-lg font-semibold">Title *</Label>
+            <Input
               type="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-lg"
               name="title"
-              id="title"
               value={formData.title}
               onChange={handleChange}
               required
+              className="text-lg"
             />
           </div>
 
@@ -259,21 +278,23 @@ const BlogPopup = ({ isOpen, blogId, onClose, getAllBlogs }) => {
             />
           </div>
 
-          <div className="flex items-center justify-center md:justify-start">
-            <button
-              className="px-6 py-2 bg-black text-white rounded-md text-base md:text-lg hover:bg-gray-800 transition"
+          {/* Submit Button */}
+          <div className="flex justify-center gap-4">
+            <Button
               type="submit"
+              className="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-lg transition"
             >
-              {blogId ? "Update Blog" : "Create Blog"}
-            </button>
+              Update Blog
+            </Button>
+            <Button
+              type="button"
+              className="px-10 py-3 bg-gray-500 hover:bg-gray-600 text-white text-lg font-semibold rounded-lg transition"
+              onClick={onClose}
+            >
+              Close
+            </Button>
           </div>
         </form>
-        <button
-          className="mt-4 px-6 py-2 bg-gray-500 text-white rounded-md text-base hover:bg-gray-600"
-          onClick={onClose}
-        >
-          Close
-        </button>
       </div>
     </div>
   );
