@@ -3,86 +3,48 @@ const blogModel = require("../models/blogModel")
 
 const createBlogsCtrl = async (req, res) => {
   try {
-    const { title, subtitle, slug, desc, keywords, tags } = req.body;
+    const { title, desc, images } = req.body;
 
-    if (!title || !desc) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide title and description",
-      });
+    if (!title || !desc || !images) {
+      return res.status(400).json({ success: false, message: "Please provide all fields" });
     }
 
-    // Normalize keywords and tags (accept comma-separated strings or arrays)
-    const normalizeList = (val) => {
-      if (!val) return [];
-      if (Array.isArray(val)) return val.map((v) => String(v).trim()).filter(Boolean);
-      return String(val)
-        .split(",")
-        .map((v) => v.trim())
-        .filter(Boolean);
-    };
-    const keywordsList = normalizeList(keywords);
-    const tagsList = normalizeList(tags);
+    // parse stringified array
+    const parsedImages = JSON.parse(images);
 
-    // Handle images: support `image` (single) and `images` (multiple)
-    let uploadedImages = [];
-    const files = req.files || {};
-    let imageField = files.image || null;
-    const imagesField = files.images || null;
-
-    // If multiple images are provided
-    if (imagesField) {
-      const imagesArray = Array.isArray(imagesField) ? imagesField : [imagesField];
-      for (const img of imagesArray) {
-        const uploaded = await uploadImageToCloudinary(img, process.env.FOLDER_NAME);
-        uploadedImages.push(uploaded.secure_url);
-      }
-    }
-
-    // If only single image is provided
-    if (imageField && uploadedImages.length === 0) {
-      const uploaded = await uploadImageToCloudinary(imageField, process.env.FOLDER_NAME);
-      uploadedImages.push(uploaded.secure_url);
+    if (!parsedImages.length) {
+      return res.status(400).json({ success: false, message: "Please upload images" });
     }
 
     const blog = await blogModel.create({
       title,
-      subtitle,
-      slug,
       desc,
-      keywords: keywordsList,
-      tags: tagsList,
-      image: uploadedImages[0] || undefined,
-      images: uploadedImages,
+      images: parsedImages // direct array of URLs
     });
 
-    return res.status(201).json({
-      success: true,
-      message: "Blog created successfully!",
-      blog,
-    });
+    return res.status(201).json({ success: true, message: "Blog created successfully", blog });
   } catch (error) {
-    console.log(error);
-    return res.status(500).send({
-      success: false,
-      message: "Error in create blog api!",
-    });
+    console.log("Blog Create Error:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
+
 
 const updateBlogCtrl = async (req, res) => {
   try {
     const { blogId } = req.params;
-    const { title, subtitle, slug, desc, keywords, tags } = req.body;
-
+    const { title, desc, type } = req.body;
+    let images = req.body.images ? JSON.parse(req.body.images) : []; // images array from frontend
+    console.log(req.body)
     // Validate required fields
     if (!title || !desc) {
       return res.status(400).json({
         success: false,
-        message: "Please provide title and description",
+        message: "Please provide all required fields",
       });
     }
 
+    // Find existing blog
     const blog = await blogModel.findById(blogId);
     if (!blog) {
       return res.status(404).json({
@@ -91,50 +53,31 @@ const updateBlogCtrl = async (req, res) => {
       });
     }
 
-    // Normalize keywords and tags
-    const normalizeList = (val) => {
-      if (!val) return [];
-      if (Array.isArray(val)) return val.map((v) => String(v).trim()).filter(Boolean);
-      return String(val)
-        .split(",")
-        .map((v) => v.trim())
-        .filter(Boolean);
-    };
-    const keywordsList = normalizeList(keywords);
-    const tagsList = normalizeList(tags);
+    // Handle newly uploaded files if any
+    if (req.files && req.files.length > 0) {
+      const uploadedImages = await Promise.all(
+        req.files.map((file) =>
+          uploadImageToCloudinary(file, process.env.FOLDER_NAME)
+        )
+      );
 
-    // Handle images update
-    const files = req.files || {};
-    let newImages = [];
-    const imageField = files.image || null;
-    const imagesField = files.images || null;
-
-    if (imagesField) {
-      const imagesArray = Array.isArray(imagesField) ? imagesField : [imagesField];
-      for (const img of imagesArray) {
-        const uploaded = await uploadImageToCloudinary(img, process.env.FOLDER_NAME);
-        newImages.push(uploaded.secure_url);
-      }
+      const uploadedUrls = uploadedImages.map((img) => img.secure_url);
+      // Merge existing images with new uploads
+      images = [...blog.images || [], ...uploadedUrls].slice(0, 10); // max 10 images
+    } else if (!images.length) {
+      // If no images provided and no existing images, fallback to empty array
+      images = blog.images || [];
     }
 
-    if (imageField && newImages.length === 0) {
-      const uploaded = await uploadImageToCloudinary(imageField, process.env.FOLDER_NAME);
-      newImages.push(uploaded.secure_url);
-    }
-
+    // Update blog
     const updatedBlog = await blogModel.findByIdAndUpdate(
       blogId,
       {
         title,
-        subtitle,
-        slug,
         desc,
-        keywords: keywordsList,
-        tags: tagsList,
-        image: newImages.length ? newImages[0] : blog.image,
-        images: newImages.length ? newImages : blog.images,
+        type,
+        images,
       },
-      { new: true }
       { new: true }
     );
 
