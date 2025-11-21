@@ -212,95 +212,266 @@ const BUSINESS_CATEGORIES = [
   "Zoological & Pet Services",
 ];
 
-
 const SUBCATEGORIES: { [key: string]: string[] } = {
   "Advertising Agencies": ["Advertising Agencies"],
   "Agriculture Equipment & Seeds": ["Agriculture Equipment & Seeds"],
-  "Apparels / Garments": ["Men's Wear", "Women's Wear", "Kids Wear", "Accessories"],
-  "Automobiles (Car, Bike, Showroom, Service)": ["Car Showroom", "Bike Showroom", "Car Service", "Bike Service"],
+  "Apparels / Garments": [
+    "Men's Wear",
+    "Women's Wear",
+    "Kids Wear",
+    "Accessories",
+  ],
+  "Automobiles (Car, Bike, Showroom, Service)": [
+    "Car Showroom",
+    "Bike Showroom",
+    "Car Service",
+    "Bike Service",
+  ],
   "Automobile Spare Parts": ["Car Parts", "Bike Parts", "Tyres", "Batteries"],
-  "Baby Care & Kids Stores": ["Toys", "Clothing", "Feeding Supplies", "Baby Care Products"],
-  "Banks & ATMs": ["Bank Branches", "ATMs", "Loan Services", "Investment Services"],
+  "Baby Care & Kids Stores": [
+    "Toys",
+    "Clothing",
+    "Feeding Supplies",
+    "Baby Care Products",
+  ],
+  "Banks & ATMs": [
+    "Bank Branches",
+    "ATMs",
+    "Loan Services",
+    "Investment Services",
+  ],
   "Banquet Halls": ["Wedding Halls", "Party Halls", "Corporate Events"],
   "Beauty Parlours & Salons": ["Salon", "Haircut", "Spa", "Bridal Makeup"],
   "Boutiques & Tailors": ["Boutique", "Tailoring", "Custom Clothing"],
-  "Book Shops & Stationery": ["Books", "Stationery", "Magazines", "School Supplies"],
-  "Builders & Developers": ["Residential Builders", "Commercial Builders", "Developers"],
-  "Car Rentals & Taxi Services": ["Car Rental", "Taxi Service", "Airport Pickup"],
-  "Catering Services": ["Wedding Catering", "Corporate Catering", "Event Catering"],
+  "Book Shops & Stationery": [
+    "Books",
+    "Stationery",
+    "Magazines",
+    "School Supplies",
+  ],
+  "Builders & Developers": [
+    "Residential Builders",
+    "Commercial Builders",
+    "Developers",
+  ],
+  "Car Rentals & Taxi Services": [
+    "Car Rental",
+    "Taxi Service",
+    "Airport Pickup",
+  ],
+  "Catering Services": [
+    "Wedding Catering",
+    "Corporate Catering",
+    "Event Catering",
+  ],
   "Chemists & Medical Stores": ["Pharmacy", "Medicines", "Healthcare Products"],
-  "Coaching Classes & Tuition": ["School Coaching", "Competitive Exams", "Skill Development"],
-  "Computer Sales & Services": ["Computer Store", "Laptop Sales", "Computer Repair", "Networking Services"],
-  "Courier & Cargo Services": ["Courier Service", "Cargo Service", "Parcel Pickup"],
+  "Coaching Classes & Tuition": [
+    "School Coaching",
+    "Competitive Exams",
+    "Skill Development",
+  ],
+  "Computer Sales & Services": [
+    "Computer Store",
+    "Laptop Sales",
+    "Computer Repair",
+    "Networking Services",
+  ],
+  "Courier & Cargo Services": [
+    "Courier Service",
+    "Cargo Service",
+    "Parcel Pickup",
+  ],
   "Dairy Products & Milk Suppliers": ["Milk", "Butter", "Cheese", "Ghee"],
-  "Dance & Music Classes": ["Dance Classes", "Music Classes", "Instrument Training"],
-  "Diagnostic Centres & Pathology Labs": ["Blood Tests", "X-Ray", "MRI", "Ultrasound"],
-  "Doctors (All Specializations)": ["General Physician", "Dentist", "Cardiologist", "Gynecologist", "Pediatrician", "Dermatologist"],
+  "Dance & Music Classes": [
+    "Dance Classes",
+    "Music Classes",
+    "Instrument Training",
+  ],
+  "Diagnostic Centres & Pathology Labs": [
+    "Blood Tests",
+    "X-Ray",
+    "MRI",
+    "Ultrasound",
+  ],
+  "Doctors (All Specializations)": [
+    "General Physician",
+    "Dentist",
+    "Cardiologist",
+    "Gynecologist",
+    "Pediatrician",
+    "Dermatologist",
+  ],
   "Dry Cleaners & Laundry Services": ["Laundry", "Dry Cleaning", "Ironing"],
-  "Education Institutes": ["Schools", "Colleges", "Skill Development", "Vocational Courses"],
-  Electricians: ["Residential Electrical", "Commercial Electrical", "Wiring Services"],
-  "Electronics & Home Appliances": ["TV", "Fridge", "Washing Machine", "AC", "Mobile Devices"],
-  "Event Organisers": ["Wedding Planning", "Corporate Events", "Birthday Parties"],
-  "Eye Clinics & Opticians": ["Eye Checkup", "Spectacles", "Contact Lenses", "Optical Store"],
+  "Education Institutes": [
+    "Schools",
+    "Colleges",
+    "Skill Development",
+    "Vocational Courses",
+  ],
+  Electricians: [
+    "Residential Electrical",
+    "Commercial Electrical",
+    "Wiring Services",
+  ],
+  "Electronics & Home Appliances": [
+    "TV",
+    "Fridge",
+    "Washing Machine",
+    "AC",
+    "Mobile Devices",
+  ],
+  "Event Organisers": [
+    "Wedding Planning",
+    "Corporate Events",
+    "Birthday Parties",
+  ],
+  "Eye Clinics & Opticians": [
+    "Eye Checkup",
+    "Spectacles",
+    "Contact Lenses",
+    "Optical Store",
+  ],
   "Fast Food & Restaurants": ["Fast Food", "Restaurant", "Cafe", "Beverages"],
   "Fitness Centres & Gyms": ["Gym", "Yoga", "Aerobics", "Zumba"],
   Florists: ["Flower Shops", "Bouquets", "Event Decoration"],
-  "Furniture Dealers & Home Decor": ["Furniture Store", "Home Decor", "Modular Kitchen"],
-  "Financial Services (Loans, Insurance, CA)": ["Banking", "Loans", "Insurance", "Accounting"],
+  "Furniture Dealers & Home Decor": [
+    "Furniture Store",
+    "Home Decor",
+    "Modular Kitchen",
+  ],
+  "Financial Services (Loans, Insurance, CA)": [
+    "Banking",
+    "Loans",
+    "Insurance",
+    "Accounting",
+  ],
   "Garment Shops": ["Men's Wear", "Women's Wear", "Kids Wear", "Accessories"],
   "Gas Agencies": ["Domestic Gas", "Commercial Gas", "Cylinder Delivery"],
   "Gift Shops": ["Gifts", "Greeting Cards", "Toys", "Souvenirs"],
-  "Grocery Stores & Kirana": ["Grocery Store", "Kirana Shop", "Daily Essentials"],
+  "Grocery Stores & Kirana": [
+    "Grocery Store",
+    "Kirana Shop",
+    "Daily Essentials",
+  ],
   Gynecologists: ["Gynecologist"],
   "Hardware & Sanitary Shops": ["Hardware Store", "Sanitary Products", "Tools"],
-  "Hospitals & Nursing Homes": ["Hospital", "Nursing Home", "Emergency Services"],
-  "Hostels / PG Accommodation": ["Hostel", "PG Accommodation", "Shared Apartments"],
+  "Hospitals & Nursing Homes": [
+    "Hospital",
+    "Nursing Home",
+    "Emergency Services",
+  ],
+  "Hostels / PG Accommodation": [
+    "Hostel",
+    "PG Accommodation",
+    "Shared Apartments",
+  ],
   "Hotels & Resorts": ["Hotel", "Resort", "Guest House"],
-  "House Cleaning & Pest Control": ["House Cleaning", "Pest Control", "Sanitization"],
+  "House Cleaning & Pest Control": [
+    "House Cleaning",
+    "Pest Control",
+    "Sanitization",
+  ],
   "Ice Cream Parlours": ["Ice Cream", "Desserts", "Frozen Yogurt"],
   "Interior Designers": ["Interior Design", "Home Decor", "Modular Furniture"],
-  "Internet Service Providers": ["Broadband", "Fiber Internet", "Wi-Fi Services"],
-  "Insurance Agents": ["Life Insurance", "Health Insurance", "Vehicle Insurance"],
+  "Internet Service Providers": [
+    "Broadband",
+    "Fiber Internet",
+    "Wi-Fi Services",
+  ],
+  "Insurance Agents": [
+    "Life Insurance",
+    "Health Insurance",
+    "Vehicle Insurance",
+  ],
   "Industrial Suppliers": ["Industrial Equipment", "Raw Materials", "Tools"],
   "Jewellery Shops": ["Gold", "Silver", "Diamond", "Custom Jewellery"],
   "Job Placement Agencies": ["Recruitment", "Staffing", "Career Guidance"],
   "Juice Centres": ["Fresh Juice", "Smoothies", "Cold Pressed Juice"],
   "Kids Wear & Toy Shops": ["Kids Clothing", "Toys", "School Supplies"],
-  "Kitchen Appliances Dealers": ["Microwave", "Oven", "Refrigerator", "Blender"],
-  "Laboratories (Medical/Industrial)": ["Medical Lab", "Industrial Lab", "Testing Services"],
+  "Kitchen Appliances Dealers": [
+    "Microwave",
+    "Oven",
+    "Refrigerator",
+    "Blender",
+  ],
+  "Laboratories (Medical/Industrial)": [
+    "Medical Lab",
+    "Industrial Lab",
+    "Testing Services",
+  ],
   "Laundry Services": ["Laundry", "Dry Cleaning", "Ironing"],
   "Lawyers & Legal Services": ["Lawyer", "Legal Consultation", "Documentation"],
   Libraries: ["Public Library", "School Library", "College Library"],
   "Lighting Shops": ["LED Lights", "Bulbs", "Lamps", "Chandeliers"],
   "Marriage Gardens": ["Wedding Venue", "Banquet Hall", "Event Garden"],
-  "Mobile Phone Dealers & Repair": ["Mobile Store", "Repair Services", "Accessories"],
-  "Modular Kitchen Dealers": ["Modular Kitchen", "Cabinets", "Kitchen Accessories"],
+  "Mobile Phone Dealers & Repair": [
+    "Mobile Store",
+    "Repair Services",
+    "Accessories",
+  ],
+  "Modular Kitchen Dealers": [
+    "Modular Kitchen",
+    "Cabinets",
+    "Kitchen Accessories",
+  ],
   "Movers & Packers": ["House Moving", "Office Relocation", "Packing Services"],
   "Music Instrument Shops": ["Guitar", "Piano", "Drums", "Other Instruments"],
   "Nursing Homes": ["Nursing Home", "Elderly Care", "Medical Assistance"],
-  "Nutritionists & Dieticians": ["Diet Consultation", "Weight Management", "Health Plans"],
+  "Nutritionists & Dieticians": [
+    "Diet Consultation",
+    "Weight Management",
+    "Health Plans",
+  ],
   Opticians: ["Spectacles", "Contact Lenses", "Eye Checkup"],
-  "Online Shopping / E-commerce Support": ["E-commerce", "Online Store", "Delivery Support"],
+  "Online Shopping / E-commerce Support": [
+    "E-commerce",
+    "Online Store",
+    "Delivery Support",
+  ],
   "Orthopedic Clinics": ["Orthopedic Consultation", "Surgery", "Physiotherapy"],
   "Painters & Contractors": ["Painting", "Renovation", "Construction"],
-  "Pet Shops & Veterinary Clinics": ["Pet Shop", "Veterinary Clinic", "Pet Care"],
+  "Pet Shops & Veterinary Clinics": [
+    "Pet Shop",
+    "Veterinary Clinic",
+    "Pet Care",
+  ],
   "Petrol Pumps": ["Petrol Station", "Diesel Station", "CNG Station"],
-  "Photographers & Videographers": ["Photography", "Videography", "Drone Services"],
+  "Photographers & Videographers": [
+    "Photography",
+    "Videography",
+    "Drone Services",
+  ],
   "Printing Press & Xerox": ["Printing", "Xerox", "Photocopy"],
   "Property Dealers": ["Real Estate", "Property Sale", "Property Rent"],
   "Quick Service Restaurants": ["Fast Food", "Burger", "Pizza", "Sandwich"],
   "Quilts & Bedding Dealers": ["Quilts", "Bedsheets", "Pillows", "Blankets"],
   "Real Estate Agents": ["Property Dealer", "Builder", "Brokerage"],
   "Restaurants & Cafes": ["Restaurant", "Cafe", "Bakery", "Beverages"],
-  "Repair Services (AC, Fridge, Washing Machine)": ["AC Repair", "Fridge Repair", "Washing Machine Repair"],
+  "Repair Services (AC, Fridge, Washing Machine)": [
+    "AC Repair",
+    "Fridge Repair",
+    "Washing Machine Repair",
+  ],
   "Resorts & Holiday Homes": ["Resort", "Holiday Home", "Villa Rental"],
   "Schools & Colleges": ["School", "College", "Coaching Center"],
-  "Security Services & Guards": ["Security Guard", "CCTV Installation", "Event Security"],
-  "Solar Dealers (Water Heater, Rooftop)": ["Solar Panels", "Water Heater", "Rooftop Installation"],
+  "Security Services & Guards": [
+    "Security Guard",
+    "CCTV Installation",
+    "Event Security",
+  ],
+  "Solar Dealers (Water Heater, Rooftop)": [
+    "Solar Panels",
+    "Water Heater",
+    "Rooftop Installation",
+  ],
   "Sports Shops & Academies": ["Sports Shop", "Academy", "Coaching Classes"],
   "Stationery & Xerox Shops": ["Stationery", "Xerox", "Printing Services"],
   "Tailors & Boutiques": ["Tailor", "Boutique", "Custom Clothing"],
-  "Taxi Services & Car Rentals": ["Taxi Service", "Car Rental", "Airport Pickup"],
+  "Taxi Services & Car Rentals": [
+    "Taxi Service",
+    "Car Rental",
+    "Airport Pickup",
+  ],
   "Tiffin Centres": ["Tiffin Service", "Home Delivery", "Meal Subscription"],
   "Tour & Travel Agents": ["Travel Agency", "Tour Guide", "Holiday Packages"],
   "Tent House & Decorators": ["Tent Rental", "Decorators", "Event Setup"],
@@ -308,22 +479,40 @@ const SUBCATEGORIES: { [key: string]: string[] } = {
   "UPS & Inverter Dealers": ["UPS", "Inverters", "Electrical Equipment"],
   "Uniform Suppliers": ["School Uniforms", "Corporate Uniforms", "Safety Wear"],
   "Vegetable & Fruit Vendors": ["Vegetables", "Fruits", "Organic Produce"],
-  "Veterinary Doctors": ["Veterinary Consultation", "Pet Care", "Animal Surgery"],
-  "Video Shooting & Editing Services": ["Video Shooting", "Editing", "Drone Services"],
+  "Veterinary Doctors": [
+    "Veterinary Consultation",
+    "Pet Care",
+    "Animal Surgery",
+  ],
+  "Video Shooting & Editing Services": [
+    "Video Shooting",
+    "Editing",
+    "Drone Services",
+  ],
   "Vehicle Repair Garages": ["Car Repair", "Bike Repair", "Service Center"],
-  "Water Suppliers (20L Jar, Tanker)": ["Water Delivery", "Jar Supply", "Tanker Supply"],
+  "Water Suppliers (20L Jar, Tanker)": [
+    "Water Delivery",
+    "Jar Supply",
+    "Tanker Supply",
+  ],
   "Wedding Planners": ["Wedding Planning", "Event Management", "Decor"],
   "Watch & Clock Dealers": ["Watches", "Clocks", "Repair Services"],
   "Wellness & Spa Centres": ["Spa", "Wellness Center", "Massage Therapy"],
-  "Website Designers & IT Services": ["Web Design", "IT Services", "Digital Marketing"],
+  "Website Designers & IT Services": [
+    "Web Design",
+    "IT Services",
+    "Digital Marketing",
+  ],
   "Xerox & Printing Services": ["Xerox", "Printing", "Photocopy"],
   "X-Ray & Radiology Centres": ["X-Ray", "MRI", "CT Scan", "Ultrasound"],
   "Yoga Centres": ["Yoga Classes", "Meditation", "Fitness"],
-  "Yellow Pages / Directory Services": ["Business Directory", "Listing Services"],
+  "Yellow Pages / Directory Services": [
+    "Business Directory",
+    "Listing Services",
+  ],
   "Zari & Embroidery Shops": ["Zari Work", "Embroidery", "Custom Clothing"],
   "Zoological & Pet Services": ["Zoo Services", "Pet Care", "Animal Feeding"],
 };
-
 
 const BUSINESS_TYPES = [
   "Individual",
@@ -1018,7 +1207,7 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
         paymentMethods: formData.paymentMethods,
         amenities: formData.amenities,
         priceRange: formData.priceRange,
-        vendor: user?._id,
+        vendor: formData.vendor,
       };
 
       // Add business data
@@ -1034,7 +1223,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
           await initiateRequiredSubscriptionPayment(submitData);
         } catch (payErr) {
           console.error("Payment initiation error:", payErr);
-          toast.error("Payment step failed or cancelled. Business not created.");
+          toast.error(
+            "Payment step failed or cancelled. Business not created."
+          );
         }
       } else {
         // For edit-mode or non-vendor roles, keep existing create/update behavior
@@ -1055,9 +1246,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
         } else {
           toast.error(
             response?.message ||
-            (mode === "edit"
-              ? "Failed to update business"
-              : "Failed to list business")
+              (mode === "edit"
+                ? "Failed to update business"
+                : "Failed to list business")
           );
         }
       }
@@ -1069,14 +1260,34 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (formData.selectedVendor) {
+      // If user is super_admin or admin, set vendor as selectedVendor
+      if (user?.role === "admin" || user?.role === "super_admin") {
+        setFormData((prev) => ({
+          ...prev,
+          vendor: formData.selectedVendor,
+        }));
+      } else {
+        // Otherwise, keep vendor as current user ID
+        setFormData((prev) => ({
+          ...prev,
+          vendor: user?._id,
+        }));
+      }
+    }
+  }, [formData.selectedVendor, user?.role, user?._id]);
   // Required subscription plan (must be purchased before listing)
   const REQUIRED_PLAN_ID = "68d82c963b1b20fc6809a54a";
 
   // Initiate Razorpay flow for required subscription plan
   const initiateRequiredSubscriptionPayment = async (submitData: FormData) => {
     // Fetch required plan details (price, name, duration)
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
-    const planResp = await axios.get(`${baseUrl}/subscription/plans/${REQUIRED_PLAN_ID}`);
+    const baseUrl =
+      import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
+    const planResp = await axios.get(
+      `${baseUrl}/subscription/plans/${REQUIRED_PLAN_ID}`
+    );
     const plan = planResp?.data?.data;
     if (!plan?._id) {
       throw new Error("Required plan not found");
@@ -1094,7 +1305,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
     }
 
     const startDate = new Date();
-    const endDate = new Date(startDate.getTime() + (plan.duration || 365) * 24 * 60 * 60 * 1000);
+    const endDate = new Date(
+      startDate.getTime() + (plan.duration || 365) * 24 * 60 * 60 * 1000
+    );
 
     const options: any = {
       key: "rzp_live_RXNNi6vqWQruCx",
@@ -1111,7 +1324,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
 
           if (!createResp?.success || !createResp?.business?._id) {
             toast.dismiss();
-            throw new Error(createResp?.message || "Business creation failed after payment");
+            throw new Error(
+              createResp?.message || "Business creation failed after payment"
+            );
           }
 
           const createdBusinessId = createResp.business._id;
@@ -1141,10 +1356,15 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
           toast.dismiss();
 
           if (verifyResp?.data?.success) {
-            toast.success(verifyResp?.data?.message || "Payment successful! Listing activated.");
+            toast.success(
+              verifyResp?.data?.message ||
+                "Payment successful! Listing activated."
+            );
             navigate("/vendor/dashboard");
           } else {
-            toast.error(verifyResp?.data?.message || "Payment verification failed");
+            toast.error(
+              verifyResp?.data?.message || "Payment verification failed"
+            );
           }
         } catch (err) {
           toast.dismiss();
@@ -1160,7 +1380,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
       theme: { color: "#f63b60" },
       modal: {
         ondismiss: () => {
-          toast.info("Payment cancelled. Complete payment to activate listing.");
+          toast.info(
+            "Payment cancelled. Complete payment to activate listing."
+          );
         },
       },
     };
@@ -1169,9 +1391,6 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
     const rzp = new (window as any).Razorpay(options);
     rzp.open();
   };
-
-
-
 
   const [categorySearch, setCategorySearch] = useState("");
   const [subCategorySearch, setSubCategorySearch] = useState("");
@@ -1183,10 +1402,9 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
 
   const filteredSubCategories = formData.category
     ? SUBCATEGORIES[formData.category]?.filter((sub) =>
-      sub.toLowerCase().includes(subCategorySearch.toLowerCase())
-    )
+        sub.toLowerCase().includes(subCategorySearch.toLowerCase())
+      )
     : [];
-
 
   const renderStep = () => {
     switch (currentStep) {
@@ -1243,122 +1461,136 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
               <div>
                 <Label htmlFor="category">Business Category *</Label>
                 <div className="space-y-2">
-                   <Input
-                     id="categorySearch"
-                     placeholder="Search category..."
-                     value={categorySearch}
-                     onChange={(e) => setCategorySearch(e.target.value)}
-                   />
-                   {categorySearch.trim().length > 0 && (
-                     <div className="border rounded bg-white shadow max-h-40 overflow-y-auto">
-                       {filteredCategories.length > 0 ? (
-                         filteredCategories.slice(0, 20).map((category) => (
-                           <button
-                             type="button"
-                             key={category}
-                             className="w-full text-left px-2 py-1 hover:bg-gray-100"
-                             onClick={() => {
-                               handleInputChange("root", "category", category);
-                               handleInputChange("root", "subCategory", "");
-                               setCategorySearch("");
-                             }}
-                           >
-                             {category}
-                           </button>
-                         ))
-                       ) : (
-                         <div className="px-2 py-1 text-gray-400">No results found</div>
-                       )}
-                     </div>
-                   )}
-                   <select
-                     id="category"
-                     className="w-full border rounded px-2 py-2"
-                     value={formData.category}
-                     onChange={(e) => {
-                       const value = e.target.value;
-                       handleInputChange("root", "category", value);
-                       handleInputChange("root", "subCategory", "");
-                       setCategorySearch("");
-                     }}
-                   >
-                     <option value="" disabled>
-                       Select category
-                     </option>
-                     {filteredCategories.length > 0 ? (
-                       filteredCategories.map((category) => (
-                         <option key={category} value={category}>
-                           {category}
-                         </option>
-                       ))
-                     ) : (
-                       <option value="" disabled>
-                         No results found
-                       </option>
-                     )}
-                   </select>
-                 </div>
+                  <Input
+                    id="categorySearch"
+                    placeholder="Search category..."
+                    value={categorySearch}
+                    onChange={(e) => setCategorySearch(e.target.value)}
+                  />
+                  {categorySearch.trim().length > 0 && (
+                    <div className="border rounded bg-white shadow max-h-40 overflow-y-auto">
+                      {filteredCategories.length > 0 ? (
+                        filteredCategories.slice(0, 20).map((category) => (
+                          <button
+                            type="button"
+                            key={category}
+                            className="w-full text-left px-2 py-1 hover:bg-gray-100"
+                            onClick={() => {
+                              handleInputChange("root", "category", category);
+                              handleInputChange("root", "subCategory", "");
+                              setCategorySearch("");
+                            }}
+                          >
+                            {category}
+                          </button>
+                        ))
+                      ) : (
+                        <div className="px-2 py-1 text-gray-400">
+                          No results found
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <select
+                    id="category"
+                    className="w-full border rounded px-2 py-2"
+                    value={formData.category}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleInputChange("root", "category", value);
+                      handleInputChange("root", "subCategory", "");
+                      setCategorySearch("");
+                    }}
+                  >
+                    <option value="" disabled>
+                      Select category
+                    </option>
+                    {filteredCategories.length > 0 ? (
+                      filteredCategories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="" disabled>
+                        No results found
+                      </option>
+                    )}
+                  </select>
+                </div>
               </div>
 
               {/* Subcategory */}
               <div>
                 <Label htmlFor="subCategory">Specialty/Subcategory</Label>
                 <div className="space-y-2">
-                   <Input
-                     id="subCategorySearch"
-                     placeholder="Search subcategory..."
-                     value={subCategorySearch}
-                     onChange={(e) => setSubCategorySearch(e.target.value)}
-                     disabled={!formData.category}
-                   />
-                   {formData.category && subCategorySearch.trim().length > 0 && (
-                     <div className="border rounded bg-white shadow max-h-40 overflow-y-auto">
-                       {filteredSubCategories.length > 0 ? (
-                         filteredSubCategories.slice(0, 20).map((subCategory) => (
-                           <button
-                             type="button"
-                             key={subCategory}
-                             className="w-full text-left px-2 py-1 hover:bg-gray-100"
-                             onClick={() => {
-                               handleInputChange("root", "subCategory", subCategory);
-                               setSubCategorySearch("");
-                             }}
-                           >
-                             {subCategory}
-                           </button>
-                         ))
-                       ) : (
-                         <div className="px-2 py-1 text-gray-400">No results found</div>
-                       )}
-                     </div>
-                   )}
-                   <select
-                     id="subCategory"
-                     className="w-full border rounded px-2 py-2"
-                     value={formData.subCategory}
-                     onChange={(e) => {
-                       const value = e.target.value;
-                       handleInputChange("root", "subCategory", value);
-                       setSubCategorySearch("");
-                     }}
-                     disabled={!formData.category}
-                   >
-                     <option value="" disabled>
-                       {formData.category ? "Select specialty" : "Select category first"}
-                     </option>
-                     {filteredSubCategories.length > 0 ? (
-                       filteredSubCategories.map((subCategory) => (
-                         <option key={subCategory} value={subCategory}>
-                           {subCategory}
-                         </option>
-                       ))
-                     ) : (
-                       <option value="" disabled>
-                         {formData.category ? "No results found" : "Select category first"}
-                       </option>
-                     )}
-                   </select>
-                 </div>
+                  <Input
+                    id="subCategorySearch"
+                    placeholder="Search subcategory..."
+                    value={subCategorySearch}
+                    onChange={(e) => setSubCategorySearch(e.target.value)}
+                    disabled={!formData.category}
+                  />
+                  {formData.category && subCategorySearch.trim().length > 0 && (
+                    <div className="border rounded bg-white shadow max-h-40 overflow-y-auto">
+                      {filteredSubCategories.length > 0 ? (
+                        filteredSubCategories
+                          .slice(0, 20)
+                          .map((subCategory) => (
+                            <button
+                              type="button"
+                              key={subCategory}
+                              className="w-full text-left px-2 py-1 hover:bg-gray-100"
+                              onClick={() => {
+                                handleInputChange(
+                                  "root",
+                                  "subCategory",
+                                  subCategory
+                                );
+                                setSubCategorySearch("");
+                              }}
+                            >
+                              {subCategory}
+                            </button>
+                          ))
+                      ) : (
+                        <div className="px-2 py-1 text-gray-400">
+                          No results found
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <select
+                    id="subCategory"
+                    className="w-full border rounded px-2 py-2"
+                    value={formData.subCategory}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      handleInputChange("root", "subCategory", value);
+                      setSubCategorySearch("");
+                    }}
+                    disabled={!formData.category}
+                  >
+                    <option value="" disabled>
+                      {formData.category
+                        ? "Select specialty"
+                        : "Select category first"}
+                    </option>
+                    {filteredSubCategories.length > 0 ? (
+                      filteredSubCategories.map((subCategory) => (
+                        <option key={subCategory} value={subCategory}>
+                          {subCategory}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="" disabled>
+                        {formData.category
+                          ? "No results found"
+                          : "Select category first"}
+                      </option>
+                    )}
+                  </select>
+                </div>
               </div>
 
               <div>
@@ -1692,21 +1924,29 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
                     value={formData.address.pincode}
                     placeholder="Enter 6-digit pincode"
                     onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                      setFormData(prev => ({
+                      const value = e.target.value
+                        .replace(/\D/g, "")
+                        .slice(0, 6);
+                      setFormData((prev) => ({
                         ...prev,
                         address: {
                           ...prev.address,
-                          pincode: value
-                        }
+                          pincode: value,
+                        },
                       }));
                     }}
                     maxLength={6}
-                    className={formData.address.pincode ? "bg-green-50 border-green-200" : ""}
+                    className={
+                      formData.address.pincode
+                        ? "bg-green-50 border-green-200"
+                        : ""
+                    }
                     required
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    {formData.address.pincode ? "✓ Pincode entered" : "Enter manually if not auto-filled"}
+                    {formData.address.pincode
+                      ? "✓ Pincode entered"
+                      : "Enter manually if not auto-filled"}
                   </p>
                 </div>
 
@@ -1812,10 +2052,10 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
                     </Button>
                     {(formData.coordinates.latitude !== 0 ||
                       formData.coordinates.longitude !== 0) && (
-                        <Badge variant="secondary" className="text-xs">
-                          📍 Location Set
-                        </Badge>
-                      )}
+                      <Badge variant="secondary" className="text-xs">
+                        📍 Location Set
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>
