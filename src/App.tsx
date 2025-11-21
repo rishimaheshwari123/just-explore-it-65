@@ -243,7 +243,7 @@ const App = () => {
                   element={
                     <PrivateRoute>
                       <ProtectedRoute requiredPermission="addBusiness">
-                        <AddBusiness />
+                        <VendorAddBusiness />
                       </ProtectedRoute>
                     </PrivateRoute>
                   }
