@@ -96,8 +96,8 @@ const Blogs = () => {
 
   // Handle blog click
   const handleBlogClick = (blog) => {
-    const slugOrId = blog.slug || blog._id;
-    navigate(`/blogs/${slugOrId}`);
+    const slug = blog.slug || blog._id;
+    navigate(`/blogs/${slug}`);
   };
 
   // Clear filters
@@ -268,7 +268,7 @@ const Blogs = () => {
                         className="w-full gradient-gold text-white group-hover:bg-amber-600"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleBlogClick(blog._id);
+                          handleBlogClick(blog);
                         }}
                       >
                         Read More

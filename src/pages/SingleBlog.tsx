@@ -15,13 +15,11 @@ const SingleBlog = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Format date
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Calculate reading time
   const calculateReadingTime = (text) => {
     const wordsPerMinute = 200;
     const words = text.split(" ").length;
@@ -29,58 +27,50 @@ const SingleBlog = () => {
     return `${minutes} min read`;
   };
 
-  // Helper: check if param looks like a Mongo ObjectId
   const isObjectId = (val) => /^[a-fA-F0-9]{24}$/.test(val || "");
 
-  // Get single blog by id or slug
   const getSingleBlog = async (slugOrId) => {
     try {
       setLoading(true);
       let blogData = null;
+
       if (isObjectId(slugOrId)) {
         const byId = await getSingleBlogAPI(slugOrId);
         blogData = byId || null;
       }
+
       if (!blogData) {
         const all = await getAllBlogsAPI();
         blogData = all.find((b) => (b.slug || "") === (slugOrId || "")) || null;
       }
+
       if (!blogData) throw new Error("Blog not found");
 
       setBlog(blogData);
-      // Get related blogs of the same type
       getRelatedBlogs(blogData.type, blogData._id);
     } catch (error) {
-      console.error("Error fetching blog:", error);
       setError("Failed to load blog. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Get related blogs
   const getRelatedBlogs = async (blogType, currentBlogId) => {
     try {
       const response = await getAllBlogsAPI();
       if (response) {
-        // Filter blogs of the same type, excluding current blog
         const related = response
           .filter((b) => b.type === blogType && b._id !== currentBlogId)
-          .slice(0, 3); // Get only 3 related blogs
+          .slice(0, 3);
         setRelatedBlogs(related);
       }
-    } catch (error) {
-      console.error("Error fetching related blogs:", error);
-    }
+    } catch {}
   };
 
   useEffect(() => {
-    if (slug) {
-      getSingleBlog(slug);
-    }
+    if (slug) getSingleBlog(slug);
   }, [slug]);
 
-  // Handle share
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -89,13 +79,11 @@ const SingleBlog = () => {
         url: window.location.href,
       });
     } else {
-      // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
       alert("Link copied to clipboard!");
     }
   };
 
-  // Handle related blog click
   const handleRelatedBlogClick = (b) => {
     const slugOrId = b.slug || b._id;
     navigate(`/blogs/${slugOrId}`);
@@ -104,10 +92,7 @@ const SingleBlog = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading blog...</p>
-        </div>
+        <p>Loading...</p>
       </div>
     );
   }
@@ -116,8 +101,8 @@ const SingleBlog = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-black mb-4">{error || "Blog not found"}</p>
-          <Button onClick={() => navigate("/blogs")}>Back to Blogs</Button>
+          <p className="mb-4">{error || "Blog not found"}</p>
+          <Button onClick={() => navigate("/blogs")}>Back</Button>
         </div>
       </div>
     );
@@ -127,70 +112,66 @@ const SingleBlog = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <section className="py-8 gradient-gold text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto px-4">
           <Button
             variant="outline"
             className="mb-6 text-black border-white hover:bg-white hover:text-amber-600"
             onClick={() => navigate("/blogs")}
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Blogs
+            <ArrowLeft className="w-4 h-4 mr-2" /> Back to Blogs
           </Button>
-          <div className="mb-4">
-            <Badge className="bg-white text-amber-600 mb-4">{blog.type}</Badge>
-          </div>
-          <h1 className="text-3xl md:text-4xl text-black font-bold mb-4">
+
+          <Badge className="bg-white text-amber-600 mb-4">{blog.type}</Badge>
+
+          <h1 className="text-3xl md:text-4xl font-bold text-black mb-4">
             {blog.title}
           </h1>
-          <div className="flex items-center space-x-6 text-sm">
-            <span className="flex text-black items-center">
+
+          <div className="flex items-center space-x-6 text-sm text-black">
+            <span className="flex items-center">
               <Calendar className="w-4 h-4 mr-2" />
               {formatDate(blog.createdAt)}
             </span>
-            <span className="flex text-black items-center">
+
+            <span className="flex items-center">
               <Clock className="w-4 h-4 mr-2" />
               {calculateReadingTime(blog.desc)}
             </span>
+
             <Button
               variant="outline"
               size="sm"
               className="text-black border-white hover:bg-white hover:text-amber-600"
               onClick={handleShare}
             >
-              <Share2 className="w-4 h-4 mr-2" />
-              Share
+              <Share2 className="w-4 h-4 mr-2" /> Share
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Blog Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Blog Body */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
-          {/* Featured Image */}
-          <div className="w-full h-96 overflow-hidden">
+          {/* Main Image */}
+          <div className="w-full h-96">
             <BlogImages images={blog.images} alt={blog.title} />
           </div>
 
-          {/* Blog Content */}
+          {/* Description */}
           <div className="p-8">
-            <div className="prose prose-lg max-w-none">
-              <div
-                className="text-gray-600 text-sm line-clamp-3"
-                dangerouslySetInnerHTML={{ __html: blog.desc }}
-              />
+            <div className="prose prose-lg max-w-none prose-img:rounded-xl prose-img:shadow-lg prose-img:w-full prose-img:h-auto">
+              <div dangerouslySetInnerHTML={{ __html: blog.desc }} />
             </div>
 
-            {/* Author Info */}
+            {/* Author */}
             <div className="border-t pt-6 mt-8">
               <div className="flex items-center">
-                <div className="w-12 h-12 gradient-gold rounded-full flex items-center justify-center text-white text-lg font-bold">
+                <div className="w-12 h-12 gradient-gold rounded-full flex items-center justify-center text-white">
                   <User className="w-6 h-6" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-lg font-semibold text-gray-900">
-                    Real Expert
-                  </p>
+                  <p className="text-lg font-semibold">Real Expert</p>
                   <p className="text-gray-600">
                     Published on {formatDate(blog.createdAt)}
                   </p>
@@ -202,39 +183,30 @@ const SingleBlog = () => {
 
         {/* Related Blogs */}
         {relatedBlogs.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Related Articles
-            </h2>
+          <div>
+            <h2 className="text-2xl font-bold mb-6">Related Articles</h2>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedBlogs.map((relatedBlog) => (
                 <Card
                   key={relatedBlog._id}
-                  className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
+                  className="overflow-hidden hover:shadow-lg cursor-pointer"
                   onClick={() => handleRelatedBlogClick(relatedBlog)}
                 >
-                  <div className="relative">
-                    <img
-                      src={
-                        relatedBlog.image ||
-                        "/placeholder.svg?height=200&width=300"
-                      }
-                      alt={relatedBlog.title}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute top-2 left-2">
-                      <Badge className="bg-amber-500 text-white text-xs">
-                        {relatedBlog.type}
-                      </Badge>
-                    </div>
-                  </div>
+                  <img
+                    src={relatedBlog.images[0]}
+                    className="w-full h-48 object-cover"
+                    alt={relatedBlog.title}
+                  />
+
                   <CardContent className="p-4">
-                    <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
+                    <h3 className="font-semibold line-clamp-2 mb-2">
                       {relatedBlog.title}
                     </h3>
-                    <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">
                       {relatedBlog.desc}
                     </p>
+
                     <div className="flex items-center text-xs text-gray-500">
                       <Calendar className="w-3 h-3 mr-1" />
                       {formatDate(relatedBlog.createdAt)}
@@ -245,33 +217,6 @@ const SingleBlog = () => {
             </div>
           </div>
         )}
-
-        {/* CTA Section */}
-        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            Looking for Your Dream Property?
-          </h3>
-          <p className="text-gray-600 mb-6">
-            Explore our extensive collection of properties and find the perfect
-            home for you.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              className="gradient-gold text-white"
-              onClick={() => navigate("/properties")}
-            >
-              Browse Properties
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={() => navigate("/contact")}
-            >
-              Contact Us
-            </Button>
-          </div>
-        </div>
       </div>
     </div>
   );
