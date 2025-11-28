@@ -1242,7 +1242,10 @@ const AddBusinessForm: React.FC<AddBusinessFormProps> = ({
               ? "Business updated successfully!"
               : "Business created successfully!"
           );
-          navigate("/vendor/dashboard");
+          if (user?.role === "vendor") {
+            navigate("/vendor/dashboard");
+          }
+          navigate("/admin/dashboard");
         } else {
           toast.error(
             response?.message ||
