@@ -208,10 +208,10 @@ const BusinessListing: React.FC = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+          <h2 className="text-xl md:text-4xl font-bold bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
             Business Directory
           </h2>
-          <p className="text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-gray-600 text-sm md:text-lg max-w-3xl mx-auto leading-relaxed">
             Discover top-rated businesses in your area. Verified listings with
             genuine reviews and instant contact options.
           </p>

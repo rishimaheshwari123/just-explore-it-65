@@ -26,11 +26,11 @@ const TrendingSection: React.FC = () => {
           {/* Trending Searches */}
           <div>
             <div className="text-center mb-6">
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 bg-clip-text text-transparent mb-2 flex items-center justify-center">
-                <Flame className="h-5 w-5 sm:h-6 sm:w-6 mr-2 text-red-500" />
+              <h2 className="text-lg sm:text-xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 bg-clip-text text-transparent mb-2 flex items-center justify-center">
+                <Flame className="h-4 w-4 sm:h-6 sm:w-6 mr-2 text-red-500" />
                 Trending Searches
               </h2>
-              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">
+              <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">
                 What people are searching for right now
               </p>
             </div>
@@ -43,21 +43,25 @@ const TrendingSection: React.FC = () => {
                   className="bg-white/80 backdrop-blur-sm p-3 sm:p-4 rounded-xl border border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all duration-300 cursor-pointer group"
                 >
                   <div className="flex items-center justify-between flex-wrap gap-2">
+                    {/* Left Section */}
                     <div className="flex items-center flex-1 min-w-0">
                       <div className="bg-purple-100 p-2 rounded-lg mr-3 group-hover:bg-purple-200 transition-colors">
                         <Search className="h-4 w-4 text-purple-600" />
                       </div>
+
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 text-sm sm:text-base truncate group-hover:text-purple-700 transition-colors">
+                        <h3 className="font-semibold text-gray-900 text-xs sm:text-sm truncate group-hover:text-purple-700 transition-colors">
                           {search.term}
                         </h3>
-                        <p className="text-xs sm:text-sm text-gray-500">
+                        <p className="text-[10px] sm:text-xs text-gray-500">
                           {search.count}
                         </p>
                       </div>
                     </div>
+
+                    {/* Right Section */}
                     <div className="flex items-center space-x-2">
-                      <Badge className="bg-green-100 text-green-700 text-xs sm:text-sm hover:bg-green-200">
+                      <Badge className="bg-green-100 text-green-700 text-[10px] sm:text-xs hover:bg-green-200">
                         <TrendingUp className="h-3 w-3 mr-1" />
                         {search.trend}
                       </Badge>
@@ -70,39 +74,39 @@ const TrendingSection: React.FC = () => {
           </div>
         </div>
 
-        {/* Quick Stats */}
+        {/* Quick Stats Section */}
         <div className="mt-12 sm:mt-16 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 rounded-2xl p-6 sm:p-8 text-white">
           <div className="text-center mb-6 sm:mb-8">
-            <h3 className="text-lg sm:text-2xl font-bold mb-2">
+            <h3 className="text-base sm:text-xl font-bold mb-2">
               Why Choose Our Platform?
             </h3>
-            <p className="text-purple-100 text-sm sm:text-base">
+            <p className="text-purple-100 text-xs sm:text-sm">
               Trusted by millions of users across India
             </p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             <div className="text-center">
-              <div className="text-xl sm:text-3xl font-bold mb-1">50K+</div>
-              <div className="text-xs sm:text-sm text-purple-100">
+              <div className="text-lg sm:text-2xl font-bold mb-1">50K+</div>
+              <div className="text-[10px] sm:text-xs text-purple-100">
                 Verified Businesses
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xl sm:text-3xl font-bold mb-1">2M+</div>
-              <div className="text-xs sm:text-sm text-purple-100">
+              <div className="text-lg sm:text-2xl font-bold mb-1">2M+</div>
+              <div className="text-[10px] sm:text-xs text-purple-100">
                 Happy Customers
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xl sm:text-3xl font-bold mb-1">500+</div>
-              <div className="text-xs sm:text-sm text-purple-100">
+              <div className="text-lg sm:text-2xl font-bold mb-1">500+</div>
+              <div className="text-[10px] sm:text-xs text-purple-100">
                 Cities Covered
               </div>
             </div>
             <div className="text-center">
-              <div className="text-xl sm:text-3xl font-bold mb-1">24/7</div>
-              <div className="text-xs sm:text-sm text-purple-100">
+              <div className="text-lg sm:text-2xl font-bold mb-1">24/7</div>
+              <div className="text-[10px] sm:text-xs text-purple-100">
                 Customer Support
               </div>
             </div>

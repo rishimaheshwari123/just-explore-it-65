@@ -13,11 +13,11 @@ const ConnectSection = () => {
           {/* We've added bg-background, padding, and shadow for a consistent look with the right column */}
           <div className="bg-background p-5 rounded-2xl shadow-xl border border-border flex flex-col justify-between">
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-foreground leading-tight mb-4">
+              <h2 className="text-xl md:text-5xl font-bold text-foreground leading-tight mb-4">
                 We connect <br />
                 <span className="text-primary ">Buyers & Sellers</span>
               </h2>
-              <p className="text-lg text-muted-foreground mb-6 max-w-xl">
+              <p className="text-sm md:text-lg text-muted-foreground mb-6 max-w-xl">
                 <strong>Business Gurujee</strong> is India's trusted online B2B
                 marketplace, helping buyers connect with verified suppliers
                 across industries. Our mission is to simplify trade by providing

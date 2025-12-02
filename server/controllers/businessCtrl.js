@@ -224,7 +224,7 @@ const createBusinessCtrl = async (req, res) => {
             paymentMethods: paymentMethods || [],
             amenities: amenities || [],
             vendor,
-            status: 'pending',
+            status: 'active',
         });
 
         await Vendor.findByIdAndUpdate(vendor, {

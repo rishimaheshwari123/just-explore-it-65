@@ -1,42 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
-import { 
-  Building2, 
-  Search, 
-  Filter, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  MoreHorizontal, 
-  Calendar, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Star, 
-  Users, 
-  TrendingUp, 
-  CheckCircle, 
-  XCircle, 
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
+import {
+  Building2,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  Trash2,
+  MoreHorizontal,
+  Calendar,
+  MapPin,
+  Phone,
+  Mail,
+  Star,
+  Users,
+  TrendingUp,
+  CheckCircle,
+  XCircle,
   Clock,
   RefreshCw,
   Download,
   User,
   Globe,
   Shield,
-  AlertCircle
-} from 'lucide-react';
-import { format } from 'date-fns';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+  AlertCircle,
+} from "lucide-react";
+import { format } from "date-fns";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface Business {
   _id: string;
@@ -77,7 +111,7 @@ interface Business {
     totalViews: number;
     totalCalls: number;
   };
-  status: 'active' | 'inactive' | 'pending' | 'suspended';
+  status: "active" | "inactive" | "pending" | "suspended";
   isPremium: boolean;
   currentSubscription?: {
     planName: string;
@@ -96,34 +130,42 @@ interface Business {
 const BusinessManagement: React.FC = () => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(
+    null
+  );
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [alertDialog, setAlertDialog] = useState({
     open: false,
     business: null as Business | null,
-    action: '',
+    action: "",
   });
 
   // Fetch all businesses
   const fetchBusinesses = async () => {
     try {
       setLoading(true);
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
-      const response = await fetch(`${BASE_URL}/property/businesses?limit=1000`);
+      const BASE_URL =
+        import.meta.env.VITE_API_BASE_URL ||
+        "https://server.businessgurujee.com/api/v1";
+      const response = await fetch(
+        `${BASE_URL}/property/businesses?limit=1000`
+      );
       const data = await response.json();
-      
+      console.log(data);
       if (data.success) {
         setBusinesses(data.businesses || []);
-        toast.success(`Loaded ${data.businesses?.length || 0} businesses successfully`);
+        toast.success(
+          `Loaded ${data.businesses?.length || 0} businesses successfully`
+        );
       } else {
-        toast.error('Failed to fetch businesses');
+        toast.error("Failed to fetch businesses");
       }
     } catch (error) {
-      console.error('Error fetching businesses:', error);
-      toast.error('Failed to fetch businesses');
+      console.error("Error fetching businesses:", error);
+      toast.error("Failed to fetch businesses");
     } finally {
       setLoading(false);
     }
@@ -134,79 +176,100 @@ const BusinessManagement: React.FC = () => {
   }, []);
 
   // Filter businesses
-  const filteredBusinesses = businesses.filter(business => {
-    const matchesSearch = 
+  const filteredBusinesses = businesses.filter((business) => {
+    const matchesSearch =
       business.businessName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       business.vendor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      business.vendor.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      business.vendor.company
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
       business.address.city.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesCategory = categoryFilter === 'all' || business.category === categoryFilter;
-    const matchesStatus = statusFilter === 'all' || business.status === statusFilter;
-    
+
+    const matchesCategory =
+      categoryFilter === "all" || business.category === categoryFilter;
+    const matchesStatus =
+      statusFilter === "all" || business.status === statusFilter;
+
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
   // Update business status
   const updateBusinessStatus = async (businessId: string, status: string) => {
     try {
-      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://server.businessgurujee.com/api/v1";
-      const response = await fetch(`${BASE_URL}/property/business/update/${businessId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status }),
-      });
+      const BASE_URL =
+        import.meta.env.VITE_API_BASE_URL ||
+        "https://server.businessgurujee.com/api/v1";
+      const response = await fetch(
+        `${BASE_URL}/property/business/update/${businessId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status }),
+        }
+      );
 
       const data = await response.json();
-      
+
       if (data.success) {
-        setBusinesses(prev => 
-          prev.map(business => 
+        setBusinesses((prev) =>
+          prev.map((business) =>
             business._id === businessId ? { ...business, status } : business
           )
         );
         toast.success(`Business ${status} successfully`);
       } else {
-        toast.error('Failed to update business status');
+        toast.error("Failed to update business status");
       }
     } catch (error) {
-      console.error('Error updating business status:', error);
-      toast.error('Failed to update business status');
+      console.error("Error updating business status:", error);
+      toast.error("Failed to update business status");
     } finally {
-      setAlertDialog({ open: false, business: null, action: '' });
+      setAlertDialog({ open: false, business: null, action: "" });
     }
   };
 
   // Export businesses to PDF
   const exportBusinessesToPDF = () => {
     const doc = new jsPDF();
-    
+
     // Title
     doc.setFontSize(20);
-    doc.text('Business Management Report', 14, 20);
-    
+    doc.text("Business Management Report", 14, 20);
+
     // Date
     doc.setFontSize(12);
-    doc.text(`Generated on: ${format(new Date(), 'PPP')}`, 14, 30);
-    
+    doc.text(`Generated on: ${format(new Date(), "PPP")}`, 14, 30);
+
     // Summary
     doc.text(`Total Businesses: ${filteredBusinesses.length}`, 14, 40);
-    doc.text(`Active: ${filteredBusinesses.filter(b => b.status === 'active').length}`, 14, 50);
-    doc.text(`Pending: ${filteredBusinesses.filter(b => b.status === 'pending').length}`, 14, 60);
-    
+    doc.text(
+      `Active: ${
+        filteredBusinesses.filter((b) => b.status === "active").length
+      }`,
+      14,
+      50
+    );
+    doc.text(
+      `Pending: ${
+        filteredBusinesses.filter((b) => b.status === "pending").length
+      }`,
+      14,
+      60
+    );
+
     // Table data
     const tableColumn = [
-      'Business Name', 
-      'Vendor', 
-      'Category', 
-      'Location', 
-      'Status', 
-      'Views', 
-      'Rating'
+      "Business Name",
+      "Vendor",
+      "Category",
+      "Location",
+      "Status",
+      "Views",
+      "Rating",
     ];
-    
+
     const tableRows = filteredBusinesses.map((business) => [
       business.businessName,
       business.vendor.name,
@@ -214,7 +277,9 @@ const BusinessManagement: React.FC = () => {
       `${business.address.city}, ${business.address.state}`,
       business.status,
       business.analytics.totalViews.toString(),
-      `${business.ratings.average.toFixed(1)} (${business.ratings.totalReviews})`
+      `${business.ratings.average.toFixed(1)} (${
+        business.ratings.totalReviews
+      })`,
     ]);
 
     autoTable(doc, {
@@ -226,35 +291,35 @@ const BusinessManagement: React.FC = () => {
       alternateRowStyles: { fillColor: [245, 247, 250] },
     });
 
-    doc.save(`business-report-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
-    toast.success('Business report exported successfully!');
+    doc.save(`business-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+    toast.success("Business report exported successfully!");
   };
 
   // Get status badge
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'active':
+      case "active":
         return (
           <Badge className="bg-green-100 text-green-800 border-green-200">
             <CheckCircle className="w-3 h-3 mr-1" />
             Active
           </Badge>
         );
-      case 'inactive':
+      case "inactive":
         return (
           <Badge className="bg-gray-100 text-gray-800 border-gray-200">
             <XCircle className="w-3 h-3 mr-1" />
             Inactive
           </Badge>
         );
-      case 'pending':
+      case "pending":
         return (
           <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">
             <Clock className="w-3 h-3 mr-1" />
             Pending
           </Badge>
         );
-      case 'suspended':
+      case "suspended":
         return (
           <Badge className="bg-red-100 text-red-800 border-red-200">
             <AlertCircle className="w-3 h-3 mr-1" />
@@ -268,18 +333,31 @@ const BusinessManagement: React.FC = () => {
 
   // Get business image
   const getBusinessImage = (business: Business) => {
-    return business.images?.find(img => img.isPrimary)?.url || 
-           business.images?.[0]?.url || 
-           '/placeholder-business.jpg';
+    return (
+      business.images?.find((img) => img.isPrimary)?.url ||
+      business.images?.[0]?.url ||
+      "/placeholder-business.jpg"
+    );
   };
 
   // Categories for filter
   const categories = [
-    'Food & Dining', 'Healthcare', 'Education', 'Shopping',
-    'Hotels & Travel', 'Fitness & Wellness', 'Beauty & Spa',
-    'Electronics & Technology', 'Automotive', 'Real Estate',
-    'Financial Services', 'Professional Services', 'Home & Garden',
-    'Entertainment', 'Sports & Recreation', 'Government & Community'
+    "Food & Dining",
+    "Healthcare",
+    "Education",
+    "Shopping",
+    "Hotels & Travel",
+    "Fitness & Wellness",
+    "Beauty & Spa",
+    "Electronics & Technology",
+    "Automotive",
+    "Real Estate",
+    "Financial Services",
+    "Professional Services",
+    "Home & Garden",
+    "Entertainment",
+    "Sports & Recreation",
+    "Government & Community",
   ];
 
   if (loading) {
@@ -334,49 +412,51 @@ const BusinessManagement: React.FC = () => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Businesses</p>
+                <p className="text-sm text-muted-foreground">
+                  Total Businesses
+                </p>
                 <p className="text-2xl font-bold">{businesses.length}</p>
               </div>
               <Building2 className="h-8 w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Active</p>
                 <p className="text-2xl font-bold text-green-600">
-                  {businesses.filter(b => b.status === 'active').length}
+                  {businesses.filter((b) => b.status === "active").length}
                 </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Pending</p>
                 <p className="text-2xl font-bold text-yellow-600">
-                  {businesses.filter(b => b.status === 'pending').length}
+                  {businesses.filter((b) => b.status === "pending").length}
                 </p>
               </div>
               <Clock className="h-8 w-8 text-yellow-500" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Premium</p>
                 <p className="text-2xl font-bold text-purple-600">
-                  {businesses.filter(b => b.isPremium).length}
+                  {businesses.filter((b) => b.isPremium).length}
                 </p>
               </div>
               <Star className="h-8 w-8 text-purple-500" />
@@ -400,19 +480,21 @@ const BusinessManagement: React.FC = () => {
                 />
               </div>
             </div>
-            
+
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-full sm:w-48">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Categories</SelectItem>
-                {categories.map(category => (
-                  <SelectItem key={category} value={category}>{category}</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            
+
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-48">
                 <SelectValue placeholder="Status" />
@@ -490,7 +572,7 @@ const BusinessManagement: React.FC = () => {
                           </div>
                         </div>
                       </TableCell>
-                      
+
                       <TableCell>
                         <div>
                           <p className="font-medium text-gray-900">
@@ -501,7 +583,7 @@ const BusinessManagement: React.FC = () => {
                           </p>
                         </div>
                       </TableCell>
-                      
+
                       <TableCell>
                         <Badge variant="outline">{business.category}</Badge>
                         {business.isPremium && (
@@ -510,18 +592,18 @@ const BusinessManagement: React.FC = () => {
                           </Badge>
                         )}
                       </TableCell>
-                      
+
                       <TableCell>
                         <div className="flex items-center gap-1 text-sm text-gray-600">
                           <MapPin className="w-3 h-3" />
                           {business.address.city}, {business.address.state}
                         </div>
                       </TableCell>
-                      
+
                       <TableCell>{getStatusBadge(business.status)}</TableCell>
-                      
+
                       <TableCell>{getSubscriptionBadge(business)}</TableCell>
-                      
+
                       <TableCell>
                         <div className="text-sm">
                           <div className="flex items-center gap-1">
@@ -534,14 +616,14 @@ const BusinessManagement: React.FC = () => {
                           </div>
                         </div>
                       </TableCell>
-                      
+
                       <TableCell>
                         <div className="flex items-center gap-1 text-sm text-gray-600">
                           <Calendar className="w-3 h-3" />
-                          {format(new Date(business.createdAt), 'MMM dd, yyyy')}
+                          {format(new Date(business.createdAt), "MMM dd, yyyy")}
                         </div>
                       </TableCell>
-                      
+
                       <TableCell onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -559,14 +641,14 @@ const BusinessManagement: React.FC = () => {
                               <Eye className="w-4 h-4 mr-2" />
                               View Details
                             </DropdownMenuItem>
-                            
-                            {business.status === 'pending' && (
+
+                            {business.status === "pending" && (
                               <DropdownMenuItem
                                 onClick={() =>
                                   setAlertDialog({
                                     open: true,
                                     business,
-                                    action: 'active',
+                                    action: "active",
                                   })
                                 }
                                 className="text-green-600"
@@ -575,14 +657,14 @@ const BusinessManagement: React.FC = () => {
                                 Approve
                               </DropdownMenuItem>
                             )}
-                            
-                            {business.status === 'active' && (
+
+                            {business.status === "active" && (
                               <DropdownMenuItem
                                 onClick={() =>
                                   setAlertDialog({
                                     open: true,
                                     business,
-                                    action: 'suspended',
+                                    action: "suspended",
                                   })
                                 }
                                 className="text-red-600"
@@ -591,14 +673,14 @@ const BusinessManagement: React.FC = () => {
                                 Suspend
                               </DropdownMenuItem>
                             )}
-                            
-                            {business.status === 'suspended' && (
+
+                            {business.status === "suspended" && (
                               <DropdownMenuItem
                                 onClick={() =>
                                   setAlertDialog({
                                     open: true,
                                     business,
-                                    action: 'active',
+                                    action: "active",
                                   })
                                 }
                                 className="text-green-600"
@@ -651,12 +733,18 @@ const BusinessManagement: React.FC = () => {
                         className="w-16 h-16 rounded-lg object-cover"
                       />
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg">{selectedBusiness.businessName}</h3>
-                        <p className="text-sm text-gray-600">{selectedBusiness.category}</p>
+                        <h3 className="font-semibold text-lg">
+                          {selectedBusiness.businessName}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {selectedBusiness.category}
+                        </p>
                         <div className="flex items-center gap-2 mt-1">
                           {getStatusBadge(selectedBusiness.status)}
                           {selectedBusiness.isPremium && (
-                            <Badge className="bg-purple-100 text-purple-800">Premium</Badge>
+                            <Badge className="bg-purple-100 text-purple-800">
+                              Premium
+                            </Badge>
                           )}
                           {selectedBusiness.verification.isVerified && (
                             <Badge className="bg-green-100 text-green-800">
@@ -667,12 +755,21 @@ const BusinessManagement: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2 text-sm">
-                      <p><span className="font-medium">Type:</span> {selectedBusiness.businessType}</p>
-                      <p><span className="font-medium">Description:</span> {selectedBusiness.description}</p>
+                      <p>
+                        <span className="font-medium">Type:</span>{" "}
+                        {selectedBusiness.businessType}
+                      </p>
+                      <p>
+                        <span className="font-medium">Description:</span>{" "}
+                        {selectedBusiness.description}
+                      </p>
                       {selectedBusiness.subCategory && (
-                        <p><span className="font-medium">Sub-category:</span> {selectedBusiness.subCategory}</p>
+                        <p>
+                          <span className="font-medium">Sub-category:</span>{" "}
+                          {selectedBusiness.subCategory}
+                        </p>
                       )}
                     </div>
                   </CardContent>
@@ -687,10 +784,14 @@ const BusinessManagement: React.FC = () => {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div>
-                      <p className="font-semibold">{selectedBusiness.vendor.name}</p>
-                      <p className="text-sm text-gray-600">{selectedBusiness.vendor.company}</p>
+                      <p className="font-semibold">
+                        {selectedBusiness.vendor.name}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {selectedBusiness.vendor.company}
+                      </p>
                     </div>
-                    
+
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-gray-400" />
@@ -719,7 +820,9 @@ const BusinessManagement: React.FC = () => {
                       {selectedBusiness.contactInfo.secondaryPhone && (
                         <div className="flex items-center gap-2">
                           <Phone className="w-4 h-4 text-gray-400" />
-                          <span>{selectedBusiness.contactInfo.secondaryPhone}</span>
+                          <span>
+                            {selectedBusiness.contactInfo.secondaryPhone}
+                          </span>
                         </div>
                       )}
                       {selectedBusiness.contactInfo.email && (
@@ -731,9 +834,9 @@ const BusinessManagement: React.FC = () => {
                       {selectedBusiness.contactInfo.website && (
                         <div className="flex items-center gap-2">
                           <Globe className="w-4 h-4 text-gray-400" />
-                          <a 
-                            href={selectedBusiness.contactInfo.website} 
-                            target="_blank" 
+                          <a
+                            href={selectedBusiness.contactInfo.website}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:underline"
                           >
@@ -756,10 +859,15 @@ const BusinessManagement: React.FC = () => {
                     <div className="text-sm">
                       <p>{selectedBusiness.address.street}</p>
                       <p>{selectedBusiness.address.area}</p>
-                      <p>{selectedBusiness.address.city}, {selectedBusiness.address.state}</p>
+                      <p>
+                        {selectedBusiness.address.city},{" "}
+                        {selectedBusiness.address.state}
+                      </p>
                       <p>PIN: {selectedBusiness.address.pincode}</p>
                       {selectedBusiness.address.landmark && (
-                        <p className="text-gray-600">Near: {selectedBusiness.address.landmark}</p>
+                        <p className="text-gray-600">
+                          Near: {selectedBusiness.address.landmark}
+                        </p>
                       )}
                     </div>
                   </CardContent>
@@ -804,7 +912,9 @@ const BusinessManagement: React.FC = () => {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                        <span className="font-semibold">{selectedBusiness.ratings.average.toFixed(1)}</span>
+                        <span className="font-semibold">
+                          {selectedBusiness.ratings.average.toFixed(1)}
+                        </span>
                         <span className="text-sm text-gray-600">
                           ({selectedBusiness.ratings.totalReviews} reviews)
                         </span>
@@ -812,7 +922,8 @@ const BusinessManagement: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <Shield className="w-4 h-4 text-blue-400" />
                         <span className="text-sm">
-                          Trust Score: {selectedBusiness.verification.trustScore}%
+                          Trust Score:{" "}
+                          {selectedBusiness.verification.trustScore}%
                         </span>
                       </div>
                     </div>
@@ -833,13 +944,13 @@ const BusinessManagement: React.FC = () => {
                     <div>
                       <span className="font-medium">Created:</span>
                       <p className="text-gray-600">
-                        {format(new Date(selectedBusiness.createdAt), 'PPP p')}
+                        {format(new Date(selectedBusiness.createdAt), "PPP p")}
                       </p>
                     </div>
                     <div>
                       <span className="font-medium">Last Updated:</span>
                       <p className="text-gray-600">
-                        {format(new Date(selectedBusiness.updatedAt), 'PPP p')}
+                        {format(new Date(selectedBusiness.updatedAt), "PPP p")}
                       </p>
                     </div>
                   </div>
@@ -851,12 +962,16 @@ const BusinessManagement: React.FC = () => {
       </Dialog>
 
       {/* Status Update Alert Dialog */}
-      <AlertDialog open={alertDialog.open} onOpenChange={(open) => setAlertDialog({ ...alertDialog, open })}>
+      <AlertDialog
+        open={alertDialog.open}
+        onOpenChange={(open) => setAlertDialog({ ...alertDialog, open })}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Status Change</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to change the status of "{alertDialog.business?.businessName}" to {alertDialog.action}?
+              Are you sure you want to change the status of "
+              {alertDialog.business?.businessName}" to {alertDialog.action}?
               This action will affect the business visibility and vendor access.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -865,7 +980,10 @@ const BusinessManagement: React.FC = () => {
             <AlertDialogAction
               onClick={() => {
                 if (alertDialog.business) {
-                  updateBusinessStatus(alertDialog.business._id, alertDialog.action);
+                  updateBusinessStatus(
+                    alertDialog.business._id,
+                    alertDialog.action
+                  );
                 }
               }}
             >
@@ -880,7 +998,10 @@ const BusinessManagement: React.FC = () => {
 
 // Helper function to get subscription badge
 const getSubscriptionBadge = (business: Business) => {
-  if (!business.currentSubscription || business.currentSubscription.status !== 'active') {
+  if (
+    !business.currentSubscription ||
+    business.currentSubscription.status !== "active"
+  ) {
     return (
       <Badge variant="outline" className="text-gray-600 border-gray-300">
         Free Plan
@@ -889,11 +1010,12 @@ const getSubscriptionBadge = (business: Business) => {
   }
 
   const { planName, priority, endDate } = business.currentSubscription;
-  const isExpiringSoon = new Date(endDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-  
+  const isExpiringSoon =
+    new Date(endDate) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
   let badgeClass = "bg-blue-100 text-blue-800";
   let icon = "💼";
-  
+
   if (priority >= 3) {
     badgeClass = "bg-purple-100 text-purple-800";
     icon = "👑";
@@ -908,7 +1030,10 @@ const getSubscriptionBadge = (business: Business) => {
         {icon} {planName}
       </Badge>
       {isExpiringSoon && (
-        <Badge variant="outline" className="text-orange-600 border-orange-300 text-xs">
+        <Badge
+          variant="outline"
+          className="text-orange-600 border-orange-300 text-xs"
+        >
           Expires Soon
         </Badge>
       )}

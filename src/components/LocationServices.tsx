@@ -220,10 +220,10 @@ const LocationServices: React.FC = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+          <h2 className="text-xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
             Nearby Services
           </h2>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-6">
+          <p className="text-gray-600 text-sm md:text-lg max-w-2xl mx-auto mb-6">
             Discover local businesses and services around you with real-time
             location data
           </p>
@@ -307,12 +307,16 @@ const LocationServices: React.FC = () => {
                   <div className="absolute top-3 left-3">
                     <Badge
                       variant={
-                        isBusinessOpen(business.businessHours) ? "default" : "secondary"
+                        isBusinessOpen(business.businessHours)
+                          ? "default"
+                          : "secondary"
                       }
                       className="bg-white/90 text-gray-800"
                     >
                       <Clock className="h-3 w-3 mr-1" />
-                      {isBusinessOpen(business.businessHours) ? "Open" : "Closed"}
+                      {isBusinessOpen(business.businessHours)
+                        ? "Open"
+                        : "Closed"}
                     </Badge>
                   </div>
                   <div className="absolute top-3 right-3">
@@ -385,7 +389,6 @@ const LocationServices: React.FC = () => {
                   </div>
 
                   {/* Travel Options */}
-                
                 </div>
               </div>
             ))
@@ -393,7 +396,6 @@ const LocationServices: React.FC = () => {
         </div>
 
         {/* Map Integration Note */}
-      
       </div>
     </section>
   );
