@@ -1,4 +1,4 @@
-// Business Categories for filtering and display
+// Legacy static categories - will be replaced by dynamic categories from API
 export const BUSINESS_CATEGORIES = [
   // A
   "Advertising Agencies",
@@ -160,6 +160,31 @@ export const BUSINESS_CATEGORIES = [
   "Zari & Embroidery Shops",
   "Zoological & Pet Services"
 ];
+
+// Types for dynamic categories
+export interface Category {
+  _id: string;
+  name: string;
+  description?: string;
+  image?: string;
+  isActive: boolean;
+  sortOrder: number;
+  subCategories?: SubCategory[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SubCategory {
+  _id: string;
+  name: string;
+  description?: string;
+  category: string | Category;
+  image?: string;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
 
 // Grouped categories for better organization
 export const CATEGORY_GROUPS = {

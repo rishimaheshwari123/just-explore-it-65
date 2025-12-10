@@ -39,25 +39,11 @@ import { business } from "../../service/apis";
 import GooglePlacesAutocomplete from "../../components/GooglePlacesAutocomplete";
 import { Camera, Globe, Mail, Phone, Share2, Upload } from "lucide-react";
 import { imageUpload } from "@/service/operations/image";
+import { useCategories, useSubCategories } from "@/hooks/useCategories";
+import { Combobox } from "@/components/ui/combobox";
 
-const BUSINESS_CATEGORIES = [
-  "Food & Dining",
-  "Healthcare",
-  "Education",
-  "Shopping",
-  "Hotels & Travel",
-  "Fitness & Wellness",
-  "Beauty & Spa",
-  "Electronics & Technology",
-  "Automotive",
-  "Real Estate",
-  "Financial Services",
-  "Professional Services",
-  "Home & Garden",
-  "Entertainment",
-  "Sports & Recreation",
-  "Government & Community",
-];
+// Static categories removed - now using dynamic categories from API
+
 const DAYS_OF_WEEK = [
   "monday",
   "tuesday",
@@ -158,6 +144,9 @@ const VendorEditBusiness = () => {
   const vendorId = user?._id;
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Dynamic categories hooks
+  const { categories, loading: categoriesLoading } = useCategories();
   const [formData, setFormData] = useState<BusinessFormData>({
     businessName: "",
     description: "",
@@ -209,6 +198,10 @@ const VendorEditBusiness = () => {
     amenities: [],
     priceRange: "",
   });
+
+  const { subCategories, loading: subCategoriesLoading } = useSubCategories(
+    formData.category ? categories.find(cat => cat.name === formData.category)?._id : undefined
+  );
 
   const [newService, setNewService] = useState({
     name: "",
@@ -752,33 +745,18 @@ const VendorEditBusiness = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="category">Category *</Label>
-                      <Select
+                      <Combobox
+                        options={categories.map(cat => ({ value: cat.name, label: cat.name }))}
                         value={formData.category}
-                        onValueChange={(value) =>
-                          handleInputChange("root", "category", value)
-                        }
-                      >
-                        <SelectTrigger
-                          className={`text-black bg-white border ${
-                            errors.category ? "border-red-500" : ""
-                          }`}
-                        >
-                          <SelectValue placeholder="Select category">
-                            {formData.category || "Select category"}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border">
-                          {BUSINESS_CATEGORIES.map((category) => (
-                            <SelectItem
-                              key={category}
-                              value={category}
-                              className="text-black hover:bg-gray-100 cursor-pointer"
-                            >
-                              {category}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        onValueChange={(value) => {
+                          handleInputChange("root", "category", value);
+                          handleInputChange("root", "subCategory", "");
+                        }}
+                        placeholder="Search and select category..."
+                        searchPlaceholder="Search categories..."
+                        emptyText="No categories found."
+                        disabled={categoriesLoading}
+                      />
                       {errors.category && (
                         <p className="text-red-500 text-sm mt-1">
                           {errors.category}

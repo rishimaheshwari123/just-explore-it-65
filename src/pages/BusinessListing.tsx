@@ -29,7 +29,7 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TopBar from "@/components/TopBar";
-import { BUSINESS_CATEGORIES } from "@/constants/categories";
+import { useCategories } from "@/hooks/useCategories";
 
 interface Business {
   _id: string;
@@ -122,7 +122,9 @@ const BusinessListing = () => {
   const [selectedDistance, setSelectedDistance] = useState("10"); // km
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
 
-  const categories = BUSINESS_CATEGORIES
+  // Dynamic categories hook
+  const { categories: dynamicCategories, loading: categoriesLoading } = useCategories();
+  const categories = dynamicCategories.map(cat => cat.name);
 
   const locations = [
     "Mumbai",

@@ -19,7 +19,7 @@ import {
   Clock,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { BUSINESS_CATEGORIES } from "@/constants/categories";
+import { useCategories } from "@/hooks/useCategories";
 
 interface Business {
   _id: string;
@@ -105,7 +105,9 @@ const BusinessListing: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>("rating");
   const [priceFilter, setPriceFilter] = useState<string>("all");
 
-  const categories = BUSINESS_CATEGORIES;
+  // Dynamic categories hook
+  const { categories: dynamicCategories, loading: categoriesLoading } = useCategories();
+  const categories = dynamicCategories.map(cat => cat.name);
   const fetchBusinesses = async () => {
     setLoading(true);
     try {

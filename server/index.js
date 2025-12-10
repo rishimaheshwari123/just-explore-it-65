@@ -49,6 +49,7 @@ app.use("/api/v1/ads", require("./routes/adsRoute"));
 app.use("/api/v1/subscription", require("./routes/subscriptionRoutes"));
 app.use("/api/v1/razorpay", require("./routes/razorpayRoute"))
 app.use("/api/v1/hero-carousel", require("./routes/heroCarouselRoute"))
+app.use("/api/v1", require("./routes/categoryRoute"))
 // Dynamic sitemap
 app.use("/sitemap.xml", require("./routes/sitemapRoute"))
 

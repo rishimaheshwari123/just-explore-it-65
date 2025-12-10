@@ -45,6 +45,7 @@ import UsersManagement from "./pages/admin/UsersManagement";
 import SubscriptionLogs from "./pages/admin/SubscriptionLogs";
 import CreateAdd from "./pages/admin/CreateAdd";
 import HeroCarousel from "./pages/admin/HeroCarousel";
+import CategoryManagement from "./pages/admin/CategoryManagement";
 import VerifyEmail from "./pages/VerifyEmail";
 import SubscriptionPage from "./pages/SubscriptionPage";
 import VendorSubscriptions from "./pages/vendor/VendorSubscriptions";
@@ -215,6 +216,15 @@ const App = () => {
                     <PrivateRoute>
                       {/* Allow both admin and super_admin without special permission */}
                       <HeroCarousel />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="categories"
+                  element={
+                    <PrivateRoute>
+                      {/* Allow both admin and super_admin to manage categories */}
+                      <CategoryManagement />
                     </PrivateRoute>
                   }
                 />

@@ -9,11 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { useCategories, useSubCategories } from "@/hooks/useCategories";
 import {
   ArrowLeft,
   Save,
@@ -233,6 +235,12 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const [loading, setLoading] = useState(false);
+  
+  // Dynamic categories hooks
+  const { categories, loading: categoriesLoading } = useCategories();
+  const { subCategories, loading: subCategoriesLoading } = useSubCategories(
+    formData.category ? categories.find(cat => cat.name === formData.category)?._id : undefined
+  );
 
   const [formData, setFormData] = useState<BusinessFormData>({
     businessName: "",
@@ -655,47 +663,42 @@ const BusinessForm: React.FC<BusinessFormProps> = ({ businessId, mode }) => {
 
                 <div>
                   <Label htmlFor="category">Category *</Label>
-                  <Select
+                  <Combobox
+                    options={categories.map(cat => ({ value: cat.name, label: cat.name }))}
                     value={formData.category}
                     onValueChange={(value) => {
                       handleInputChange("root", "category", value);
                       handleInputChange("root", "subCategory", "");
                     }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {BUSINESS_CATEGORIES.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Search and select category..."
+                    searchPlaceholder="Search categories..."
+                    emptyText="No categories found."
+                    disabled={categoriesLoading}
+                  />
+                  {categoriesLoading && (
+                    <p className="text-sm text-gray-500 mt-1">Loading categories...</p>
+                  )}
                 </div>
 
                 <div>
                   <Label htmlFor="subCategory">Sub Category *</Label>
-                  <Select
+                  <Combobox
+                    options={subCategories.map(subCat => ({ value: subCat.name, label: subCat.name }))}
                     value={formData.subCategory}
                     onValueChange={(value) =>
                       handleInputChange("root", "subCategory", value)
                     }
-                    disabled={!formData.category}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select sub category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {formData.category &&
-                        SUBCATEGORIES[formData.category]?.map((subCategory) => (
-                          <SelectItem key={subCategory} value={subCategory}>
-                            {subCategory}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                    placeholder="Search and select subcategory..."
+                    searchPlaceholder="Search subcategories..."
+                    emptyText="No subcategories found."
+                    disabled={!formData.category || subCategoriesLoading}
+                  />
+                  {subCategoriesLoading && (
+                    <p className="text-sm text-gray-500 mt-1">Loading subcategories...</p>
+                  )}
+                  {!formData.category && (
+                    <p className="text-sm text-gray-500 mt-1">Please select a category first.</p>
+                  )}
                 </div>
 
                 <div>

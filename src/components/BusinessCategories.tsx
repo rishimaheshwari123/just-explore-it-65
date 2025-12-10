@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { BUSINESS_CATEGORIES } from "@/constants/categories";
+import { useCategories } from "@/hooks/useCategories";
 
 import {
   Megaphone,
@@ -222,23 +222,47 @@ export const categoryIcons = {
 const BusinessCategories = () => {
   const [showAll, setShowAll] = useState(false);
   const navigate = useNavigate();
+  
+  // Dynamic categories hook
+  const { categories: dynamicCategories, loading } = useCategories();
 
   const handleCategoryClick = (categoryName: string) => {
     // Navigate to properties page with category filter
     navigate(`/business-listing?category=${encodeURIComponent(categoryName)}`);
   };
 
-  const categories = BUSINESS_CATEGORIES.map((categoryName) => ({
-    name: categoryName,
+  const categories = dynamicCategories.map((category) => ({
+    name: category.name,
+    image: category.image,
     icon:
-      categoryIcons[categoryName as keyof typeof categoryIcons]?.icon ||
+      categoryIcons[category.name as keyof typeof categoryIcons]?.icon ||
       Briefcase,
     color:
-      categoryIcons[categoryName as keyof typeof categoryIcons]?.color ||
+      categoryIcons[category.name as keyof typeof categoryIcons]?.color ||
       "text-gray-500",
   }));
 
   const visibleCategories = showAll ? categories : categories.slice(0, 12);
+
+  if (loading) {
+    return (
+      <section className=" bg-gradient-to-br from-muted/30 via-background to-muted/20">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex flex-col items-center justify-between p-3 md:p-4 min-h-[100px] md:min-h-[120px] bg-white/60 backdrop-blur-sm border border-white/30 rounded-xl shadow-md animate-pulse"
+              >
+                <div className="w-7 h-7 md:w-10 md:h-10 bg-gray-300 rounded-full"></div>
+                <div className="mt-2 w-full h-4 bg-gray-300 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className=" bg-gradient-to-br from-muted/30 via-background to-muted/20">
@@ -272,11 +296,19 @@ hover:bg-white/90 hover:border-purple-300
 rounded-xl shadow-md hover:shadow-xl"
                 onClick={() => handleCategoryClick(category.name)}
               >
-                {/* ✅ ICON */}
+                {/* ✅ IMAGE OR ICON */}
                 <div className="p-2 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-sm group-hover:shadow-md transition-all duration-300">
-                  <IconComponent
-                    className={`${category.color} group-hover:scale-110 transition-transform duration-300`}
-                  />
+                  {category.image ? (
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-7 h-7 md:w-10 md:h-10 object-cover rounded-full group-hover:scale-110 transition-transform duration-300"
+                    />
+                  ) : (
+                    <IconComponent
+                      className={`${category.color} group-hover:scale-110 transition-transform duration-300`}
+                    />
+                  )}
                 </div>
 
                 {/* ✅ CATEGORY NAME */}
